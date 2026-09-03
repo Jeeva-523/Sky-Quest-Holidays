@@ -1,0 +1,36 @@
+<!-- Header & Navigation Bar -->
+<header class="navbar">
+  <div class="container nav-container">
+    <div class="brand-logo-container">
+      <a href="index.html" class="brand-logo-img-link" title="Sky Quest Home" onclick="if(window.location.pathname.includes('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/')) { window.scrollTo({top: 0, behavior: 'smooth'}); return false; }">
+        <img src="images/logo.png" alt="Sky Quest Emblem Logo" class="logo-icon-img" />
+      </a>
+      <div class="brand-text-wrapper">
+        <div class="brand-title">
+          <span class="sky-part">SKY</span><span class="quest-part">QUEST</span>
+        </div>
+        <div class="brand-subtitle">— HOLIDAYS —</div>
+      </div>
+    </div>
+
+    <ul class="nav-links" id="navLinks">
+      <li class="mobile-nav-header">
+        <span class="mobile-nav-title">Menu</span>
+        <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close menu">✕</button>
+      </li>
+      <li><a href="index.html" class="nav-link active">Home</a></li>
+      <li><a href="index.html#packages" class="nav-link">Destinations</a></li>
+      <li><a href="gallery.html" class="nav-link">Gallery 📸</a></li>
+      <li><a href="index.html#about" class="nav-link">About</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <a href="tel:+917338710611" class="btn btn-outline btn-nav-call">
+        📞 +91 73387 10611
+      </a>
+      <a href="#contact" class="btn btn-primary">Enquire Now</a>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">☰</button>
+    </div>
+  </div>
+</header>
+<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>

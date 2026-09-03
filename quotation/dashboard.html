@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>SkyQuest Holidays - Quotation Generator Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body>
+
+  <!-- Top Action & Tab Bar -->
+  <header class="top-action-tabs-bar">
+    <div class="form-tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-client', this)">🏢 Client & Header Details</button>
+      <button class="tab-btn" onclick="switchTab('tab-itinerary', this)">📄 Daily Pages (Add/Remove)</button>
+      <button class="tab-btn" onclick="switchTab('tab-food', this)">🍽️ Food & Package Pricing</button>
+      <button class="tab-btn" onclick="switchTab('tab-terms', this)">📋 Terms & Contact Info</button>
+      <button class="tab-btn" onclick="switchTab('tab-history', this)">📚 Quotation History (<span id="history-count-badge">0</span>)</button>
+    </div>
+
+    <div class="header-actions">
+      <div class="status-badge" id="live-page-badge">
+        <div class="status-dot"></div>
+        <span id="page-count-text">Active Pages: 5 Pages (2 Day Pages Dedicated)</span>
+      </div>
+
+      <button class="btn btn-green" id="btn-save-main" onclick="saveQuotationData()">
+        💾 Save Quotation
+      </button>
+
+      <a href="index.html" target="_blank" class="btn btn-sky" id="btn-preview-link" onclick="updatePreview()">
+        👁️ PDF Preview
+      </a>
+
+      <button class="btn btn-gold" id="btn-print-main" onclick="printQuotation()">
+        🖨️ Print / Save PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- Dashboard Container -->
+  <div class="dashboard-container">
+
+    <!-- Form Control Panel -->
+    <div class="form-panel">
+      <div class="form-body">
+
+        <!-- Tab 1: Client Details -->
+        <div class="tab-content active" id="tab-client">
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="inp-location">📍 PICKUP / DROP LOCATION</label>
+              <input type="text" id="inp-location" class="form-input" title="Pickup / Drop Location" placeholder="Enter Pickup / Drop Location"
+                value="Erode, Tamil Nadu" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+              <label for="inp-ref-no">🔖 QUOTATION REFERENCE NO.</label>
+              <input type="text" id="inp-ref-no" class="form-input" title="Quotation Reference No."
+                placeholder="Enter Reference No." value="SQH/QT/2026/SKY-109" oninput="updatePreview()">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="inp-destination">📍 DESTINATION</label>
+              <input type="text" id="inp-destination" class="form-input" title="Destination"
+                placeholder="Enter Destination" value="Bengaluru & Coorg" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+              <label for="inp-duration-text">⏱️ DURATION / STAY</label>
+              <input type="text" id="inp-duration-text" class="form-input" title="Duration / Stay"
+                placeholder="Enter Duration" value="2 Days / 3 Nights" oninput="updatePreview()">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="inp-pax">👥 GROUP PAX COUNT</label>
+              <input type="text" id="inp-pax" class="form-input" title="Group Pax Count" placeholder="Enter Pax Count"
+                value="90 Students + 4 Staff" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+              <label for="inp-dates">📅 TRAVEL DATES RANGE <span class="label-subtext">(Optional - Leave empty to hide)</span></label>
+              <input type="text" id="inp-dates" class="form-input" title="Travel Dates" placeholder="e.g. Sept 16 (Night) – Sept 19, 2026"
+                value="Sept 16 (Night) – Sept 19, 2026" oninput="updatePreview()">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="inp-tour-type">📌 TOUR TYPE / EXPEDITION THEME</label>
+              <input type="text" id="inp-tour-type" class="form-input" title="Tour Type / Expedition Theme" placeholder="Enter Tour Type"
+                value="Industrial Visit & Nature Expedition" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+              <label for="inp-quote-date">📅 QUOTATION DATE (SELECT MONTH)</label>
+              <select id="inp-quote-date" class="form-select form-input" title="Quotation Date" onchange="updatePreview()">
+                <option value="September 2026" selected>September 2026</option>
+                <option value="August 2026">August 2026</option>
+                <option value="October 2026">October 2026</option>
+                <option value="November 2026">November 2026</option>
+                <option value="December 2026">December 2026</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="inp-validity">⌛ QUOTATION VALIDITY</label>
+              <input type="text" id="inp-validity" class="form-input" title="Quotation Validity" placeholder="Enter Validity"
+                value="15 Days from issuance" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+              <label for="inp-prepared-by">✍️ PREPARED BY (TEAM / WING)</label>
+              <input type="text" id="inp-prepared-by" class="form-input" title="Prepared By" placeholder="Enter Prepared By"
+                value="SkyQuest Tour Operations Wing" oninput="updatePreview()">
+            </div>
+          </div>
+
+
+
+          <!-- Page 1 Trip Highlights Toggle & Cloudinary CDN Section -->
+          <div class="gallery-control-box">
+            <div class="gallery-control-header">
+              <div>
+                <div class="gallery-control-title">
+                  🏞️ Fleet & Trip Highlights Showcase
+                </div>
+                <div class="gallery-control-subtitle">
+                  Enable or disable the 4-photo Fleet & Trip Highlights section on Page 1
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="chk-show-gallery" title="Toggle Fleet & Trip Highlights Showcase" checked onchange="toggleGalleryShowcase()">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <!-- BULK UPLOAD DROPZONE -->
+            <div class="bulk-upload-zone" id="bulk-upload-dropzone" onclick="document.getElementById('bulk-file-input').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+              <div class="bulk-upload-icon">📸</div>
+              <div class="bulk-upload-title">
+                Click or Drag & Drop Photos Here to Bulk Upload (1 to 4 Photos)
+              </div>
+              <div class="bulk-upload-subtext">
+                Select multiple photos at once. Auto-compresses & syncs with Page 1 Photo Showcase!
+              </div>
+              <div class="bulk-upload-tip">
+                📱 <strong>Mobile Phone / USB Tip:</strong> If Windows blocks selecting multiple files directly from your phone, copy photos to your PC Desktop first, OR pick photos 1-by-1 (they will auto-fill Slots #1, #2, #3, #4 sequentially)!
+              </div>
+              <input type="file" id="bulk-file-input" class="hidden-input" accept="image/*" multiple onchange="handleBulkInputChange(event)" title="Bulk upload photos">
+            </div>
+
+            <!-- DASHBOARD LIVE PHOTO GALLERY MANAGER -->
+            <div class="gallery-manager-wrapper">
+              <div class="gallery-manager-header">
+                <span class="gallery-manager-title">👁️ Uploaded Photo Gallery Manager:</span>
+                <div class="gallery-manager-actions">
+                  <button type="button" class="btn btn-outline btn-clear-all" onclick="clearAllGalleryPhotos()">🗑️ Clear All Photos</button>
+                  <button type="button" class="btn btn-outline btn-reset-default" onclick="resetDefaultGallery()">🔄 Reset Default Photos</button>
+                </div>
+              </div>
+              <div id="dash-gallery-preview-container" class="gallery-live-preview-grid">
+                <!-- Dynamically rendered visual photo cards -->
+              </div>
+            </div>
+
+            <div id="gallery-inputs-wrapper" class="gallery-inputs-wrapper">
+              <span class="gallery-inputs-title">Advanced Photo URLs & Individual Slot Uploads:</span>
+
+              <!-- Upload Item 1 -->
+              <div class="upload-item-card">
+                <img id="thumb-img-1" src="group_bus.jpg" alt="Thumb 1" class="upload-thumb-img" onerror="this.src='https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&auto=format&fit=crop'">
+                <div class="upload-item-content">
+                  <label for="inp-img-1" class="upload-item-label">Image 1 (Group Photo):</label>
+                  <div class="upload-item-inputs">
+                    <input type="text" id="inp-img-1" class="form-input form-input-sm" value="group_bus.jpg" oninput="updatePreview(); renderDashboardGalleryPreview();">
+                    <label class="btn-file-upload">
+                      📁 Replace <input type="file" id="file-input-1" class="hidden-input" accept="image/*" onchange="handleFileUpload(1, event)">
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Upload Item 2 -->
+              <div class="upload-item-card">
+                <img id="thumb-img-2" src="bus_night.jpg" alt="Thumb 2" class="upload-thumb-img" onerror="this.src='https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=200&auto=format&fit=crop'">
+                <div class="upload-item-content">
+                  <label for="inp-img-2" class="upload-item-label">Image 2 (Luxury Bus Photo):</label>
+                  <div class="upload-item-inputs">
+                    <input type="text" id="inp-img-2" class="form-input form-input-sm" value="bus_night.jpg" oninput="updatePreview(); renderDashboardGalleryPreview();">
+                    <label class="btn-file-upload">
+                      📁 Replace <input type="file" id="file-input-2" class="hidden-input" accept="image/*" onchange="handleFileUpload(2, event)">
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Upload Item 3 -->
+              <div class="upload-item-card">
+                <img id="thumb-img-3" src="cruise.jpg" alt="Thumb 3" class="upload-thumb-img" onerror="this.src='https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=200&auto=format&fit=crop'">
+                <div class="upload-item-content">
+                  <label for="inp-img-3" class="upload-item-label">Image 3 (Harbor Cruise Photo):</label>
+                  <div class="upload-item-inputs">
+                    <input type="text" id="inp-img-3" class="form-input form-input-sm" value="cruise.jpg" oninput="updatePreview(); renderDashboardGalleryPreview();">
+                    <label class="btn-file-upload">
+                      📁 Replace <input type="file" id="file-input-3" class="hidden-input" accept="image/*" onchange="handleFileUpload(3, event)">
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Upload Item 4 -->
+              <div class="upload-item-card">
+                <img id="thumb-img-4" src="safari.jpg" alt="Thumb 4" class="upload-thumb-img" onerror="this.src='https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=200&auto=format&fit=crop'">
+                <div class="upload-item-content">
+                  <label for="inp-img-4" class="upload-item-label">Image 4 (Jeep Safari Photo):</label>
+                  <div class="upload-item-inputs">
+                    <input type="text" id="inp-img-4" class="form-input form-input-sm" value="safari.jpg" oninput="updatePreview(); renderDashboardGalleryPreview();">
+                    <label class="btn-file-upload">
+                      📁 Replace <input type="file" id="file-input-4" class="hidden-input" accept="image/*" onchange="handleFileUpload(4, event)">
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Tab 2: Daily Pages -->
+        <div class="tab-content" id="tab-itinerary">
+          <div class="day-pages-bar">
+            <div class="day-pages-title">
+              📄 DEDICATED DAY PAGES (1 DAY = 1 PAGE)
+            </div>
+            <button class="btn btn-sky btn-sm-pad" onclick="addNewDayCard()">
+              ➕ Add Day Page
+            </button>
+          </div>
+
+          <div id="day-cards-list" class="day-cards-wrapper"></div>
+        </div>
+
+        <!-- Tab 3: Food Option & Pricing -->
+        <div class="tab-content" id="tab-food">
+          <div class="form-group meal-plan-card">
+            <label for="inp-food-option" class="meal-plan-label">🍽️ MEAL PLAN SELECTION (COVER & PRICE PAGE BADGE)</label>
+            <input type="text" id="inp-food-option" class="form-input meal-plan-select" title="Meal Plan Selection"
+              placeholder="e.g. 🍵 DAY 02 FOOD INCLUDED or 🍽️ WITH FOOD" value="🍵 DAY 02 FOOD INCLUDED" oninput="updatePreview()">
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="inp-rate">💰 Package Rate Per Head (₹)</label>
+              <input type="text" id="inp-rate" class="form-input" title="Package Rate Per Head" placeholder="Enter Rate"
+                value="₹4,500 /-" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+              <label for="inp-rate-cond">📋 Rate Condition</label>
+              <input type="text" id="inp-rate-cond" class="form-input" title="Rate Condition"
+                placeholder="Enter Rate Condition" value="Based on 80 Pax + 4 Staff (Complementary)" oninput="updatePreview()">
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Terms & Contact -->
+        <div class="tab-content" id="tab-terms">
+          <div class="form-group">
+            <label for="inp-phone">📞 Phone / WhatsApp</label>
+            <input type="text" id="inp-phone" class="form-input" title="Phone / WhatsApp" placeholder="Enter Phone"
+              value="+91 73387 10611 / +91 63818 25934" oninput="updatePreview()">
+          </div>
+
+          <div class="form-group">
+            <label for="inp-email">✉️ Official Email</label>
+            <input type="text" id="inp-email" class="form-input" title="Official Email" placeholder="Enter Email"
+              value="skyquestholidays@gmail.com" oninput="updatePreview()">
+          </div>
+
+          <div class="form-group">
+            <label for="inp-web">🌐 Website URL</label>
+            <input type="text" id="inp-web" class="form-input" title="Website URL" placeholder="Enter Website"
+              value="sky-quest-holidays.web.app" oninput="updatePreview()">
+          </div>
+        </div>
+
+        <!-- Tab 5: Quotation History (Last 10 Days) -->
+        <div class="tab-content" id="tab-history">
+          <div class="history-header-box">
+            <div class="history-header-title-group">
+              <span class="history-header-title">📚 SAVED QUOTATIONS HISTORY (LAST 10 DAYS)</span>
+              <span class="history-header-subtitle">Matches by Quotation Reference No (🔖). Edit & Save updates existing quotation without duplicates.</span>
+            </div>
+            <div class="history-header-controls">
+              <input type="text" id="inp-search-history" class="form-input form-input-search" placeholder="🔍 Search Ref No / Client..." oninput="renderHistoryCards()">
+              <button class="btn btn-danger btn-clear-history" onclick="clearAllHistory()">🗑️ Clear</button>
+            </div>
+          </div>
+
+          <div id="history-cards-list" class="history-cards-list">
+            <!-- History Card Items dynamically rendered here -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Hidden Print Frame -->
+    <iframe id="preview-frame" title="Live Quotation Document Preview" src="index.html?v=6" class="page-hidden"></iframe>
+
+  </div>
+
+  <script>
+    let daysData = [
+      {
+        dayNum: 1,
+        title: "DAY 01: Bangalore",
+        subtitle: "Experiencing Bangalore Industry",
+        destination: "Bangalore Expedition",
+        mealPlan: "WITHOUT FOOD",
+        transport: "52-Seater Luxury Bus",
+        spotsText: "SPOT 01 | Bangalore Event Palace Drop\nSPOT 02 | Evening 3 PM Start Towards COORG\nSPOT 03 | Night Stay at Coorg"
+      },
+      {
+        dayNum: 2,
+        title: "DAY 02: Coorg",
+        subtitle: "Culture, Shopping, Mountain Drive & Night DJ",
+        destination: "Coorg Highlands",
+        mealPlan: "WITH FOOD",
+        transport: "52-Seater Luxury Bus",
+        spotsText: "SPOT 01 | Breakfast 🍱\nSPOT 02 | Golden Temple\nSPOT 03 | Chikole Dam\nSPOT 04 | Lunch 😋\nSPOT 05 | Nisargadhama Forest\nSPOT 06 | Shopping\nSPOT 07 | Harangi Dam Light Show\nSPOT 08 | Dj Hangover\nSPOT 09 | Dinner 🍽️"
+      }
+    ];
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        const attr = btn.getAttribute('onclick') || '';
+        if (attr.includes(tabId)) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      document.querySelectorAll('.tab-content').forEach(content => {
+        if (content.id === tabId) {
+          content.classList.add('active');
+        } else {
+          content.classList.remove('active');
+        }
+      });
+
+      if (tabId === 'tab-history') {
+        renderHistoryCards();
+      }
+    }
+
+    const HISTORY_STORAGE_KEY = 'skyquest_quotations_history_list_v1';
+
+    function getHistoryList() {
+      try {
+        const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return filterLast10Days(parsed);
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function filterLast10Days(list) {
+      const tenDaysMs = 10 * 24 * 60 * 60 * 1000;
+      const now = Date.now();
+      return list.filter(item => {
+        if (!item.savedAt) return false;
+        const time = new Date(item.savedAt).getTime();
+        return !isNaN(time) && (now - time <= tenDaysMs);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function renderHistoryCards() {
+      const container = document.getElementById('history-cards-list');
+      const badge = document.getElementById('history-count-badge');
+      const searchInput = document.getElementById('inp-search-history');
+      if (!container) return;
+
+      let list = getHistoryList();
+      if (badge) badge.innerText = list.length;
+
+      const query = (searchInput?.value || '').trim().toLowerCase();
+      if (query.length > 0) {
+        list = list.filter(item => {
+          const ref = (item.refNo || '').toLowerCase();
+          const client = (item.clientName || '').toLowerCase();
+          const dest = (item.destination || '').toLowerCase();
+          return ref.includes(query) || client.includes(query) || dest.includes(query);
+        });
+      }
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="history-empty-box">
+            ${query ? '🔍 No matching quotations found for "' + escapeHtml(query) + '"' : '📭 No quotations saved in the last 10 days.<br>Click \'💾 Save Quotation\' above to save quotations into history.'}
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map((item) => {
+        const dateStr = item.savedAt ? new Date(item.savedAt).toLocaleString('en-IN', {
+          day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true
+        }) : 'Recent';
+
+        const itemId = escapeHtml(item.id || item.refNo);
+        let displayTitle = item.locationText || item.clientName;
+        if (!displayTitle || displayTitle === 'Untitled Client') {
+          displayTitle = (item.fullData && item.fullData.locationText) ? item.fullData.locationText : 'Untitled Location';
+        }
+
+        return `
+          <div class="history-card">
+            <div class="history-info">
+              <div class="history-client">📍 ${escapeHtml(displayTitle)}</div>
+              <div class="history-meta-row">
+                <span class="history-badge-tag">🔖 ${escapeHtml(item.refNo || 'REF: N/A')}</span>
+                <span>📍 ${escapeHtml(item.destination || 'N/A')}</span>
+                <span>👥 ${escapeHtml(item.paxText || 'N/A')}</span>
+                <span>💰 ${escapeHtml(item.rate || 'N/A')}</span>
+                <span class="history-date-stamp">🕒 ${dateStr}</span>
+              </div>
+            </div>
+            <div class="history-actions-row">
+              <button class="btn btn-sky btn-sm-pad" onclick="loadQuotationFromHistoryById('${itemId}')">
+                ✏️ Edit
+              </button>
+              <button class="btn btn-green btn-sm-pad" onclick="previewQuotationFromHistoryById('${itemId}')">
+                👁️ Preview
+              </button>
+              <button class="btn btn-danger btn-sm-pad" onclick="deleteQuotationFromHistoryById('${itemId}')">
+                🗑️
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getCurrentFormData() {
+      const paxValue = document.getElementById('inp-pax')?.value || '80 Students + 4 Staff (Complementary)';
+      const showGallery = document.getElementById('chk-show-gallery')?.checked || false;
+
+      return {
+        clientName: document.getElementById('inp-client-name')?.value || '',
+        refNo: document.getElementById('inp-ref-no')?.value || '',
+        destination: document.getElementById('inp-destination')?.value || '',
+        durationText: document.getElementById('inp-duration-text')?.value || '',
+        paxText: paxValue,
+        datesText: document.getElementById('inp-dates')?.value || '',
+        locationText: document.getElementById('inp-location')?.value || 'Thiruchengode, Tamil Nadu',
+        foodOption: document.getElementById('inp-food-option')?.value || 'day-02-food',
+        rate: document.getElementById('inp-rate')?.value || '',
+        rateCond: document.getElementById('inp-rate-cond')?.value || '',
+        phone: document.getElementById('inp-phone')?.value || '',
+        email: document.getElementById('inp-email')?.value || '',
+        web: document.getElementById('inp-web')?.value || '',
+        showGallery: showGallery,
+        galleryImages: {
+          img1: document.getElementById('inp-img-1') ? document.getElementById('inp-img-1').value.trim() : '',
+          img2: document.getElementById('inp-img-2') ? document.getElementById('inp-img-2').value.trim() : '',
+          img3: document.getElementById('inp-img-3') ? document.getElementById('inp-img-3').value.trim() : '',
+          img4: document.getElementById('inp-img-4') ? document.getElementById('inp-img-4').value.trim() : ''
+        },
+        daysData: daysData.map((d, idx) => ({
+          dayNum: idx + 1,
+          title: d.title,
+          subtitle: d.subtitle,
+          destination: d.destination,
+          mealPlan: d.mealPlan || (idx === 0 ? 'WITHOUT FOOD' : 'WITH FOOD'),
+          transport: d.transport || '52-Seater Luxury Bus',
+          pax: paxValue,
+          spots: parseSpotsText(d.spotsText),
+          spotsText: d.spotsText
+        }))
+      };
+    }
+
+    function saveQuotationData() {
+      updatePreview();
+      const currentData = getCurrentFormData();
+
+      let list = getHistoryList();
+      const refKey = (currentData.refNo || '').trim().toLowerCase();
+
+      // Find existing item by Quotation Reference No (refNo)
+      const existingIdx = list.findIndex(item => {
+        const itemRef = (item.refNo || '').trim().toLowerCase();
+        if (refKey.length > 0 && itemRef.length > 0) {
+          return itemRef === refKey;
+        }
+        return false;
+      });
+
+      const titleName = currentData.locationText || currentData.clientName || 'Untitled Location';
+      const historyItem = {
+        id: currentData.refNo ? currentData.refNo.trim() : ('QT-' + Date.now()),
+        clientName: titleName,
+        locationText: currentData.locationText || '',
+        refNo: currentData.refNo || '',
+        destination: currentData.destination || '',
+        paxText: currentData.paxText || '',
+        rate: currentData.rate || '',
+        savedAt: new Date().toISOString(),
+        fullData: currentData
+      };
+
+      let isUpdated = false;
+      if (existingIdx >= 0) {
+        // Update existing record in-place! No duplicates created!
+        list[existingIdx] = historyItem;
+        isUpdated = true;
+      } else {
+        list.unshift(historyItem);
+      }
+
+      list = filterLast10Days(list);
+
+      try {
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(list));
+      } catch (e) {}
+
+      renderHistoryCards();
+
+      const btn = document.getElementById('btn-save-main');
+      if (btn) {
+        const orig = btn.innerHTML;
+        btn.innerHTML = isUpdated ? '✅ Quotation Updated!' : '✅ Saved to History!';
+        btn.style.background = 'linear-gradient(135deg, #22C55E, #16A34A)';
+        setTimeout(() => {
+          btn.innerHTML = orig;
+          btn.style.background = 'linear-gradient(135deg, #16a34a, #15803d)';
+        }, 2000);
+      }
+
+      const msg = isUpdated
+        ? `🔄 Existing Quotation Updated!\n\nReference No: ${historyItem.refNo}\nLocation: ${historyItem.clientName}\n\nThe existing quotation record has been updated in history without creating duplicate entries.`
+        : `💾 New Quotation Saved to History!\n\nReference No: ${historyItem.refNo}\nLocation: ${historyItem.clientName}\n\nYou can access and edit this saved quotation anytime under the '📚 Quotation History' tab.`;
+
+      alert(msg);
+    }
+
+    function loadQuotationFromHistoryById(id) {
+      const list = getHistoryList();
+      const item = list.find(it => it.id === id || (it.refNo && it.refNo.trim() === id.trim()));
+      if (!item || !item.fullData) return;
+
+      populateDashboardForm(item.fullData);
+      switchTab('tab-client');
+      updatePreview();
+
+      const titleText = item.locationText || item.clientName || (item.fullData && item.fullData.locationText) || 'Untitled Location';
+      alert(`✏️ Loaded Quotation: "${titleText}" (Ref: ${item.refNo})\n\nYou can now make edits. Clicking 'Save Quotation' will update this exact Reference No without creating a duplicate.`);
+    }
+
+    function previewQuotationFromHistoryById(id) {
+      const list = getHistoryList();
+      const item = list.find(it => it.id === id || (it.refNo && it.refNo.trim() === id.trim()));
+      if (!item || !item.fullData) return;
+
+      populateDashboardForm(item.fullData);
+      updatePreview();
+      window.open('index.html', '_blank');
+    }
+
+    function deleteQuotationFromHistoryById(id) {
+      let list = getHistoryList();
+      const item = list.find(it => it.id === id || (it.refNo && it.refNo.trim() === id.trim()));
+      if (!item) return;
+
+      if (confirm(`Are you sure you want to delete quotation "${item.clientName}" (${item.refNo})?`)) {
+        list = list.filter(it => it.id !== id && it.refNo !== id);
+        try {
+          localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(list));
+        } catch (e) {}
+        renderHistoryCards();
+      }
+    }
+
+    function clearAllHistory() {
+      if (confirm('Are you sure you want to clear all saved quotation history?')) {
+        localStorage.removeItem(HISTORY_STORAGE_KEY);
+        renderHistoryCards();
+      }
+    }
+
+    function populateDashboardForm(data) {
+      if (!data) return;
+      if (data.clientName !== undefined && document.getElementById('inp-client-name')) document.getElementById('inp-client-name').value = data.clientName;
+      if (data.refNo !== undefined && document.getElementById('inp-ref-no')) document.getElementById('inp-ref-no').value = data.refNo;
+      if (data.destination !== undefined && document.getElementById('inp-destination')) document.getElementById('inp-destination').value = data.destination;
+      if (data.durationText !== undefined && document.getElementById('inp-duration-text')) document.getElementById('inp-duration-text').value = data.durationText;
+      if (data.paxText !== undefined && document.getElementById('inp-pax')) document.getElementById('inp-pax').value = data.paxText;
+      if (data.datesText !== undefined && document.getElementById('inp-dates')) document.getElementById('inp-dates').value = data.datesText;
+      if (data.locationText !== undefined && document.getElementById('inp-location')) document.getElementById('inp-location').value = data.locationText;
+      if (data.foodOption !== undefined && document.getElementById('inp-food-option')) document.getElementById('inp-food-option').value = data.foodOption;
+      if (data.rate !== undefined && document.getElementById('inp-rate')) document.getElementById('inp-rate').value = data.rate;
+      if (data.rateCond !== undefined && document.getElementById('inp-rate-cond')) document.getElementById('inp-rate-cond').value = data.rateCond;
+      if (data.phone !== undefined && document.getElementById('inp-phone')) document.getElementById('inp-phone').value = data.phone;
+      if (data.email !== undefined && document.getElementById('inp-email')) document.getElementById('inp-email').value = data.email;
+      if (data.web !== undefined && document.getElementById('inp-web')) document.getElementById('inp-web').value = data.web;
+
+      if (data.showGallery !== undefined) {
+        const chk = document.getElementById('chk-show-gallery');
+        if (chk) chk.checked = data.showGallery;
+        toggleGalleryShowcase();
+      }
+
+      if (data.galleryImages) {
+        if (data.galleryImages.img1 && document.getElementById('inp-img-1')) document.getElementById('inp-img-1').value = data.galleryImages.img1;
+        if (data.galleryImages.img2 && document.getElementById('inp-img-2')) document.getElementById('inp-img-2').value = data.galleryImages.img2;
+        if (data.galleryImages.img3 && document.getElementById('inp-img-3')) document.getElementById('inp-img-3').value = data.galleryImages.img3;
+        if (data.galleryImages.img4 && document.getElementById('inp-img-4')) document.getElementById('inp-img-4').value = data.galleryImages.img4;
+      }
+
+      if (data.daysData && Array.isArray(data.daysData) && data.daysData.length > 0) {
+        daysData = data.daysData.map((d, idx) => ({
+          dayNum: d.dayNum || (idx + 1),
+          title: d.title || '',
+          subtitle: d.subtitle || '',
+          destination: d.destination || '',
+          mealPlan: d.mealPlan || '',
+          transport: d.transport || '',
+          spotsText: d.spotsText || (Array.isArray(d.spots)
+            ? d.spots.map(s => `${s.badge} | ${s.title}${s.desc ? ' | ' + s.desc : ''}${s.food ? ' | ' + s.food : ''}`).join('\n')
+            : '')
+        }));
+        renderDayCards();
+      }
+    }
+
+    function loadSavedQuotationData() {
+      const saved = localStorage.getItem('skyquest_quotation_saved_data');
+      if (!saved) return false;
+
+      try {
+        const data = JSON.parse(saved);
+        populateDashboardForm(data);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function toggleGalleryShowcase() {
+      const chk = document.getElementById('chk-show-gallery');
+      const lbl = document.getElementById('lbl-gallery-status');
+      const wrap = document.getElementById('gallery-inputs-wrapper');
+
+      if (chk && chk.checked) {
+        if (lbl) { lbl.innerText = '🟢 ON (Visible on Page 1)'; lbl.style.color = '#34d399'; }
+        if (wrap) wrap.style.display = 'flex';
+      } else {
+        if (lbl) { lbl.innerText = '🔴 OFF (Disabled)'; lbl.style.color = '#94A3B8'; }
+        if (wrap) wrap.style.display = 'none';
+      }
+      renderDashboardGalleryPreview();
+      updatePreview();
+    }
+
+    function renderDayCards() {
+      const container = document.getElementById('day-cards-list');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      daysData.forEach((day, index) => {
+        const card = document.createElement('div');
+        card.className = 'day-editor-card';
+        card.innerHTML = `
+          <div class="day-card-header">
+            <span class="day-card-title">📄 PAGE ${index + 2}: DAY 0${index + 1} DEDICATED ITINERARY</span>
+            ${daysData.length > 1 ? `<button class="btn btn-danger" onclick="removeDayCard(${index})">🗑️ Delete Day Page</button>` : ''}
+          </div>
+          <div class="form-group">
+            <label>Day 0${index + 1} Title</label>
+            <input type="text" class="form-input" value="${day.title}" oninput="updateDayField(${index}, 'title', this.value)">
+          </div>
+          <div class="form-group">
+            <label>Day 0${index + 1} Subtitle / Focus</label>
+            <input type="text" class="form-input" value="${day.subtitle}" oninput="updateDayField(${index}, 'subtitle', this.value)">
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Destination Name</label>
+              <input type="text" class="form-input" value="${day.destination}" oninput="updateDayField(${index}, 'destination', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Day Meal Plan (e.g. WITHOUT FOOD / WITH FOOD)</label>
+              <input type="text" class="form-input" value="${day.mealPlan || (index === 0 ? 'WITHOUT FOOD' : 'WITH FOOD')}" oninput="updateDayField(${index}, 'mealPlan', this.value)">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Day Transport</label>
+            <input type="text" class="form-input" value="${day.transport || '52-Seater Luxury Bus'}" oninput="updateDayField(${index}, 'transport', this.value)">
+          </div>
+          <div class="form-group">
+            <label>Spots & Activities (Format: BADGE | TITLE | DESC | FOOD)</label>
+            <textarea class="form-textarea" rows="5" oninput="updateDayField(${index}, 'spotsText', this.value)">${day.spotsText}</textarea>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      updateTotalBadge();
+      updatePreview();
+    }
+
+    function addNewDayCard() {
+      const newNum = daysData.length + 1;
+      daysData.push({
+        dayNum: newNum,
+        title: `DAY 0${newNum}: Local Sightseeing & Activities`,
+        subtitle: `Custom Day 0${newNum} Exploration`,
+        destination: `Destination ${newNum}`,
+        mealPlan: "WITH FOOD",
+        transport: "52-Seater Luxury Bus",
+        spotsText: `SPOT 01 | Breakfast 🍱\nSPOT 02 | Local Sightseeing Tour\nSPOT 03 | Lunch 😋\nSPOT 04 | Shopping & Evening Leisure\nSPOT 05 | Dinner 🍽️`
+      });
+      renderDayCards();
+    }
+
+    function removeDayCard(index) {
+      if (daysData.length <= 1) return;
+      daysData.splice(index, 1);
+      daysData.forEach((d, i) => d.dayNum = i + 1);
+      renderDayCards();
+    }
+
+    function updateDayField(index, key, value) {
+      if (daysData[index]) {
+        daysData[index][key] = value;
+        updatePreview();
+      }
+    }
+
+    function parseSpotsText(text) {
+      if (!text) return [];
+      const lines = text.split('\n').filter(l => l.trim().length > 0);
+      return lines.map((line, idx) => {
+        const parts = line.split('|').map(p => p.trim());
+        const autoBadge = `SPOT ${String(idx + 1).padStart(2, '0')}`;
+
+        if (parts.length === 1) {
+          return {
+            badge: autoBadge,
+            title: parts[0],
+            desc: '',
+            food: ''
+          };
+        } else {
+          let bVal = parts[0];
+          let tVal = parts[1];
+
+          if (!tVal && bVal) {
+            tVal = bVal;
+            bVal = autoBadge;
+          }
+
+          return {
+            badge: bVal || autoBadge,
+            title: tVal || parts[0],
+            desc: parts[2] || '',
+            food: parts[3] || ''
+          };
+        }
+      });
+    }
+
+    function updateTotalBadge() {
+      const totalPages = daysData.length + 3;
+      const badge = document.getElementById('page-count-text');
+      if (badge) {
+        badge.innerText = `Active Pages: ${totalPages} Pages (${daysData.length} Day Pages Dedicated)`;
+      }
+    }
+
+    function toggleGalleryShowcase() {
+      const chk = document.getElementById('chk-show-gallery');
+      const inputsWrap = document.getElementById('gallery-inputs-wrapper');
+      if (inputsWrap) {
+        inputsWrap.style.display = (chk && chk.checked) ? 'flex' : 'none';
+      }
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const iframe = document.getElementById('preview-frame');
+      const paxValue = document.getElementById('inp-pax')?.value || '90 Students + 4 Staff';
+      const showGallery = document.getElementById('chk-show-gallery')?.checked !== false;
+
+      const data = {
+        clientName: document.getElementById('inp-client-name')?.value || '',
+        refNo: document.getElementById('inp-ref-no')?.value || 'SQH/QT/2026/SKY-109',
+        destination: document.getElementById('inp-destination')?.value || 'Bengaluru & Coorg',
+        durationText: document.getElementById('inp-duration-text')?.value || '2 Days / 3 Nights',
+        paxText: paxValue,
+        datesText: document.getElementById('inp-dates') ? document.getElementById('inp-dates').value : '',
+        locationText: document.getElementById('inp-location')?.value || 'Erode, Tamil Nadu',
+        tourType: document.getElementById('inp-tour-type')?.value || 'Industrial Visit & Nature Expedition',
+        quoteDate: document.getElementById('inp-quote-date')?.value || 'September 2026',
+        validity: document.getElementById('inp-validity')?.value || '15 Days from issuance',
+        preparedBy: document.getElementById('inp-prepared-by')?.value || 'SkyQuest Tour Operations Wing',
+        foodOption: document.getElementById('inp-food-option')?.value || '🍵 DAY 02 FOOD INCLUDED',
+        rate: document.getElementById('inp-rate')?.value || '',
+        rateCond: document.getElementById('inp-rate-cond')?.value || '',
+        phone: document.getElementById('inp-phone') ? document.getElementById('inp-phone').value : '',
+        email: document.getElementById('inp-email')?.value || '',
+        web: document.getElementById('inp-web')?.value || '',
+        showGallery: showGallery,
+        galleryImages: {
+          img1: document.getElementById('inp-img-1') ? document.getElementById('inp-img-1').value.trim() : '',
+          img2: document.getElementById('inp-img-2') ? document.getElementById('inp-img-2').value.trim() : '',
+          img3: document.getElementById('inp-img-3') ? document.getElementById('inp-img-3').value.trim() : '',
+          img4: document.getElementById('inp-img-4') ? document.getElementById('inp-img-4').value.trim() : ''
+        },
+        daysData: daysData.map((d, idx) => ({
+          dayNum: idx + 1,
+          title: d.title,
+          subtitle: d.subtitle,
+          destination: d.destination,
+          mealPlan: d.mealPlan || (idx === 0 ? 'WITHOUT FOOD' : 'WITH FOOD'),
+          transport: d.transport || '52-Seater Luxury Bus',
+          pax: paxValue,
+          spots: parseSpotsText(d.spotsText),
+          spotsText: d.spotsText
+        }))
+      };
+
+      // Sync thumbnails in dashboard
+      const t1 = document.getElementById('thumb-img-1'); if (t1 && data.galleryImages.img1) t1.src = data.galleryImages.img1;
+      const t2 = document.getElementById('thumb-img-2'); if (t2 && data.galleryImages.img2) t2.src = data.galleryImages.img2;
+      const t3 = document.getElementById('thumb-img-3'); if (t3 && data.galleryImages.img3) t3.src = data.galleryImages.img3;
+      const t4 = document.getElementById('thumb-img-4'); if (t4 && data.galleryImages.img4) t4.src = data.galleryImages.img4;
+
+      try {
+        localStorage.setItem('skyquest_quotation_saved_data', JSON.stringify(data));
+      } catch(e) {}
+
+      if (iframe && iframe.contentWindow && iframe.contentWindow.updateQuotationData) {
+        iframe.contentWindow.updateQuotationData(data);
+      }
+      updateTotalBadge();
+    }
+
+    function openPdfPreview() {
+      updatePreview();
+      const indexUrl = new URL('index.html', window.location.href).href;
+      try {
+        const win = window.open(indexUrl, '_blank');
+        if (!win || win.closed || typeof win.closed === 'undefined') {
+          window.top.open(indexUrl, '_blank');
+        }
+      } catch (e) {
+        window.open(indexUrl, '_blank');
+      }
+    }
+
+    function printQuotation() {
+      updatePreview();
+      const iframe = document.getElementById('preview-frame');
+      try {
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+          return;
+        }
+      } catch (e) {}
+      window.open('index.html?print=true', '_blank');
+    }
+
+    async function generateSha1Hash(message) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(message);
+      const hashBuffer = await crypto.subtle.digest("SHA-1", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    function compressImage(file, maxDimension = 1200, quality = 0.82) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            let width = img.width;
+            let height = img.height;
+            if (width > maxDimension || height > maxDimension) {
+              if (width > height) {
+                height = Math.round((height * maxDimension) / width);
+                width = maxDimension;
+              } else {
+                width = Math.round((width * maxDimension) / height);
+                height = maxDimension;
+              }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+            resolve(dataUrl);
+          };
+          img.onerror = () => resolve(e.target.result);
+          img.src = e.target.result;
+        };
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function uploadFileToCloudinary(file) {
+      const cloudName = "dciyanu4f";
+      const apiKey = "858478214766486";
+      const apiSecret = "0j2YjgBOSMS3MKi9PtaMaG5onsI";
+      const timestamp = Math.floor(Date.now() / 1000);
+
+      try {
+        const stringToSign = `timestamp=${timestamp}${apiSecret}`;
+        const signature = await generateSha1Hash(stringToSign);
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("api_key", apiKey);
+        formData.append("timestamp", timestamp);
+        formData.append("signature", signature);
+
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await response.json();
+        if (data && data.secure_url) {
+          return data.secure_url;
+        }
+      } catch (e) {
+        console.warn("Cloudinary upload notice:", e);
+      }
+      return null;
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const zone = document.getElementById('bulk-upload-dropzone');
+      if (zone) zone.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const zone = document.getElementById('bulk-upload-dropzone');
+      if (zone) zone.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const zone = document.getElementById('bulk-upload-dropzone');
+      if (zone) zone.classList.remove('drag-over');
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleBulkUploadFiles(e.dataTransfer.files);
+      }
+    }
+
+    function handleBulkInputChange(e) {
+      if (e.target && e.target.files && e.target.files.length > 0) {
+        handleBulkUploadFiles(e.target.files);
+      }
+    }
+
+    let currentSequentialBulkSlot = 1;
+
+    async function handleBulkUploadFiles(fileList) {
+      const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
+      if (files.length === 0) return;
+
+      const chk = document.getElementById('chk-show-gallery');
+      if (chk) chk.checked = true;
+
+      if (files.length === 1) {
+        const slotIdx = currentSequentialBulkSlot;
+        currentSequentialBulkSlot = (currentSequentialBulkSlot % 4) + 1;
+
+        const file = files[0];
+        const inputEl = document.getElementById(`inp-img-${slotIdx}`);
+        const thumbEl = document.getElementById(`thumb-img-${slotIdx}`);
+
+        const compressedDataUrl = await compressImage(file);
+        if (compressedDataUrl) {
+          if (inputEl) inputEl.value = compressedDataUrl;
+          if (thumbEl) thumbEl.src = compressedDataUrl;
+        }
+
+        uploadFileToCloudinary(file).then(cdnUrl => {
+          if (cdnUrl) {
+            if (inputEl) inputEl.value = cdnUrl;
+            if (thumbEl) thumbEl.src = cdnUrl;
+            updatePreview();
+            renderDashboardGalleryPreview();
+          }
+        });
+      } else {
+        currentSequentialBulkSlot = 1;
+        const countToProcess = Math.min(4, files.length);
+        for (let i = 0; i < countToProcess; i++) {
+          const slotIdx = i + 1;
+          const file = files[i];
+          const inputEl = document.getElementById(`inp-img-${slotIdx}`);
+          const thumbEl = document.getElementById(`thumb-img-${slotIdx}`);
+
+          const compressedDataUrl = await compressImage(file);
+          if (compressedDataUrl) {
+            if (inputEl) inputEl.value = compressedDataUrl;
+            if (thumbEl) thumbEl.src = compressedDataUrl;
+          }
+
+          uploadFileToCloudinary(file).then(cdnUrl => {
+            if (cdnUrl) {
+              if (inputEl) inputEl.value = cdnUrl;
+              if (thumbEl) thumbEl.src = cdnUrl;
+              updatePreview();
+              renderDashboardGalleryPreview();
+            }
+          });
+        }
+      }
+
+      toggleGalleryShowcase();
+    }
+
+    async function handleFileUpload(imgIndex, event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const inputEl = document.getElementById(`inp-img-${imgIndex}`);
+      const thumbEl = document.getElementById(`thumb-img-${imgIndex}`);
+
+      const chk = document.getElementById('chk-show-gallery');
+      if (chk) chk.checked = true;
+
+      const compressedDataUrl = await compressImage(file);
+      if (compressedDataUrl) {
+        if (inputEl) inputEl.value = compressedDataUrl;
+        if (thumbEl) thumbEl.src = compressedDataUrl;
+      }
+
+      toggleGalleryShowcase();
+
+      const cdnUrl = await uploadFileToCloudinary(file);
+      if (cdnUrl) {
+        if (inputEl) inputEl.value = cdnUrl;
+        if (thumbEl) thumbEl.src = cdnUrl;
+        updatePreview();
+        renderDashboardGalleryPreview();
+      }
+    }
+
+    function renderDashboardGalleryPreview() {
+      const container = document.getElementById('dash-gallery-preview-container');
+      if (!container) return;
+
+      const slots = [
+        { id: 1, label: 'Photo 1 (Group)' },
+        { id: 2, label: 'Photo 2 (Bus)' },
+        { id: 3, label: 'Photo 3 (Cruise)' },
+        { id: 4, label: 'Photo 4 (Safari)' }
+      ];
+
+      let html = '';
+      slots.forEach(slot => {
+        const inputEl = document.getElementById(`inp-img-${slot.id}`);
+        const val = inputEl ? inputEl.value.trim() : '';
+
+        if (val) {
+          html += `
+            <div class="dash-photo-card">
+              <div class="dash-photo-img-wrapper">
+                <img src="${val}" class="dash-photo-img" alt="${slot.label}" onerror="this.src='https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&auto=format&fit=crop'">
+                <div class="dash-photo-badge">#${slot.id}</div>
+              </div>
+              <div class="dash-photo-actions">
+                <button type="button" class="dash-photo-btn" title="View Full Photo" onclick="window.open('${val}', '_blank')">🔍 View</button>
+                <button type="button" class="dash-photo-btn" title="Replace Photo" onclick="document.getElementById('file-input-${slot.id}').click()">📁 Replace</button>
+                <button type="button" class="dash-photo-btn btn-delete" title="Clear Photo" onclick="clearGallerySlot(${slot.id})">🗑️ Clear</button>
+              </div>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="dash-photo-card dash-photo-card-empty">
+              <div class="dash-photo-img-wrapper dash-photo-empty-wrapper">
+                <div class="dash-photo-empty-icon">📷</div>
+                <div class="dash-photo-empty-text">Empty Slot</div>
+                <div class="dash-photo-badge dash-photo-badge-empty">#${slot.id}</div>
+              </div>
+              <div class="dash-photo-actions dash-photo-actions-centered">
+                <button type="button" class="dash-photo-btn btn-upload-slot" title="Upload Photo" onclick="document.getElementById('file-input-${slot.id}').click()">📁 Upload Photo</button>
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      container.innerHTML = html;
+    }
+
+    function clearGallerySlot(slotIdx) {
+      const inputEl = document.getElementById(`inp-img-${slotIdx}`);
+      const thumbEl = document.getElementById(`thumb-img-${slotIdx}`);
+      if (inputEl) inputEl.value = '';
+      if (thumbEl) thumbEl.src = '';
+      updatePreview();
+      renderDashboardGalleryPreview();
+    }
+
+    function clearAllGalleryPhotos() {
+      for (let i = 1; i <= 4; i++) {
+        const inputEl = document.getElementById(`inp-img-${i}`);
+        const thumbEl = document.getElementById(`thumb-img-${i}`);
+        if (inputEl) inputEl.value = '';
+        if (thumbEl) thumbEl.src = '';
+      }
+      updatePreview();
+      renderDashboardGalleryPreview();
+    }
+
+    function resetDefaultGallery() {
+      document.getElementById('inp-img-1').value = 'group_bus.jpg';
+      document.getElementById('inp-img-2').value = 'bus_night.jpg';
+      document.getElementById('inp-img-3').value = 'cruise.jpg';
+      document.getElementById('inp-img-4').value = 'safari.jpg';
+      const t1 = document.getElementById('thumb-img-1'); if (t1) t1.src = 'group_bus.jpg';
+      const t2 = document.getElementById('thumb-img-2'); if (t2) t2.src = 'bus_night.jpg';
+      const t3 = document.getElementById('thumb-img-3'); if (t3) t3.src = 'cruise.jpg';
+      const t4 = document.getElementById('thumb-img-4'); if (t4) t4.src = 'safari.jpg';
+      updatePreview();
+      renderDashboardGalleryPreview();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSavedQuotationData();
+      renderDayCards();
+      toggleGalleryShowcase();
+      renderDashboardGalleryPreview();
+      renderHistoryCards();
+      setTimeout(updatePreview, 500);
+    });
+  </script>
+</body>
+
+</html>

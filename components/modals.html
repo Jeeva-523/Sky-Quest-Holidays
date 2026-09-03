@@ -1,0 +1,52 @@
+<!-- Package Detail Modal -->
+<div class="modal-overlay" id="packageModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('packageModal')">✕</button>
+    <div id="packageModalBody">
+      <!-- Rendered dynamically -->
+    </div>
+  </div>
+</div>
+
+<!-- Secret Admin Panel Modal -->
+<div class="modal-overlay" id="adminModal">
+  <div class="modal-box modal-box-admin">
+    <button class="modal-close" onclick="closeModal('adminModal')">✕</button>
+    <div class="modal-body" id="adminModalBody">
+      <!-- Admin Login or Dashboard rendered dynamically by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<!-- Custom Image Lightbox Modal -->
+<div class="lightbox-modal" id="lightboxModal">
+  <div class="lightbox-content">
+    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+    <button class="lightbox-nav lightbox-prev" onclick="prevLightboxImage()" aria-label="Previous image">&#10094;</button>
+    <img id="lightboxImg" src="" alt="Gallery Preview" />
+    <button class="lightbox-nav lightbox-next" onclick="nextLightboxImage()" aria-label="Next image">&#10095;</button>
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+  </div>
+</div>
+
+<!-- Confirmation Toast / Popup Modal -->
+<div class="toast-modal" id="toastModal">
+  <div class="toast-card">
+    <div class="toast-icon">✅</div>
+    <h3 id="toastTitle">Enquiry Submitted!</h3>
+    <p id="toastMessage">Thank you! Connecting you directly to our WhatsApp travel specialist...</p>
+    <button class="btn btn-primary" onclick="closeToast()">OK</button>
+  </div>
+</div>
+
+<!-- Floating Action Buttons -->
+<div class="floating-actions">
+  <button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+    aria-label="Scroll to top">
+    ↑
+  </button>
+  <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20want%20to%20enquire%20about%20tour%20packages%20and%20pricing."
+    target="_blank" rel="noopener noreferrer" class="floating-whatsapp" aria-label="Chat on WhatsApp +91 73387 10611" title="WhatsApp: +91 73387 10611">
+    <img src="images/whatsapp.png" alt="WhatsApp" class="floating-wa-img" />
+  </a>
+</div>

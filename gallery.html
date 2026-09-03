@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Trip Photo Gallery | SKY QUEST Holidays</title>
+  <meta name="description"
+    content="View our collection of happy travelers, college IV groups & resort experiences with SKY QUEST Holidays." />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/logo.png" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Audiowide&family=Chakra+Petch:ital,wght@1,700;1,900&family=Montserrat:wght@900&family=Righteous&family=Russo+One&display=swap"
+    rel="stylesheet">
+
+  <!-- Master CSS -->
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Premium Subpage Banner Styling */
+    .subpage-hero {
+      position: relative;
+      background: linear-gradient(135deg, var(--primary-deep), #1e293b);
+      padding: 145px 0 85px 0;
+      text-align: center;
+      color: #fff;
+      overflow: hidden;
+    }
+    .subpage-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+      opacity: 0.12;
+      z-index: 0;
+    }
+    .subpage-hero-content {
+      position: relative;
+      z-index: 1;
+    }
+    .subpage-title {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+    .subpage-subtitle {
+      font-size: 1.1rem;
+      color: var(--primary-light);
+      max-width: 600px;
+      margin: 0 auto;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 1. Header Navigation Component Wrapper -->
+  <div id="header-component"></div>
+
+  <!-- 2. Premium Subpage Hero Banner -->
+  <section class="subpage-hero">
+    <div class="container subpage-hero-content">
+      <h1 class="subpage-title">✈️ Our Trip Photo Gallery</h1>
+      <p class="subpage-subtitle">Capture the best moments of our travelers, college IV groups, resort stays, and scenic getaways.</p>
+    </div>
+  </section>
+
+  <!-- 3. Photo Gallery Component Wrapper -->
+  <div id="gallery-component"></div>
+
+  <!-- 4. Modals Component Wrapper (includes Lightbox Modal) -->
+  <div id="modals-component"></div>
+
+  <!-- 5. Footer Component Wrapper -->
+  <div id="footer-component"></div>
+
+  <!-- Master JavaScript -->
+  <script src="js/data.js?v=21"></script>
+  <script src="js/app.js?v=21"></script>
+  <script src="js/component-loader.js?v=21"></script>
+
+  <script>
+    // Highlight the Gallery page in navigation links once loaded
+    document.addEventListener("componentsLoaded", () => {
+      const navLinks = document.querySelectorAll(".nav-link");
+      navLinks.forEach(link => {
+        if (link.getAttribute("href") === "gallery.html") {
+          link.classList.add("active");
+        } else {
+          link.classList.remove("active");
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

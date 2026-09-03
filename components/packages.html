@@ -1,0 +1,525 @@
+<!-- Filter Categories & Tour Packages -->
+<section id="packages" class="packages-section">
+  <div class="container">
+    <div class="packages-header reveal visible">
+      <div>
+        <h2 class="section-title">Our Tour Packages</h2>
+        <p class="section-sub section-description">From stays and transport to local sightseeing, we’ve got your entire
+          trip sorted.</p>
+      </div>
+      <a href="#contact" class="btn btn-primary btn-nowrap">Enquire Now</a>
+    </div>
+
+    <!-- FILTER TABS -->
+    <div class="pkg-filter reveal visible">
+      <button class="pkg-tab active" onclick="filterPkgs('all', this)">✨ All Destinations</button>
+      <button class="pkg-tab" onclick="filterPkgs('tamilnadu', this)">🛕 Tamil Nadu</button>
+      <button class="pkg-tab" onclick="filterPkgs('kerala', this)">🌴 Kerala</button>
+      <button class="pkg-tab" onclick="filterPkgs('karnataka', this)">🌄 Karnataka</button>
+      <button class="pkg-tab" onclick="filterPkgs('honeymoon', this)">❤️ Honeymoon</button>
+      <button class="pkg-tab" onclick="filterPkgs('college', this)">🎓 College IV</button>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="pkg-empty-state hidden-state" id="pkg-empty">
+      <div class="pkg-empty-icon">🗺️</div>
+      <h3>Choose Your Destination</h3>
+      <p>Select <strong>Kerala</strong>, <strong>Karnataka</strong> or <strong>Tamil Nadu</strong> above to explore our
+        curated tour packages.</p>
+    </div>
+
+    <!-- PACKAGES GRID -->
+    <div class="pkg-grid packages-grid" id="packagesGrid">
+
+      <!-- ==================== KERALA PACKAGES ==================== -->
+      <div class="pkg-card package-card" onclick="openPackageModal('1')" data-cat="kerala">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://res.cloudinary.com/dciyanu4f/image/upload/v1785231479/gkvgt0lwbdmtgpdwluqv.jpg"
+            alt="Cochin – Munnar" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Popular</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Cochin <span class="pkg-sep">–</span> Munnar</h3>
+          <div class="pkg-meta"><span>🌴 Kerala</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">Breathtaking tea gardens, misty hilltops, waterfalls, and tea factory tour.</p>
+          <ul class="card-highlights">
+            <li>✅ Eravikulam National Park</li>
+            <li>✅ Mattupetty Dam & Echo Point</li>
+            <li>✅ Top Station & Tea Museum</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('1'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Cochin%20-%20Munnar%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('2')" data-cat="kerala">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+            alt="Cochin – Vagamon" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Scenic</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Cochin <span class="pkg-sep">–</span> Vagamon</h3>
+          <div class="pkg-meta"><span>🌴 Kerala</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">Rolling green pine forests, Kurisumala ashram, Vagamon meadows, and glass bridge.</p>
+          <ul class="card-highlights">
+            <li>✅ Vagamon Pine Forest</li>
+            <li>✅ Green Meadows & Lake</li>
+            <li>✅ Glass Bridge Experience</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('2'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Cochin%20-%20Vagamon%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('3')" data-cat="kerala">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=800&q=80"
+            alt="Cochin – Marayoor" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Nature</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Cochin <span class="pkg-sep">–</span> Marayoor</h3>
+          <div class="pkg-meta"><span>🌴 Kerala</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">Natural Sandalwood forest, ancient Neolithic Muniyara dolmens, and sugarcane farms.</p>
+          <ul class="card-highlights">
+            <li>✅ Sandalwood Forest</li>
+            <li>✅ Muniyara Neolithic Dolmens</li>
+            <li>✅ Sugarcane Farms & Waterfalls</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('3'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Cochin%20-%20Marayoor%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('4')" data-cat="kerala">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?auto=format&fit=crop&w=800&q=80"
+            alt="Cochin – Wonderla" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Fun</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Cochin <span class="pkg-sep">–</span> Wonderla</h3>
+          <div class="pkg-meta"><span>🌴 Kerala</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">High-thrill land rides, wave pools, water slides, and Marine Drive evening cruise.</p>
+          <ul class="card-highlights">
+            <li>✅ Wonderla Amusement Park Pass</li>
+            <li>✅ Wave Pool & Water Slides</li>
+            <li>✅ Marine Drive Sunset Cruise</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('4'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Cochin%20-%20Wonderla%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('5')" data-cat="kerala">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=800&q=80"
+            alt="Cochin – Alappuzha" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Backwaters</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Cochin <span class="pkg-sep">–</span> Alappuzha</h3>
+          <div class="pkg-meta"><span>🌴 Kerala</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">Private AC Houseboat cruise through coconut lagoons, paddy fields, and Karimeen feast.</p>
+          <ul class="card-highlights">
+            <li>✅ Private AC Houseboat Cruise</li>
+            <li>✅ Vembanad Backwaters</li>
+            <li>✅ Alappuzha & Marari Beach</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('5'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Cochin%20-%20Alappuzha%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('6')" data-cat="kerala">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=800&q=80"
+            alt="Cochin – Varkala" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Beach</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Cochin <span class="pkg-sep">–</span> Varkala</h3>
+          <div class="pkg-meta"><span>🌴 Kerala</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">Red cliffs over Arabian sea, Papanasam holy beach, cliffside cafes, and black sand beach.</p>
+          <ul class="card-highlights">
+            <li>✅ Varkala Red Cliff Viewpoint</li>
+            <li>✅ Papanasam Beach</li>
+            <li>✅ Black Sand Beach & Kappil Lake</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('6'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Cochin%20-%20Varkala%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('7')" data-cat="kerala">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+            alt="Cochin – Wayanad" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Wildlife</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Cochin <span class="pkg-sep">–</span> Wayanad</h3>
+          <div class="pkg-meta"><span>🌴 Kerala</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">Edakkal caves, Banasura Sagar earth dam, Soochipara falls, and Wayanad wildlife safari.</p>
+          <ul class="card-highlights">
+            <li>✅ Edakkal Caves</li>
+            <li>✅ Banasura Sagar Dam</li>
+            <li>✅ Wayanad Wildlife Safari</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('7'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Cochin%20-%20Wayanad%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== KARNATAKA PACKAGES ==================== -->
+      <div class="pkg-card package-card" onclick="openPackageModal('11')" data-cat="karnataka">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80"
+            alt="Bangalore – Mysore" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Royal</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Bangalore <span class="pkg-sep">–</span> Mysore</h3>
+          <div class="pkg-meta"><span>🌄 Karnataka</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">Illuminated Mysore Palace, Chamundi Hills, Mysore Zoo, and Brindavan Gardens light show.</p>
+          <ul class="card-highlights">
+            <li>✅ Mysore Palace & Light Show</li>
+            <li>✅ Chamundi Hills Temple</li>
+            <li>✅ Brindavan Gardens Fountain</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('11'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Bangalore%20-%20Mysore%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('12')" data-cat="karnataka">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80"
+            alt="Bangalore – Coorg" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Coffee Trail</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Bangalore <span class="pkg-sep">–</span> Coorg</h3>
+          <div class="pkg-meta"><span>🌄 Karnataka</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">Scotland of India! Coffee plantations, Abbey Falls, Raja's Seat, and Dubare elephant camp.</p>
+          <ul class="card-highlights">
+            <li>✅ Abbey Waterfalls</li>
+            <li>✅ Raja's Seat Sunset</li>
+            <li>✅ Dubare Elephant Camp</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('12'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Bangalore%20-%20Coorg%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('13')" data-cat="karnataka">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+            alt="Bangalore – Chikmagalore" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Hills</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Bangalore <span class="pkg-sep">–</span> Chikmagalore</h3>
+          <div class="pkg-meta"><span>🌄 Karnataka</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">Mullayanagiri (highest peak in Karnataka), Baba Budangiri caves, Hebbe falls, and coffee walk.</p>
+          <ul class="card-highlights">
+            <li>✅ Mullayanagiri Peak Trek</li>
+            <li>✅ Baba Budangiri Shrine</li>
+            <li>✅ Hebbe Waterfalls Safari</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('13'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Bangalore%20-%20Chikmagalore%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('14')" data-cat="karnataka">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80"
+            alt="Mysore – Coorg" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Heritage</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Mysore <span class="pkg-sep">–</span> Coorg</h3>
+          <div class="pkg-meta"><span>🌄 Karnataka</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">Combine royal grand palaces of Mysore with mist-covered coffee hills of Coorg.</p>
+          <ul class="card-highlights">
+            <li>✅ Mysore Palace & Chamundi Hills</li>
+            <li>✅ Abbey Waterfalls & Raja's Seat</li>
+            <li>✅ Bylakuppe Golden Temple</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('14'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Mysore%20-%20Coorg%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('15')" data-cat="karnataka">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+            alt="Mysore – Chikmagalore" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Nature</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Mysore <span class="pkg-sep">–</span> Chikmagalore</h3>
+          <div class="pkg-meta"><span>🌄 Karnataka</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">Royal Mysore history combined with Mullayanagiri peak trek & coffee plantation walk.</p>
+          <ul class="card-highlights">
+            <li>✅ Mysore Palace & Brindavan Gardens</li>
+            <li>✅ Mullayanagiri Peak Trek</li>
+            <li>✅ Baba Budangiri & Hebbe Falls</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('15'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Mysore%20-%20Chikmagalore%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('16')" data-cat="karnataka">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80"
+            alt="Coorg – Chikmagalore" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Combo</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Coorg <span class="pkg-sep">–</span> Chikmagalore</h3>
+          <div class="pkg-meta"><span>🌄 Karnataka</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">Ultimate coffee lovers trail! Abbey Falls in Coorg + Mullayanagiri trek in Chikmagalur.</p>
+          <ul class="card-highlights">
+            <li>✅ Abbey Waterfalls & Dubare Camp</li>
+            <li>✅ Mullayanagiri Highest Peak</li>
+            <li>✅ Coffee Plantation Homestay</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('16'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Coorg%20-%20Chikmagalore%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAMIL NADU PACKAGES ==================== -->
+      <div class="pkg-card package-card" onclick="openPackageModal('17')" data-cat="tamilnadu">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?auto=format&fit=crop&w=800&q=80"
+            alt="Ooty" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Popular</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Ooty</h3>
+          <div class="pkg-meta"><span>🛕 Tamil Nadu</span><span>📅 3D | 2N</span></div>
+          <p class="card-tagline">Botanical gardens, Nilgiri Toy Train, tea estates, Pykara lake boating, and Rose Garden.</p>
+          <ul class="card-highlights">
+            <li>✅ Ooty Botanical Garden</li>
+            <li>✅ Ooty Lake & Pykara Boating</li>
+            <li>✅ Doddabetta Peak & Toy Train</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('17'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Ooty%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('18')" data-cat="tamilnadu">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80"
+            alt="Kodaikanal" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Scenic</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Kodaikanal</h3>
+          <div class="pkg-meta"><span>🛕 Tamil Nadu</span><span>📅 3D | 2N</span></div>
+          <p class="card-tagline">Mist-covered pine forests, Kodai Star Lake boating, Coaker's Walk, and Guna Caves.</p>
+          <ul class="card-highlights">
+            <li>✅ Kodai Star Lake Boating</li>
+            <li>✅ Coaker's Walk & Pillar Rocks</li>
+            <li>✅ Pine Forest & Guna Caves</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('18'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Kodaikanal%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('19')" data-cat="tamilnadu">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80"
+            alt="Rameswaram" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Spiritual</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Rameswaram</h3>
+          <div class="pkg-meta"><span>🛕 Tamil Nadu</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">Pamban Sea Bridge, Ramanathaswamy Temple (22 Wells), Dhanushkodi ghost town beach.</p>
+          <ul class="card-highlights">
+            <li>✅ Pamban Sea Bridge View</li>
+            <li>✅ Ramanathaswamy Temple</li>
+            <li>✅ Dhanushkodi Beach Point</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('19'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Rameswaram%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('20')" data-cat="tamilnadu">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80"
+            alt="Madurai" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Heritage</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Madurai</h3>
+          <div class="pkg-meta"><span>🛕 Tamil Nadu</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">Historic Meenakshi Amman Temple, Thirumalai Nayakar Palace, and authentic Madurai Jigarthanda.</p>
+          <ul class="card-highlights">
+            <li>✅ Meenakshi Amman Temple</li>
+            <li>✅ Thirumalai Nayakar Palace</li>
+            <li>✅ Alagar Kovil & Gandhi Museum</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('20'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Madurai%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('21')" data-cat="tamilnadu">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80"
+            alt="Mahabalipuram" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Historical</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Mahabalipuram</h3>
+          <div class="pkg-meta"><span>🛕 Tamil Nadu</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">UNESCO Shore Temple, Arjuna's Penance, Pancha Rathas monolithic rock sculptures & Beach.</p>
+          <ul class="card-highlights">
+            <li>✅ UNESCO Shore Temple</li>
+            <li>✅ Pancha Rathas Monoliths</li>
+            <li>✅ Arjuna's Penance Relief</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('21'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Mahabalipuram%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('22')" data-cat="tamilnadu">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80"
+            alt="Kanyakumari" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Ocean Tip</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Kanyakumari</h3>
+          <div class="pkg-meta"><span>🛕 Tamil Nadu</span><span>📅 2D | 1N</span></div>
+          <p class="card-tagline">Triveni Sangam confluence, Vivekananda Rock Memorial ferry, Thiruvalluvar Statue & Sunset.</p>
+          <ul class="card-highlights">
+            <li>✅ Vivekananda Rock Memorial Ferry</li>
+            <li>✅ Thiruvalluvar Statue</li>
+            <li>✅ Triveni Sangam Sunset Point</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('22'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Kanyakumari%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== HONEYMOON & COLLEGE IV ==================== -->
+      <div class="pkg-card package-card" onclick="openPackageModal('23')" data-cat="college">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80"
+            alt="Goa Beach Fiesta & DJ Night" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">College IV</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Goa Beach Fiesta & DJ Night</h3>
+          <div class="pkg-meta"><span>🎓 College IV</span><span>📅 4D | 3N</span></div>
+          <div><span class="group-offer-tag">🔥 Special Group Offer Available</span></div>
+          <p class="card-tagline">Sun-kissed beaches, water sports, historic forts, and college IV DJ party.</p>
+          <ul class="card-highlights">
+            <li>✅ Baga & Calangute Beach</li>
+            <li>✅ Aguada Fort & Mandovi Cruise</li>
+            <li>✅ DJ Night Party Access</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('23'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Goa%20IV%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pkg-card package-card" onclick="openPackageModal('24')" data-cat="honeymoon">
+        <div class="pkg-img card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1598091383021-15ddea10925d?auto=format&fit=crop&w=800&q=80"
+            alt="Kashmir Paradise on Earth" class="card-img pkg-img-inner" loading="lazy" />
+          <span class="pkg-badge card-badge">Honeymoon</span>
+        </div>
+        <div class="pkg-body card-content">
+          <h3 class="pkg-dest card-title">Kashmir Paradise on Earth</h3>
+          <div class="pkg-meta"><span>❤️ Honeymoon</span><span>📅 6D | 5N</span></div>
+          <div><span class="group-offer-tag">🔥 Special Honeymoon Offer</span></div>
+          <p class="card-tagline">Dal Lake Shikara ride, Gulmarg snow gondola, and Pahalgam valley.</p>
+          <ul class="card-highlights">
+            <li>✅ Dal Lake Luxury Houseboat</li>
+            <li>✅ Gulmarg Snow Gondola</li>
+            <li>✅ Pahalgam Betaab Valley</li>
+          </ul>
+          <div class="card-footer">
+            <button class="btn btn-primary pkg-btn" onclick="openPackageModal('24'); event.stopPropagation();">Enquire Now</button>
+            <a href="https://wa.me/917338710611?text=Hi%20Sky%20Quest%20Holidays!%20I%20am%20interested%20in%20Kashmir%20package."
+              target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" onclick="event.stopPropagation();">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>

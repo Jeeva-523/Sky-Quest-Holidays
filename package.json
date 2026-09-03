@@ -1,0 +1,13 @@
+{
+  "name": "sky-quest-holidays",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "npx -y serve .",
+    "start": "npx -y serve .",
+    "build": "echo Static site ready"
+  },
+  "dependencies": {
+    "firebase": "^12.16.0",
+    "pngjs": "^7.0.0"
+  }
+}

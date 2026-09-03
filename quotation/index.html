@@ -1,0 +1,1936 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>SkyQuest Holidays - Official Tour Quotation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css?v=6">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --bg-warm-ivory: #FAF8F5;
+      --bg-card: rgba(255, 255, 255, 0.7);
+      --bg-card-solid: #FFFFFF;
+      --primary-navy: #0B1D3A;
+      --primary-navy-light: #162C52;
+      --secondary-sky: #0284C7;
+      --secondary-sky-light: #E0F2FE;
+      --accent-gold: #C5A059;
+      --accent-gold-dark: #9A7B3E;
+      --accent-gold-light: #FDF9F0;
+      --text-dark: #0F172A;
+      --text-muted: #526075;
+      --border-light: rgba(11, 29, 58, 0.1);
+      --border-gold: rgba(197, 160, 89, 0.45);
+      --shadow-sm: 0 4px 14px rgba(11, 29, 58, 0.05);
+      --shadow-md: 0 10px 28px rgba(11, 29, 58, 0.09);
+      --font-heading: 'Outfit', sans-serif;
+      --font-editorial: 'Playfair Display', serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      background-color: #E2E8F0;
+      font-family: var(--font-body);
+      color: var(--text-dark);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page-hidden {
+      display: none !important;
+    }
+
+    .document-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      padding: 40px 20px;
+    }
+
+    .page {
+      position: relative;
+      width: 210mm;
+      height: 297mm;
+      background-color: var(--bg-warm-ivory);
+      overflow: hidden;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 8mm 12mm 10mm 12mm;
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .page-luxury-frame {
+      position: absolute;
+      top: 4mm;
+      left: 4mm;
+      right: 4mm;
+      bottom: 4mm;
+      border: 1px solid rgba(197, 160, 89, 0.35);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .page-luxury-frame::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      right: 3px;
+      bottom: 3px;
+      border: 1px dashed rgba(197, 160, 89, 0.2);
+    }
+
+    .corner-bracket {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      border-color: var(--accent-gold);
+      border-style: solid;
+      z-index: 3;
+      opacity: 0.75;
+    }
+
+    .bracket-tl {
+      top: 3.5mm;
+      left: 3.5mm;
+      border-width: 2px 0 0 2px;
+    }
+
+    .bracket-tr {
+      top: 3.5mm;
+      right: 3.5mm;
+      border-width: 2px 2px 0 0;
+    }
+
+    .bracket-bl {
+      bottom: 3.5mm;
+      left: 3.5mm;
+      border-width: 0 0 2px 2px;
+    }
+
+    .bracket-br {
+      bottom: 3.5mm;
+      right: 3.5mm;
+      border-width: 0 2px 2px 0;
+    }
+
+    .screen-toolbar {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      gap: 12px;
+      background: rgba(11, 29, 58, 0.94);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      padding: 10px 18px;
+      border-radius: 40px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--accent-gold);
+    }
+
+    .btn-print {
+      background: linear-gradient(135deg, var(--accent-gold), #D97706);
+      color: #FFFFFF;
+      border: none;
+      padding: 10px 22px;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 14px;
+      border-radius: 30px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-save-doc {
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      color: #ffffff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-save-doc:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(22, 163, 74, 0.50);
+    }
+
+    .bg-pattern-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.15;
+    }
+
+    .bg-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 170mm;
+      height: 170mm;
+      opacity: 0.20;
+      pointer-events: none;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .watermark-logo-img {
+      width: 100%;
+      height: auto;
+      max-height: 100%;
+      object-fit: contain;
+      filter: contrast(3) brightness(0.25) saturate(2);
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .large-page-watermark {
+      position: absolute;
+      top: 54%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-12deg);
+      font-family: var(--font-heading);
+      font-size: 56pt;
+      font-weight: 900;
+      font-style: italic;
+      color: rgba(11, 29, 58, 0.05);
+      letter-spacing: 4px;
+      text-align: center;
+      pointer-events: none;
+      z-index: 2;
+      white-space: nowrap;
+      line-height: 1.05;
+      text-transform: uppercase;
+    }
+
+    .page-content {
+      position: relative;
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: space-between;
+    }
+
+    /* Header Bar */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 5px;
+      border-bottom: 2px solid var(--accent-gold);
+      margin-bottom: 6px;
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+    }
+
+    .brand-full-logo-img {
+      height: 75px;
+      width: auto;
+      max-width: 380px;
+      object-fit: contain;
+    }
+
+    .doc-meta-badge {
+      text-align: right;
+      background: #FAF8F5;
+      padding: 5px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--accent-gold);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .doc-meta-title {
+      font-family: var(--font-heading);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      color: var(--primary-navy);
+    }
+
+    .doc-meta-sub {
+      font-size: 8.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 1px;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-navy-light) 100%);
+      color: #FFFFFF;
+      border-radius: 12px;
+      padding: 16px 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 12px;
+      border: 1px solid var(--accent-gold);
+    }
+
+    .hero-tag {
+      display: inline-block;
+      background: rgba(197, 160, 89, 0.2);
+      color: var(--accent-gold);
+      border: 1px solid rgba(197, 160, 89, 0.4);
+      padding: 2px 10px;
+      border-radius: 16px;
+      font-size: 8.5px;
+      font-weight: 800;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.25;
+      color: var(--accent-gold);
+      margin-bottom: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .hero-subtitle {
+      font-size: 11.5px;
+      color: #F8FAFC;
+      font-weight: 600;
+      font-family: var(--font-heading);
+      line-height: 1.4;
+      opacity: 0.95;
+    }
+
+    /* Meal Plan Badges */
+    .meal-plan-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-heading);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .meal-plan-with-food {
+      background: rgba(34, 197, 94, 0.15);
+      color: #15803D;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+
+    .meal-plan-without-food {
+      background: rgba(239, 68, 68, 0.15);
+      color: #B91C1C;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .info-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-gold);
+      border-radius: 10px;
+      padding: 12px 14px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    .card-gold-accent {
+      border-top: 3px solid var(--accent-gold);
+    }
+
+    .card-navy-accent {
+      border-top: 3px solid var(--primary-navy);
+    }
+
+    .card-sky-accent {
+      border-top: 3px solid var(--secondary-sky);
+    }
+
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--primary-navy);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid rgba(11, 29, 58, 0.12);
+    }
+
+    .section-title-icon {
+      width: 15px;
+      height: 15px;
+      color: var(--accent-gold-dark);
+    }
+
+    .card-details-text {
+      font-size: 10.5px;
+      line-height: 1.6;
+      color: var(--text-dark);
+    }
+
+    /* About Brand Card */
+    .about-brand-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-gold);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-sm);
+      border-top: 3px solid var(--secondary-sky);
+    }
+
+    .about-brand-text {
+      font-size: 10px;
+      line-height: 1.5;
+      color: var(--text-dark);
+    }
+
+    /* Specialized Services Grid */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .service-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: var(--bg-card-solid);
+      padding: 10px 12px;
+      border-radius: 8px;
+      border-left: 3px solid var(--secondary-sky);
+      border-right: 1px solid rgba(11, 29, 58, 0.06);
+    }
+
+    .service-icon {
+      font-size: 15px;
+    }
+
+    .service-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--primary-navy);
+    }
+
+    .service-desc {
+      font-size: 8.5px;
+      color: var(--text-muted);
+      line-height: 1.35;
+      margin-top: 2px;
+    }
+
+    /* Top Specs Bar (5 Column Navy Container on Day Pages) */
+    .trip-stats-bar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      background: #0B1D3A;
+      color: #FFFFFF;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      border: 1px solid var(--accent-gold);
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-label {
+      font-size: 7.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--accent-gold);
+      font-weight: 700;
+    }
+
+    .stat-val {
+      font-family: var(--font-heading);
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #FFFFFF;
+    }
+
+    /* Single Day Banner */
+    .single-day-banner {
+      background: #0B1D3A;
+      color: #FFFFFF;
+      border-radius: 10px;
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--accent-gold);
+      margin-bottom: 14px;
+    }
+
+    .single-day-badge {
+      background: var(--accent-gold);
+      color: var(--primary-navy);
+      font-family: var(--font-heading);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 14px;
+      border-radius: 20px;
+      letter-spacing: 0.8px;
+      white-space: nowrap;
+    }
+
+    .single-day-title {
+      font-family: var(--font-heading);
+      font-size: 16px;
+      font-weight: 800;
+      color: #FFFFFF;
+    }
+
+    .single-day-sub {
+      font-size: 9.5px;
+      color: #94A3B8;
+      margin-top: 2px;
+    }
+
+    /* Day Timeline / Spot Card List Layout */
+    .day-timeline-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 6px;
+      flex-grow: 1;
+    }
+
+    .timeline-slot {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(197, 160, 89, 0.3);
+      border-left: 6px solid #0B1D3A;
+      border-radius: 14px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 3px 12px rgba(11, 29, 58, 0.06);
+    }
+
+    .spot-badge-pill {
+      background: #D0E1FD;
+      color: #0B1D3A;
+      font-family: var(--font-heading);
+      font-size: 13px;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 10px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      min-width: 90px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .spot-icon-asterisk {
+      background: #86EFAC;
+      color: #166534;
+      font-size: 15px;
+      font-weight: 900;
+      min-width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .slot-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .slot-heading {
+      font-family: var(--font-heading);
+      font-size: 17px;
+      font-weight: 800;
+      color: #0B1D3A;
+      letter-spacing: -0.2px;
+    }
+
+    .slot-desc {
+      font-size: 9.5px;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    .food-note-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #F0FDF4;
+      color: #166534;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      font-size: 8.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 8px;
+      margin-top: 4px;
+      width: fit-content;
+    }
+
+    /* Page 4: Investment & Specifications */
+    .pricing-banner {
+      background: linear-gradient(135deg, #0B1D3A, #162C52);
+      border-radius: 10px;
+      padding: 14px 20px;
+      color: #FFFFFF;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      border: 1px solid var(--accent-gold);
+    }
+
+    .pricing-main-label {
+      font-family: var(--font-heading);
+      font-size: 14px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: 0.5px;
+    }
+
+    .pricing-sub-label {
+      font-size: 9px;
+      color: var(--accent-gold);
+      margin-top: 2px;
+    }
+
+    .price-tag {
+      text-align: right;
+    }
+
+    .price-amount {
+      font-family: var(--font-heading);
+      font-size: 22px;
+      font-weight: 900;
+      color: #FFFFFF;
+    }
+
+    .price-unit {
+      font-size: 9px;
+      color: #94A3B8;
+    }
+
+    .inc-exc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .inc-card {
+      background: rgba(240, 253, 244, 0.85);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .exc-card {
+      background: rgba(254, 242, 242, 0.85);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .inc-title {
+      color: #15803D;
+      font-family: var(--font-heading);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .exc-title {
+      color: #B91C1C;
+      font-family: var(--font-heading);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .check-list,
+    .cross-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 9px;
+      line-height: 1.4;
+    }
+
+    .check-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+      color: #166534;
+    }
+
+    .cross-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+      color: #991B1B;
+    }
+
+    .specs-grid {
+      font-size: 10px;
+      line-height: 1.55;
+      color: var(--text-dark);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .clause-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-gold);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-top: 12px;
+      border-left: 4px solid var(--accent-gold);
+      font-size: 9px;
+      line-height: 1.45;
+      color: var(--text-muted);
+    }
+
+    .clause-card strong {
+      color: var(--primary-navy);
+    }
+
+    .clause-header {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--primary-navy);
+      margin-bottom: 4px;
+    }
+
+    .clause-body {
+      font-size: 9px;
+      line-height: 1.45;
+      color: var(--text-muted);
+    }
+
+    /* Page 5: Terms & Authorization */
+    .policy-text {
+      font-size: 10px;
+      line-height: 1.55;
+      color: var(--text-dark);
+    }
+
+    .policy-lead {
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .policy-list {
+      padding-left: 18px;
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .sign-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 14px;
+      margin-bottom: 14px;
+    }
+
+    .sign-box {
+      border: 1px dashed var(--accent-gold);
+      border-radius: 10px;
+      padding: 12px 10px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      height: 95px;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .sign-title {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--primary-navy);
+      letter-spacing: 0.5px;
+    }
+
+    .sign-line {
+      width: 85%;
+      border-top: 1.5px solid var(--primary-navy);
+      margin-top: 24px;
+    }
+
+    .sign-sub {
+      font-size: 8px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .contact-hero {
+      background: linear-gradient(135deg, var(--primary-navy), var(--primary-navy-light));
+      color: #FFFFFF;
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--accent-gold);
+      box-shadow: var(--shadow-md);
+    }
+
+    .contact-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .contact-headline {
+      font-family: var(--font-heading);
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--accent-gold);
+      letter-spacing: 0.5px;
+    }
+
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9.5px;
+      color: #E2E8F0;
+    }
+
+    .contact-qr-wrap {
+      background: #FFFFFF;
+      padding: 6px 10px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .wa-qr-badge {
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #DCFCE7;
+      border-radius: 50%;
+    }
+
+    .qr-caption {
+      font-size: 7px;
+      font-weight: 800;
+      color: var(--primary-navy);
+      letter-spacing: 0.5px;
+    }
+
+    .approved-stamp {
+      position: absolute;
+      bottom: 25mm;
+      left: 18mm;
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Footer */
+    .footer-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 8px;
+      border-top: 1.5px solid var(--border-gold);
+      font-size: 9px;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      color: var(--primary-navy);
+    }
+
+    .footer-center {
+      font-style: italic;
+      color: var(--accent-gold-dark);
+      font-weight: 500;
+    }
+
+    .page-num {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      color: var(--primary-navy);
+      background: var(--secondary-sky-light);
+      padding: 2px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(2, 132, 199, 0.3);
+    }
+
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+
+      html,
+      body {
+        background: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .screen-toolbar {
+        display: none !important;
+      }
+
+      .document-wrapper {
+        padding: 0 !important;
+        gap: 0 !important;
+        margin: 0 !important;
+      }
+
+      .page {
+        box-shadow: none !important;
+        margin: 0 !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .bg-watermark {
+        display: flex !important;
+        opacity: 0.20 !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Screen Toolbar for Printing & PDF Download -->
+  <div class="screen-toolbar">
+    <button class="btn-save-doc" onclick="saveQuotationDocument()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+        <polyline points="7 3 7 8 15 8"></polyline>
+      </svg>
+      Save Quotation
+    </button>
+    <button class="btn-print" onclick="window.print()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+        <rect x="6" y="14" width="12" height="8"></rect>
+      </svg>
+      Print / Save as PDF
+    </button>
+  </div>
+
+  <div class="document-wrapper">
+
+    <!-- ==========================================================================
+         PAGE 1: COVER, CLIENT DETAILS & SPECIALIZED CATEGORIES
+         ========================================================================== -->
+    <div class="page" id="page-cover">
+      <div class="page-luxury-frame"></div>
+      <div class="corner-bracket bracket-tl"></div>
+      <div class="corner-bracket bracket-tr"></div>
+      <div class="corner-bracket bracket-bl"></div>
+      <div class="corner-bracket bracket-br"></div>
+
+      <!-- Rich Illustration SVG Background -->
+      <svg class="bg-pattern-layer" viewBox="0 0 800 1130" fill="none" stroke="#0B1D3A" stroke-width="1.2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <g class="corner-deco-tl">
+          <path d="M 40 100 Q 140 40 260 90" stroke="#C5A059" stroke-width="1.5" stroke-dasharray="5 4" />
+          <path d="M 260 90 L 250 82 L 253 88 L 246 90 L 253 92 L 250 98 Z" fill="#C5A059" stroke="none" />
+          <g transform="translate(130, 52) rotate(-15) scale(0.85)">
+            <path d="M 15 22 L 22 2 L 30 22 L 22 18 Z" />
+          </g>
+        </g>
+        <g class="corner-deco-tr">
+          <path d="M 520 40 Q 600 90 760 30" stroke="#C5A059" stroke-width="1" />
+          <path d="M 540 60 Q 630 110 760 55" stroke="#0B1D3A" stroke-width="0.8" stroke-dasharray="8 4" />
+          <text x="680" y="45" font-size="7" fill="#C5A059" font-family="sans-serif" stroke="none">ELEV 1200m</text>
+        </g>
+        <g class="corner-deco-bl">
+          <path d="M 40 1040 Q 120 980 240 1060" stroke="#0B1D3A" stroke-width="0.9" />
+          <g transform="translate(180, 1010) scale(0.85)">
+            <circle cx="30" cy="30" r="24" stroke="#C5A059" stroke-width="1" />
+            <polygon points="30,8 34,26 30,22 26,26" fill="#0B1D3A" stroke="none" />
+            <text x="30" y="5" text-anchor="middle" font-size="7" font-weight="bold" fill="#0B1D3A"
+              stroke="none">N</text>
+          </g>
+        </g>
+        <g class="corner-deco-br">
+          <path d="M 540 1080 Q 640 1010 740 1050" stroke="#C5A059" stroke-width="1.3" stroke-dasharray="4 4" />
+          <g transform="translate(620, 1015) scale(0.9)">
+            <circle cx="12" cy="11" r="3.5" fill="#C5A059" stroke="none" />
+          </g>
+        </g>
+        <g class="body-travel-pattern" stroke="#0B1D3A" stroke-width="1">
+          <g transform="translate(60, 260) scale(0.85)">
+            <rect x="5" y="12" width="34" height="24" rx="4" stroke="#0B1D3A" stroke-width="1.2" />
+          </g>
+          <g transform="translate(660, 280) scale(0.8)">
+            <circle cx="22" cy="22" r="7.5" stroke="#0B1D3A" stroke-width="1.2" />
+          </g>
+          <g transform="translate(640, 510) scale(0.85)">
+            <path d="M 2 34 L 18 10 L 26 20 L 38 4 L 54 34 Z" stroke="#0B1D3A" stroke-width="1.2" />
+          </g>
+          <g transform="translate(650, 770) scale(0.85)">
+            <rect x="4" y="8" width="40" height="22" rx="4" stroke="#0B1D3A" stroke-width="1.2" />
+          </g>
+        </g>
+      </svg>
+
+      <div class="page-content">
+        <div>
+          <!-- Header Bar -->
+          <div class="header-bar">
+            <div class="brand-block">
+              <img src="logo-text-transparent.png" alt="SkyQuest Holidays Logo" class="brand-full-logo-img"
+                onerror="this.onerror=null; this.src='../images/logo-text-transparent.png';">
+            </div>
+            <div class="doc-meta-badge">
+              <div class="doc-meta-title">OFFICIAL TOUR QUOTATION</div>
+              <div class="doc-meta-sub" id="doc-ref-display">Ref: SQH/QT/2026/SKY-99</div>
+            </div>
+          </div>
+
+          <!-- Hero Banner -->
+          <div class="hero-banner">
+            <span class="hero-tag">📍 PICKUP / DROP LOCATION</span>
+            <h1 class="hero-title" id="doc-client-display">Erode, Tamil Nadu</h1>
+            <p class="hero-subtitle" id="doc-subtitle-display">2 Days / 3 Nights Industrial Visit & Nature Expedition — Bengaluru & Coorg</p>
+          </div>
+
+          <!-- Client & Metadata Grid -->
+          <div class="info-grid-2">
+            <div class="card card-gold-accent">
+              <div class="section-title">
+                <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                CLIENT DETAILS
+              </div>
+              <div class="card-details-text">
+                <span id="institution-row-wrap"><strong>Institution:</strong> <span id="client-name-text"></span><br></span>
+                <strong>Pickup/Drop Location:</strong> <span id="location-text">Erode, Tamil Nadu</span><br>
+                <strong>Group Strength:</strong> <span id="pax-text">90 Students + 4 Staff</span><br>
+                <strong>Meal Plan:</strong> <span class="meal-plan-badge meal-plan-with-food"
+                  id="meal-plan-cover-badge">🍵 DAY 02 FOOD INCLUDED</span>
+              </div>
+            </div>
+
+            <div class="card card-navy-accent">
+              <div class="section-title">
+                <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                </svg>
+                QUOTATION METADATA
+              </div>
+              <div class="card-details-text">
+                <strong>Quotation Date:</strong> <span id="quotation-date-text">September 2026</span><br>
+                <span id="dates-row-wrap"><strong>Travel Dates:</strong> <span
+                    id="dates-text"></span><br></span>
+                <strong>Validity:</strong> 15 Days from issuance<br>
+                <strong>Prepared By:</strong> SkyQuest Tour Operations Wing
+              </div>
+            </div>
+          </div>
+
+          <!-- ABOUT SKYQUEST HOLIDAYS -->
+          <div class="about-brand-card">
+            <div class="section-title">
+              <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                </path>
+              </svg>
+              ABOUT SKYQUEST HOLIDAYS
+            </div>
+            <p class="about-brand-text">
+              At <strong>SkyQuest Holidays</strong>, we believe travel is more than just moving from one destination to
+              another—it’s about crafting stories, inspiring minds, and building lifelong bonds. We specialize in
+              designing bespoke, safe, and exhilarating travel experiences for educational institutions, corporate
+              groups, and private travelers across South India and international destinations.
+            </p>
+          </div>
+
+          <!-- Specialized Portfolio Grid -->
+          <div class="card card-sky-accent specialized-portfolio-card">
+            <div class="section-title">
+              <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon
+                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                </polygon>
+              </svg>
+              OUR SPECIALIZED TOUR CATEGORIES
+            </div>
+            <div class="services-grid">
+              <div class="service-item">
+                <span class="service-icon">🎓</span>
+                <div>
+                  <div class="service-title">Student & Industrial Visits</div>
+                  <div class="service-desc">Curriculum-aligned industrial exposures combined with team bonding.</div>
+                </div>
+              </div>
+              <div class="service-item">
+                <span class="service-icon">🏞️</span>
+                <div>
+                  <div class="service-title">Adventure & Nature Safaris</div>
+                  <div class="service-desc">Trekking, off-road 4x4 jeep safaris, campfires, and waterfalls.</div>
+                </div>
+              </div>
+              <div class="service-item">
+                <span class="service-icon">🤝</span>
+                <div>
+                  <div class="service-title">Alumni & Corporate Retreats</div>
+                  <div class="service-desc">Resort stays, live DJ harbor cruises, and group logistics.</div>
+                </div>
+              </div>
+              <div class="service-item">
+                <span class="service-icon">✨</span>
+                <div>
+                  <div class="service-title">Tailor-Made Custom Packages</div>
+                  <div class="service-desc">Flexible itineraries designed strictly according to client budget.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- OUR TRIP & FLEET HIGHLIGHTS (4 IMAGES SHOWCASE - OPTIONAL ENABLED VIA ADMIN) -->
+          <div class="card card-gold-accent" id="trip-highlights-card">
+            <div class="section-title">
+              <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              OUR TRIP & LUXURY FLEET HIGHLIGHTS
+            </div>
+            <div class="gallery-grid-4">
+              <div class="gallery-item-4">
+                <img src="group_bus.jpg" alt="Highlight 1" class="gallery-img-4" id="img-gall-1"
+                  onerror="this.src='https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&auto=format&fit=crop'">
+              </div>
+              <div class="gallery-item-4">
+                <img src="bus_night.jpg" alt="Highlight 2" class="gallery-img-4" id="img-gall-2"
+                  onerror="this.src='https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&auto=format&fit=crop'">
+              </div>
+              <div class="gallery-item-4">
+                <img src="cruise.jpg" alt="Highlight 3" class="gallery-img-4" id="img-gall-3"
+                  onerror="this.src='https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&auto=format&fit=crop'">
+              </div>
+              <div class="gallery-item-4">
+                <img src="safari.jpg" alt="Highlight 4" class="gallery-img-4" id="img-gall-4"
+                  onerror="this.src='https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=400&auto=format&fit=crop'">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-bar">
+          <div class="footer-left"><span>SKYQUEST HOLIDAYS</span> • <span>Official Tour Quotation</span></div>
+          <div class="footer-center">Elevating Educational & Luxury Group Travel</div>
+          <div class="page-num page-num-calc">Page 1 of 5</div>
+        </div>
+      </div>
+
+      <!-- Center Watermark Logo -->
+      <div class="bg-watermark">
+        <img src="watermark-logo.png" alt="SkyQuest Watermark Logo" class="watermark-logo-img"
+          onerror="this.onerror=null; this.src='../images/watermark-logo.png';">
+      </div>
+    </div>
+
+
+    <!-- ==========================================================================
+         DYNAMIC DEDICATED DAY PAGES (PAGE 2, PAGE 3, ETC.)
+         ========================================================================== -->
+    <div id="dynamic-days-wrapper"></div>
+
+
+    <!-- ==========================================================================
+         PAGE 4: INVESTMENT & SPECIFICATIONS
+         ========================================================================== -->
+    <div class="page" id="page-pricing">
+      <div class="page-luxury-frame"></div>
+      <div class="corner-bracket bracket-tl"></div>
+      <div class="corner-bracket bracket-tr"></div>
+      <div class="corner-bracket bracket-bl"></div>
+      <div class="corner-bracket bracket-br"></div>
+
+      <div class="page-content">
+        <div>
+          <!-- Header Bar -->
+          <div class="header-bar">
+            <div class="brand-block">
+              <img src="logo-text-transparent.png" alt="SkyQuest Holidays Logo" class="brand-full-logo-img"
+                onerror="this.onerror=null; this.src='../images/logo-text-transparent.png';">
+            </div>
+            <div class="doc-meta-badge">
+              <div class="doc-meta-title">INVESTMENT & SPECIFICATIONS</div>
+              <div class="doc-meta-sub">Package Pricing & Specifications</div>
+            </div>
+          </div>
+
+          <!-- Pricing Banner -->
+          <div class="pricing-banner">
+            <div class="pricing-title-wrap">
+              <div class="pricing-main-label">PACKAGE INVESTMENT RATE</div>
+              <div class="pricing-sub-label" id="rate-cond-text">Based on 80 Pax + 4 Staff (Complementary)</div>
+            </div>
+            <div class="price-tag">
+              <div class="price-amount" id="doc-rate-display">₹4,500 /-</div>
+              <div class="price-unit">Per Head (All Inclusive)</div>
+            </div>
+          </div>
+
+          <!-- Selected Meal Plan Card -->
+          <div class="card card-gold-accent meal-plan-card">
+            <div class="section-title">
+              <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+              </svg>
+              SELECTED MEAL PLAN OPTION
+            </div>
+            <div class="meal-plan-badge-wrapper">
+              <span class="meal-plan-badge meal-plan-with-food" id="meal-plan-badge-main">🍵 DAY 02 FOOD INCLUDED</span>
+            </div>
+          </div>
+
+          <!-- Inclusions & Exclusions Grid -->
+          <div class="inc-exc-grid">
+            <div class="inc-card">
+              <div class="inc-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                PACKAGE INCLUSIONS
+              </div>
+              <ul class="check-list" id="inclusions-list">
+                <li><span>✔</span> <strong>Transportation:</strong> 52-Seater Luxury Non-A/C Bus with full DJ lightings,
+                  sound & push-back seating.</li>
+                <li><span>✔</span> <strong>Tolls & Permits:</strong> All Interstate Taxes, Toll Gates, and Vehicle
+                  Parking fees included.</li>
+                <li><span>✔</span> <strong>Accommodations:</strong> Deluxe Room Stay @ Kochi Hotel & Vagamon Resort.
+                </li>
+                <li><span>✔</span> <strong>Special Experience:</strong> Off-road 4x4 Jeep Safari (7 sightseeing points).
+                </li>
+                <li><span>✔</span> <strong>Harbor Cruise:</strong> Marine Drive Sunset Boat Cruise with Live DJ Music.
+                </li>
+                <li><span>✔</span> <strong>Campfire:</strong> Cozy night campfire with music system in Vagamon.</li>
+                <li id="inc-food-item"><span>✔</span> <strong>Meal Plan:</strong> Day 02 Food Plan (Breakfast, Lunch &
+                  Dinner on Day 02 Included).</li>
+                <li><span>✔</span> <strong>Entry Tickets:</strong> Sightseeing entry passes specified in itinerary.</li>
+                <li><span>✔</span> <strong>Faculty Compliments:</strong> 2 Staff members completely complimentary.</li>
+              </ul>
+            </div>
+
+            <div class="exc-card">
+              <div class="exc-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                PACKAGE EXCLUSIONS
+              </div>
+              <ul class="cross-list" id="exclusions-list">
+                <li><span>✖</span> <strong>Industrial Entry Fees:</strong> Self entry pass fees for industrial companies
+                  (if charged).</li>
+                <li><span>✖</span> <strong>Personal Expenses:</strong> Shopping, laundry, telephone calls, and personal
+                  tips.</li>
+                <li><span>✖</span> <strong>Unscheduled Tours:</strong> Any transport or sightseeing beyond scheduled
+                  itinerary.</li>
+                <li><span>✖</span> <strong>Insurance:</strong> Personal medical insurance or loss of personal valuables.
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Vehicle Specs -->
+          <div class="card card-navy-accent">
+            <div class="section-title">
+              <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="3" width="15" height="13"></rect>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+              </svg>
+              VEHICLE & SAFETY SPECIFICATIONS
+            </div>
+            <div class="specs-grid">
+              <div>
+                <strong>Coach Configuration:</strong> 52-Seater High-Deck Luxury Coach<br>
+                <strong>Audio/Visual:</strong> Party DJ Lighting, Sound System & LED Screen<br>
+                <strong>Seating:</strong> Ergonomic Push-back seats with high back support
+              </div>
+              <div>
+                <strong>Safety Protocols:</strong> Speed Governor, First-Aid Kit, Spare Wheel<br>
+                <strong>Driver Credentials:</strong> Experienced hill-certified drivers<br>
+                <strong>Sanitization:</strong> Disinfected interior prior to boarding
+              </div>
+            </div>
+          </div>
+
+          <!-- Liability Clause -->
+          <div class="clause-card">
+            <div class="clause-header">
+              LIABILITY & VEHICLE DAMAGE CLAUSE:
+            </div>
+            <div class="clause-body">
+              • <strong>Coach Upkeep:</strong> Any physical damage caused to the coach interior, lighting fixtures,
+              sound equipment, or window glasses due to participant negligence or misconduct will be charged directly to
+              the responsible individual or group organizer.<br>
+              • <strong>Personal Belongings:</strong> Participants are advised to take care of their personal baggage,
+              cash, and electronic items. SkyQuest Holidays shall not be held liable for accidental loss, theft, or
+              damage during the tour.
+            </div>
+          </div>
+
+        </div>
+
+        <div class="approved-stamp">
+          <svg width="85" height="85" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="44" fill="none" stroke="#C5A059" stroke-width="1.8" stroke-dasharray="4 2" />
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#0B1D3A" stroke-width="1.2" />
+            <text x="50" y="42" font-size="7.5" font-weight="900" fill="#0B1D3A" text-anchor="middle"
+              letter-spacing="1">SKYQUEST</text>
+            <text x="50" y="58" font-size="7" font-weight="800" fill="#C5A059" text-anchor="middle"
+              letter-spacing="0.5">APPROVED</text>
+          </svg>
+        </div>
+
+        <div class="footer-bar">
+          <div class="footer-left"><span>SKYQUEST HOLIDAYS</span> • <span>Package Rate & Terms</span></div>
+          <div class="footer-center">Transparent Pricing • Zero Hidden Costs</div>
+          <div class="page-num page-num-calc">Page 4 of 5</div>
+        </div>
+      </div>
+
+      <!-- Center Watermark Logo -->
+      <div class="bg-watermark">
+        <img src="watermark-logo.png" alt="SkyQuest Watermark Logo" class="watermark-logo-img"
+          onerror="this.onerror=null; this.src='../images/watermark-logo.png';">
+      </div>
+    </div>
+
+
+    <!-- ==========================================================================
+         PAGE 5: TERMS, CANCELLATION POLICY & AUTHORIZATION
+         ========================================================================== -->
+    <div class="page" id="page-terms">
+      <div class="page-luxury-frame"></div>
+      <div class="corner-bracket bracket-tl"></div>
+      <div class="corner-bracket bracket-tr"></div>
+      <div class="corner-bracket bracket-bl"></div>
+      <div class="corner-bracket bracket-br"></div>
+
+      <!-- Large Center Background Watermark Text -->
+      <div class="large-page-watermark">
+        SKYQUEST<br>HOLIDAYS
+      </div>
+
+      <div class="page-content">
+        <div>
+          <!-- Header Bar -->
+          <div class="header-bar">
+            <div class="brand-block">
+              <img src="logo-text-transparent.png" alt="SkyQuest Holidays Logo" class="brand-full-logo-img"
+                onerror="this.onerror=null; this.src='../images/logo-text-transparent.png';">
+            </div>
+            <div class="doc-meta-badge">
+              <div class="doc-meta-title">TERMS & AUTHORIZATION</div>
+              <div class="doc-meta-sub">Official Acceptance Document</div>
+            </div>
+          </div>
+
+          <!-- Cancellation Policy -->
+          <div class="card card-gold-accent cancellation-policy-card">
+            <div class="section-title">
+              <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              </svg>
+              CANCELLATION & REFUND POLICY
+            </div>
+            <div class="policy-text">
+              <p class="policy-lead">
+                We kindly request all institution representatives and group coordinators to carefully review the tour
+                confirmation terms prior to making advance deposits:
+              </p>
+              <ul class="policy-list">
+                <li><strong>Advance Deposit Non-Refundability:</strong> Any advance amount paid towards tour
+                  confirmation is non-refundable under normal circumstances.</li>
+                <li><strong>Resource Reservation:</strong> Advance funds are immediately utilized to lock transport
+                  coaches, hotel room blocks, cruise slots, and permits.</li>
+                <li><strong>Booking Transferability:</strong> Individual participant seats can be transferred to an
+                  eligible student or faculty substitute.</li>
+                <li><strong>Organizer Cancellation Safeguard:</strong> In the rare event of tour cancellation by
+                  SkyQuest Holidays, full advance refund will be processed.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Dual Signatures -->
+          <div class="sign-grid">
+            <div class="sign-box">
+              <div class="sign-title">PREPARED BY (SKYQUEST HOLIDAYS)</div>
+              <div class="sign-line"></div>
+              <div class="sign-sub">Authorized Signature & Tour Operators Seal</div>
+            </div>
+            <div class="sign-box">
+              <div class="sign-title" id="accepted-by-title">ACCEPTED BY (ERODE, TAMIL NADU)</div>
+              <div class="sign-line"></div>
+              <div class="sign-sub">HOD / Staff Coordinator Signature & Date</div>
+            </div>
+          </div>
+
+          <!-- Contact Hero Footer -->
+          <div class="contact-hero">
+            <div class="contact-left">
+              <div class="contact-headline">CONNECT WITH SKYQUEST HOLIDAYS</div>
+              <div class="contact-row" id="footer-phone-row"><span>📞 Phone / WhatsApp:</span> <strong id="footer-phone-text"></strong></div>
+              <div class="contact-row"><span>📧 Email:</span> <strong
+                  id="footer-email-text">skyquestholidays@gmail.com</strong></div>
+              <div class="contact-row"><span>🌐 Website:</span> <strong
+                  id="footer-web-text">sky-quest-holidays.web.app</strong></div>
+              <div class="contact-row"><span>📲 Instagram:</span> <strong>@skyquest_holidays</strong></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="footer-bar">
+          <div class="footer-left"><span>SKYQUEST HOLIDAYS</span> • <span>Contact & Authorization</span></div>
+          <div class="footer-center">Thank You For Choosing SkyQuest Holidays</div>
+          <div class="page-num page-num-calc">Page 5 of 5</div>
+        </div>
+      </div>
+
+      <!-- Center Watermark Logo -->
+      <div class="bg-watermark">
+        <img src="watermark-logo.png" alt="SkyQuest Watermark Logo" class="watermark-logo-img"
+          onerror="this.onerror=null; this.src='../images/watermark-logo.png';">
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Dynamic Render Engine Script -->
+  <script>
+    let currentDays = [
+      {
+        dayNum: 1,
+        title: "DAY 01: Bangalore",
+        subtitle: "Experiencing Bangalore Industry",
+        destination: "Bangalore Expedition",
+        mealPlan: "WITHOUT FOOD",
+        transport: "52-Seater Luxury Bus",
+        pax: "80 Students + 4 Staff (Complementary)",
+        spots: [
+          { badge: "SPOT 01", title: "Bangalore Event Palace Drop", desc: "", food: "" },
+          { badge: "SPOT 02", title: "Evening 3 PM Start Towards COORG", desc: "", food: "" },
+          { badge: "SPOT 03", title: "Night Stay at Coorg", desc: "", food: "" }
+        ]
+      },
+      {
+        dayNum: 2,
+        title: "DAY 02: Coorg",
+        subtitle: "Culture, Shopping, Mountain Drive & Night DJ",
+        destination: "Coorg Highlands",
+        mealPlan: "WITH FOOD",
+        transport: "52-Seater Luxury Bus",
+        pax: "80 Students + 4 Staff (Complementary)",
+        spots: [
+          { badge: "SPOT 01", title: "Breakfast 🍱", desc: "", food: "" },
+          { badge: "SPOT 02", title: "Golden Temple", desc: "", food: "" },
+          { badge: "SPOT 03", title: "Chikole Dam", desc: "", food: "" },
+          { badge: "SPOT 04", title: "Lunch 😋", desc: "", food: "" },
+          { badge: "SPOT 05", title: "Nisargadhama Forest", desc: "", food: "" },
+          { badge: "SPOT 06", title: "Shopping", desc: "", food: "" },
+          { badge: "SPOT 07", title: "Harangi Dam Light Show", desc: "", food: "" },
+          { badge: "SPOT 08", title: "Dj Hangover", desc: "", food: "" },
+          { badge: "SPOT 09", title: "Dinner 🍽️", desc: "", food: "" }
+        ]
+      }
+    ];
+
+    function renderDynamicDayPages(days) {
+      currentDays = days || currentDays;
+      const wrapper = document.getElementById('dynamic-days-wrapper');
+      if (!wrapper) return;
+
+      wrapper.innerHTML = '';
+
+      const spotBadgePalettes = [
+        { bg: '#E0F2FE', color: '#0369A1', border: '#7DD3FC', iconBg: '#BAE6FD', iconColor: '#0284C7' }, // Sky Blue
+        { bg: '#DCFCE7', color: '#15803D', border: '#86EFAC', iconBg: '#BBF7D0', iconColor: '#166534' }, // Emerald Green (Food)
+        { bg: '#FEF3C7', color: '#B45309', border: '#FDE68A', iconBg: '#FDE68A', iconColor: '#92400E' }, // Gold/Amber (DJ/Entertainment)
+        { bg: '#F3E8FF', color: '#6B21A8', border: '#D8B4FE', iconBg: '#E9D5FF', iconColor: '#581C87' }, // Purple (Stay/Hotel)
+        { bg: '#FFE4E6', color: '#BE123C', border: '#FECDD3', iconBg: '#FECDD3', iconColor: '#9F1239' }  // Rose Pink
+      ];
+
+      function getSpotPalette(spot, spotIdx) {
+        const title = (spot.title || '').toLowerCase();
+        if (title.includes('breakfast') || title.includes('lunch') || title.includes('dinner') || title.includes('food') || title.includes('meal') || title.includes('refresh') || title.includes('🍱') || title.includes('🍽️') || title.includes('😋') || title.includes('☕') || title.includes('🍵')) {
+          return spotBadgePalettes[1];
+        }
+        if (title.includes('dj') || title.includes('night') || title.includes('hangover') || title.includes('party') || title.includes('safari') || title.includes('cruise') || title.includes('campfire') || title.includes('light show')) {
+          return spotBadgePalettes[2];
+        }
+        if (title.includes('check-in') || title.includes('check-out') || title.includes('hotel') || title.includes('stay') || title.includes('resort')) {
+          return spotBadgePalettes[3];
+        }
+        return spotBadgePalettes[spotIdx % spotBadgePalettes.length];
+      }
+
+      let totalPagesAdded = 0;
+
+      currentDays.forEach((day, index) => {
+        let currentPageNum = 1;
+        
+        function createNewPage(isCont) {
+          const pageDiv = document.createElement('div');
+          pageDiv.className = 'page';
+          pageDiv.id = `page-day-${index + 1}-p${currentPageNum}`;
+
+          let headerTitle = `DAY ${String(day.dayNum).padStart(2, '0')} DEDICATED ITINERARY`;
+          if (isCont) {
+            headerTitle += ` (CONTD.)`;
+          }
+
+          let statsBarHtml = '';
+          if (!isCont) {
+            statsBarHtml = `
+              <div class="trip-stats-bar">
+                <div class="stat-box"><span class="stat-label">DESTINATION</span><span class="stat-val">${day.destination}</span></div>
+                <div class="stat-box"><span class="stat-label">DAY COVERED</span><span class="stat-val">Day ${String(day.dayNum).padStart(2, '0')}</span></div>
+                <div class="stat-box"><span class="stat-label">GROUP PAX</span><span class="stat-val">${day.pax || '80 Students + 4 Staff (Complementary)'}</span></div>
+                <div class="stat-box"><span class="stat-label">MEAL PLAN</span><span class="stat-val stat-meal-val">${day.mealPlan || (day.dayNum === 1 ? 'WITHOUT FOOD' : 'WITH FOOD')}</span></div>
+                <div class="stat-box"><span class="stat-label">TRANSPORT</span><span class="stat-val">${day.transport || '52-Seater Luxury Bus'}</span></div>
+              </div>
+            `;
+          }
+
+          let bannerHtml = '';
+          if (!isCont) {
+            bannerHtml = `
+              <div class="single-day-banner">
+                <div>
+                  <div class="single-day-title">${day.title}</div>
+                  <div class="single-day-sub">${day.subtitle}</div>
+                </div>
+                <span class="single-day-badge">FULL DAY ${String(day.dayNum).padStart(2, '0')}</span>
+              </div>
+            `;
+          } else {
+            bannerHtml = `
+              <div class="single-day-banner" style="padding: 8px 18px; margin-bottom: 10px;">
+                <div>
+                  <div class="single-day-title" style="font-size: 14px;">${day.title} (Continued)</div>
+                </div>
+                <span class="single-day-badge" style="font-size: 9px; padding: 2px 10px;">DAY ${String(day.dayNum).padStart(2, '0')} CONTD.</span>
+              </div>
+            `;
+          }
+
+          pageDiv.innerHTML = `
+            <div class="page-luxury-frame"></div>
+            <div class="corner-bracket bracket-tl"></div>
+            <div class="corner-bracket bracket-tr"></div>
+            <div class="corner-bracket bracket-bl"></div>
+            <div class="corner-bracket bracket-br"></div>
+
+            <div class="page-content">
+              <div>
+                <div class="header-bar">
+                  <div class="brand-block">
+                    <img src="logo-text-transparent.png" alt="SkyQuest Holidays Logo" class="brand-full-logo-img" onerror="this.onerror=null; this.src='../images/logo-text-transparent.png';">
+                  </div>
+                  <div class="doc-meta-badge">
+                    <div class="doc-meta-title">${headerTitle}</div>
+                    <div class="doc-meta-sub">Destination: ${day.destination}</div>
+                  </div>
+                </div>
+
+                ${statsBarHtml}
+                ${bannerHtml}
+
+                <div class="day-timeline-grid">
+                </div>
+              </div>
+
+              <div class="footer-bar">
+                <div class="footer-left"><span>SKYQUEST HOLIDAYS</span> • <span>Day ${String(day.dayNum).padStart(2, '0')} Detailed Itinerary</span></div>
+                <div class="footer-center">${day.destination}</div>
+                <div class="page-num page-num-calc">Page ${totalPagesAdded + 2}</div>
+              </div>
+            </div>
+
+            <div class="bg-watermark">
+              <img src="watermark-logo.png" alt="SkyQuest Watermark Logo" class="watermark-logo-img" onerror="this.onerror=null; this.src='../images/watermark-logo.png';">
+            </div>
+          `;
+          
+          wrapper.appendChild(pageDiv);
+          totalPagesAdded++;
+          return {
+            pageDiv,
+            gridDiv: pageDiv.querySelector('.day-timeline-grid')
+          };
+        }
+
+        let current = createNewPage(false);
+
+        if (day.spots && Array.isArray(day.spots)) {
+          day.spots.forEach((spot, spotIdx) => {
+            let foodPillHtml = spot.food ? `<span class="food-note-pill meal-food-pill">${spot.food}</span>` : '';
+            let descHtml = spot.desc ? `<div class="slot-desc">${spot.desc}</div>` : '';
+            let badgeText = spot.badge || (`SPOT ${String(spotIdx + 1).padStart(2, '0')}`);
+            let palette = getSpotPalette(spot, spotIdx);
+
+            const slotDiv = document.createElement('div');
+            slotDiv.className = 'timeline-slot';
+            slotDiv.style.borderLeft = `6px solid ${palette.border}`;
+            slotDiv.innerHTML = `
+              <div class="spot-badge-pill" style="background: ${palette.bg}; color: ${palette.color}; border: 1.5px solid ${palette.border};">${badgeText}</div>
+              <div class="spot-icon-asterisk" style="background: ${palette.iconBg}; color: ${palette.iconColor};">✳</div>
+              <div class="slot-content">
+                <div class="slot-heading">${spot.title || 'Activity Details'}</div>
+                ${descHtml}
+                ${foodPillHtml}
+              </div>
+            `;
+
+            current.gridDiv.appendChild(slotDiv);
+
+            const limitOverflow = (current.pageDiv.clientHeight > 0)
+              ? (current.pageDiv.scrollHeight > current.pageDiv.clientHeight)
+              : (currentPageNum === 1 ? (current.gridDiv.children.length > 9) : (current.gridDiv.children.length > 12));
+
+            if (limitOverflow) {
+              current.gridDiv.removeChild(slotDiv);
+              currentPageNum++;
+              current = createNewPage(true);
+              current.gridDiv.appendChild(slotDiv);
+            }
+          });
+        }
+      });
+
+      updatePageNumbers();
+    }
+
+    function updatePageNumbers() {
+      const allPages = document.querySelectorAll('.page');
+      const total = allPages.length;
+      allPages.forEach((p, idx) => {
+        const pNum = p.querySelector('.page-num-calc');
+        if (pNum) {
+          pNum.innerText = `Page ${idx + 1} of ${total}`;
+        }
+      });
+    }
+
+    window.setDayPages = function (daysData) {
+      renderDynamicDayPages(daysData);
+    };
+
+    window.updateQuotationData = function (data) {
+      if (!data) return;
+      if (data.locationText) {
+        const el1 = document.getElementById('doc-client-display'); if (el1) el1.innerText = data.locationText;
+        const el2 = document.getElementById('location-text'); if (el2) el2.innerText = data.locationText;
+        const el3 = document.getElementById('accepted-by-title'); if (el3) el3.innerText = 'ACCEPTED BY (' + data.locationText.toUpperCase() + ')';
+
+        // Update document title for browser Print / Save PDF filename
+        const cleanLoc = data.locationText.trim().replace(/[^a-zA-Z0-9\s_-]/g, '').replace(/\s+/g, '_');
+        if (cleanLoc.length > 0) {
+          document.title = `${cleanLoc}_Quotation_SkyQuest`;
+        }
+      }
+      if (data.refNo) {
+        const el = document.getElementById('doc-ref-display'); if (el) el.innerText = 'Ref: ' + data.refNo;
+      }
+      if (data.durationText || data.destination || data.tourType) {
+        const el = document.getElementById('doc-subtitle-display');
+        if (el) {
+          let baseText = data.durationText || '2 Days / 3 Nights';
+          if (data.tourType && !baseText.includes(data.tourType)) {
+            baseText += ' ' + data.tourType;
+          }
+          if (data.destination && !baseText.includes(data.destination)) {
+            baseText += ' — ' + data.destination;
+          }
+          el.innerText = baseText;
+        }
+      }
+      if (data.tourType) {
+        const el = document.getElementById('tour-type-text'); if (el) el.innerText = data.tourType;
+      }
+      if (data.quoteDate) {
+        const el = document.getElementById('quote-date-text'); if (el) el.innerText = data.quoteDate;
+      }
+      if (data.validity) {
+        const el = document.getElementById('validity-text'); if (el) el.innerText = data.validity;
+      }
+      if (data.preparedBy) {
+        const el = document.getElementById('prepared-by-text'); if (el) el.innerText = data.preparedBy;
+      }
+      if (data.phone !== undefined && data.phone !== null) {
+        const pText = data.phone.trim();
+        const wrap = document.getElementById('footer-phone-row');
+        const textSpan = document.getElementById('footer-phone-text');
+        if (pText.length > 0) {
+          if (textSpan) textSpan.innerText = pText;
+          if (wrap) wrap.style.display = 'flex';
+        } else {
+          if (textSpan) textSpan.innerText = '';
+          if (wrap) wrap.style.display = 'none';
+        }
+      }
+      if (data.paxText) {
+        const el = document.getElementById('pax-text'); if (el) el.innerText = data.paxText;
+      }
+      if (data.datesText !== undefined && data.datesText !== null) {
+        const dText = data.datesText.trim();
+        const wrap = document.getElementById('dates-row-wrap');
+        const textSpan = document.getElementById('dates-text');
+        if (dText.length > 0) {
+          if (textSpan) textSpan.innerText = dText;
+          if (wrap) wrap.style.display = 'inline';
+        } else {
+          if (textSpan) textSpan.innerText = '';
+          if (wrap) wrap.style.display = 'none';
+        }
+      }
+      if (data.email) {
+        const el = document.getElementById('footer-email-text'); if (el) el.innerText = data.email;
+      }
+      if (data.web) {
+        const el = document.getElementById('footer-web-text'); if (el) el.innerText = data.web;
+      }
+      if (data.foodOption) {
+        const b1 = document.getElementById('meal-plan-cover-badge');
+        const b2 = document.getElementById('meal-plan-badge-main');
+        let text = data.foodOption;
+        let lower = text.toLowerCase();
+        let cls = (lower.includes('without') || lower.includes('no food') || lower.includes('no meal') || lower.includes('excluded'))
+          ? 'meal-plan-badge meal-plan-without-food'
+          : 'meal-plan-badge meal-plan-with-food';
+        if (b1) { b1.innerText = text; b1.className = cls; }
+        if (b2) { b2.innerText = text; b2.className = cls; }
+      }
+      if (data.rate) {
+        const el = document.getElementById('doc-rate-display'); if (el) el.innerText = data.rate;
+      }
+      if (data.rateCond) {
+        const el = document.getElementById('rate-cond-text'); if (el) el.innerText = data.rateCond;
+      }
+
+      // Handle Page 1 Photo Showcase (Dynamic 1, 2, 3, or 4 Photo Layout)
+      if (data.galleryImages) {
+        const rawImgs = [
+          data.galleryImages.img1 || '',
+          data.galleryImages.img2 || '',
+          data.galleryImages.img3 || '',
+          data.galleryImages.img4 || ''
+        ];
+        const validImgs = rawImgs.filter(url => url && url.trim().length > 0);
+
+        const gallCard = document.getElementById('trip-highlights-card');
+        const grid = document.querySelector('.gallery-grid-4');
+
+        if (validImgs.length === 0 || data.showGallery === false) {
+          if (gallCard) gallCard.style.display = 'none';
+        } else {
+          if (gallCard) gallCard.style.display = 'block';
+
+          const g1 = document.getElementById('img-gall-1');
+          const g2 = document.getElementById('img-gall-2');
+          const g3 = document.getElementById('img-gall-3');
+          const g4 = document.getElementById('img-gall-4');
+          const elements = [g1, g2, g3, g4];
+
+          // Hide all photo wrappers first
+          elements.forEach(el => {
+            if (el && el.parentElement) el.parentElement.style.display = 'none';
+          });
+
+          // Render only available non-empty photos
+          validImgs.forEach((url, idx) => {
+            if (elements[idx]) {
+              elements[idx].src = url;
+              if (elements[idx].parentElement) elements[idx].parentElement.style.display = 'block';
+            }
+          });
+
+          // Dynamic grid layout adjustments based on uploaded photo count
+          if (grid) {
+            if (validImgs.length === 1) {
+              grid.style.gridTemplateColumns = '1fr';
+              if (g1) g1.style.height = '240px';
+            } else if (validImgs.length === 2) {
+              grid.style.gridTemplateColumns = '1fr 1fr';
+              elements.forEach(el => { if (el) el.style.height = '180px'; });
+            } else if (validImgs.length === 3) {
+              grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+              elements.forEach(el => { if (el) el.style.height = '165px'; });
+            } else {
+              grid.style.gridTemplateColumns = '1fr 1fr';
+              elements.forEach(el => { if (el) el.style.height = '165px'; });
+            }
+          }
+        }
+      }
+
+      if (data.daysData && Array.isArray(data.daysData) && data.daysData.length > 0) {
+        renderDynamicDayPages(data.daysData);
+      } else {
+        renderDynamicDayPages(currentDays);
+      }
+    };
+
+    function loadStoredData() {
+      const saved = localStorage.getItem('skyquest_quotation_saved_data');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          window.updateQuotationData(data);
+        } catch (e) {
+          renderDynamicDayPages(currentDays);
+        }
+      } else {
+        renderDynamicDayPages(currentDays);
+      }
+    }
+
+    function saveQuotationDocument() {
+      alert('💾 Quotation Document Saved Successfully!');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadStoredData();
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('print') === 'true') {
+        setTimeout(() => {
+          window.print();
+        }, 500);
+      }
+    });
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'skyquest_quotation_saved_data') {
+        loadStoredData();
+      }
+    });
+  </script>
+</body>
+
+</html>
