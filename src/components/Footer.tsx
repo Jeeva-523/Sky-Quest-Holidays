@@ -1,25 +1,46 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Compass, Phone, Mail, MapPin, Heart, Shield } from "lucide-react";
 import { COMPANY_INFO } from "@/lib/data";
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  // Hide footer completely inside Admin dashboard, Studio, and Admin Login
+  if (
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/quotation") ||
+    pathname?.startsWith("/skyAdmin")
+  ) {
+    return null;
+  }
+
   return (
     <footer className="bg-slate-950 border-t border-slate-800 text-slate-400 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Col 1: Brand Info */}
           <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-sky-400 flex items-center justify-center shadow-glow">
-                <Compass className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <span className="text-lg font-extrabold tracking-tight text-sky-400">SKY</span>
-                <span className="text-lg font-extrabold tracking-tight text-white">QUEST</span>
-                <p className="text-[9px] tracking-widest text-sky-300/80 uppercase font-semibold">
-                  Holidays & Tours
-                </p>
+            <Link href="/" className="flex items-center gap-3.5 group">
+              <img
+                src="/images/logo.png"
+                alt="Sky Quest Logo"
+                width={50}
+                height={50}
+                style={{ width: "auto", height: "48px", objectFit: "contain" }}
+                className="transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="flex flex-col">
+                <div className="font-audiowide text-[20px] tracking-wide leading-none text-white">
+                  <span className="text-sky-400">SKY</span>
+                  <span className="text-white">QUEST</span>
+                </div>
+                <span className="text-[10px] tracking-[0.25em] text-slate-400 font-bold uppercase mt-1">
+                  — HOLIDAYS —
+                </span>
               </div>
             </Link>
 
@@ -53,13 +74,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/quotation" className="hover:text-amber-400 transition-colors text-amber-300">
-                  ✨ Quotation Generator
-                </Link>
-              </li>
-              <li>
-                <Link href="/admin" className="hover:text-sky-400 transition-colors">
-                  🔒 Admin Portal
+                <Link href="/#contact" className="hover:text-sky-400 transition-colors">
+                  Contact Support
                 </Link>
               </li>
             </ul>
@@ -98,14 +114,6 @@ export default function Footer() {
               <span>{COMPANY_INFO.address}</span>
             </p>
           </div>
-        </div>
-
-        {/* Bottom Bar */}
-        <div className="mt-12 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <p>© {new Date().getFullYear()} Sky Quest Holidays. All rights reserved.</p>
-          <p className="flex items-center gap-1">
-            Built with Next.js, Tailwind CSS & Firebase
-          </p>
         </div>
       </div>
     </footer>

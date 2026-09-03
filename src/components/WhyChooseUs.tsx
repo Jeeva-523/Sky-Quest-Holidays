@@ -1,7 +1,25 @@
-import React from "react";
-import { CheckCircle2, ShieldCheck, HeartHandshake, Award, Clock } from "lucide-react";
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { CheckCircle2 } from "lucide-react";
+import { fetchSiteMediaSettings, DEFAULT_WHY_CHOOSE_IMG } from "@/lib/firebaseServices";
 
 export default function WhyChooseUs() {
+  const [whyChooseImage, setWhyChooseImage] = useState(DEFAULT_WHY_CHOOSE_IMG);
+
+  useEffect(() => {
+    const loadMedia = () => {
+      fetchSiteMediaSettings().then((settings) => {
+        if (settings && settings.whyChooseImage) {
+          setWhyChooseImage(settings.whyChooseImage);
+        }
+      });
+    };
+    loadMedia();
+    window.addEventListener("site_media_updated", loadMedia);
+    return () => window.removeEventListener("site_media_updated", loadMedia);
+  }, []);
+
   const points = [
     {
       title: "Direct Local Network",
@@ -56,9 +74,9 @@ export default function WhyChooseUs() {
           <div className="relative">
             <div className="relative rounded-3xl overflow-hidden shadow-xl border border-slate-200">
               <img
-                src="https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=1000&q=80"
-                alt="Travelers enjoying tour"
-                className="w-full h-[440px] object-cover"
+                src={whyChooseImage || DEFAULT_WHY_CHOOSE_IMG}
+                alt="Travelers enjoying tour with Sky Quest"
+                className="w-full h-[440px] object-cover transition-all duration-500"
               />
             </div>
 

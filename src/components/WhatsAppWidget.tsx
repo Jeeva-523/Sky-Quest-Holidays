@@ -1,12 +1,22 @@
 "use client";
 
 import React, { useState } from "react";
+import { usePathname } from "next/navigation";
 import { MessageCircle, X, Send, Sparkles } from "lucide-react";
 import { COMPANY_INFO } from "@/lib/data";
 
 export default function WhatsAppWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [msg, setMsg] = useState("");
+  const pathname = usePathname();
+
+  if (
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/quotation") ||
+    pathname?.startsWith("/skyAdmin")
+  ) {
+    return null;
+  }
 
   const handleSend = () => {
     const defaultText = msg || "Hi Sky Quest Holidays! I would like to enquire about your tour packages.";

@@ -1,6 +1,5 @@
-import type { Config } from "tailwindcss";
-
-const config: Config = {
+/** @type {import('tailwindcss').Config} */
+module.exports = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -8,6 +7,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        audiowide: ['"Audiowide"', 'cursive', 'sans-serif'],
+        bruno: ['"Bruno Ace SC"', 'sans-serif'],
+        transcity: ['Transcity', 'sans-serif'],
+      },
       colors: {
         brand: {
           navy: "#0B1D3A",
@@ -20,18 +24,7 @@ const config: Config = {
           "gold-light": "#FDF9F0",
         },
       },
-      fontFamily: {
-        sans: ["var(--font-outfit)", "sans-serif"],
-        heading: ["var(--font-chakra)", "sans-serif"],
-        editorial: ["var(--font-playfair)", "serif"],
-      },
-      boxShadow: {
-        glow: "0 0 20px rgba(2, 132, 199, 0.35)",
-        card: "0 10px 30px -5px rgba(11, 29, 58, 0.08)",
-        "card-hover": "0 20px 40px -10px rgba(2, 132, 199, 0.15)",
-      },
     },
   },
   plugins: [],
 };
-export default config;

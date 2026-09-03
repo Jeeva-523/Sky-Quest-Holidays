@@ -16,6 +16,18 @@ const nextConfig = {
       }
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/skyadmin',
+        destination: '/skyAdmin',
+      },
+      {
+        source: '/admin/login',
+        destination: '/skyAdmin',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

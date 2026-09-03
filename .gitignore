@@ -1,5 +1,10 @@
 node_modules/
 .next/
+out/
 .firebase/
 .env*.local
 test_output.pdf
+firebase-debug.log*
+tsconfig.tsbuildinfo
+.vscode/
+

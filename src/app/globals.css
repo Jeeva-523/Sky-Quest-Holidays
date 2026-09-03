@@ -1,6 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600;1,700;1,800;1,900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: 'Transcity';
+  src: url('/fonts/Transcity.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Audiowide';
+  src: url('/fonts/Audiowide-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer utilities {
+  .font-audiowide {
+    font-family: 'Audiowide', cursive, sans-serif !important;
+  }
+  .font-bruno {
+    font-family: 'Bruno Ace SC', sans-serif;
+  }
+  .font-serif-brand {
+    font-family: 'Playfair Display', Georgia, 'Times New Roman', serif !important;
+    font-style: italic !important;
+  }
+}
 
 @layer base {
   :root {
@@ -54,12 +84,35 @@
 }
 
 /* Print Rules */
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
 @media print {
-  .no-print {
+  .no-print,
+  .print\:hidden {
     display: none !important;
   }
-  body {
+  
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
     background: #ffffff !important;
     color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    width: 210mm !important;
+  }
+
+  /* Prevent Chromium blend-mode black rectangle bug on print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .mix-blend-multiply {
+    mix-blend-mode: normal !important;
   }
 }
+
