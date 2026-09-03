@@ -1,0 +1,73 @@
+import React from "react";
+import { Compass, Award, Shield, Users, Heart } from "lucide-react";
+import { COMPANY_INFO } from "@/lib/data";
+
+export default function AboutSection() {
+  return (
+    <section id="about" className="py-20 bg-slate-900 border-t border-slate-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left Collage Images */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <img
+                src="https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=600&q=80"
+                alt="Munnar Mountains"
+                className="w-full h-56 object-cover rounded-2xl border border-slate-700 shadow-md"
+              />
+              <img
+                src="https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=600&q=80"
+                alt="Houseboat Alleppey"
+                className="w-full h-40 object-cover rounded-2xl border border-slate-700 shadow-md"
+              />
+            </div>
+            <div className="space-y-4 pt-8">
+              <img
+                src="https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=600&q=80"
+                alt="Ooty Nilgiris"
+                className="w-full h-40 object-cover rounded-2xl border border-slate-700 shadow-md"
+              />
+              <img
+                src="https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=600&q=80"
+                alt="Thailand Pattaya Beach"
+                className="w-full h-56 object-cover rounded-2xl border border-slate-700 shadow-md"
+              />
+            </div>
+          </div>
+
+          {/* Right Content */}
+          <div>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-bold uppercase tracking-wider mb-4">
+              <Compass className="w-3.5 h-3.5" />
+              <span>About Sky Quest Holidays</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-6">
+              Passionate Travel Experts Based in Tamil Nadu
+            </h2>
+            <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
+              Founded with the vision to make holidays smooth, exciting, and accessible to everyone, <strong className="text-white">Sky Quest Holidays</strong> has grown into one of South India's most dependable tour operators.
+            </p>
+            <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-8">
+              Whether you are looking for a romantic honeymoon escape in misty Munnar, an adventurous college industrial visit in Goa, a devotional pilgrimage to Rameshwaram, or an international package to Thailand and Malaysia, our dedicated team handles transport, deluxe accommodations, and on-ground logistics with utmost care.
+            </p>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-800">
+              <div>
+                <p className="text-2xl font-black text-sky-400">{COMPANY_INFO.yearsOfExperience}+ Years</p>
+                <p className="text-xs text-slate-400">Industry Excellence</p>
+              </div>
+              <div>
+                <p className="text-2xl font-black text-amber-400">500+ Trips</p>
+                <p className="text-xs text-slate-400">Successfully Executed</p>
+              </div>
+              <div>
+                <p className="text-2xl font-black text-emerald-400">100%</p>
+                <p className="text-xs text-slate-400">Customer Delight</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

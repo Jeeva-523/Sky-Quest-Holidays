@@ -1,13 +1,29 @@
 {
   "name": "sky-quest-holidays",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
-    "dev": "npx -y serve .",
-    "start": "npx -y serve .",
-    "build": "echo Static site ready"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "firebase": "^12.16.0",
-    "pngjs": "^7.0.0"
+    "clsx": "^2.1.1",
+    "firebase": "^11.3.1",
+    "lucide-react": "^0.475.0",
+    "next": "^14.2.24",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.19",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3"
   }
 }

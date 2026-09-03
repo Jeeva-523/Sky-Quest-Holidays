@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand-navy: #0B1D3A;
+    --brand-sky: #0284C7;
+    --brand-gold: #C5A059;
+  }
+
+  body {
+    @apply bg-slate-900 text-slate-100 antialiased font-sans selection:bg-sky-500 selection:text-white;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0284c7;
+}
+
+/* Glassmorphism effects */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glow-hover:hover {
+  box-shadow: 0 0 25px rgba(2, 132, 199, 0.4);
+}
+
+/* Gold Gradient Text */
+.gold-gradient-text {
+  background: linear-gradient(135deg, #FDE047 0%, #D97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Sky Gradient Text */
+.sky-gradient-text {
+  background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
