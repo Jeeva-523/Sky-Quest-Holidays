@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, Sparkles, Filter, RefreshCw } from "lucide-react";
+import Link from "next/link";
+import { Search, Sparkles, RefreshCw } from "lucide-react";
 import { TourPackage } from "@/lib/types";
-import { CATEGORIES } from "@/lib/data";
 import { fetchAllPackages } from "@/lib/firebaseServices";
 import PackageCard from "./PackageCard";
 import BookingModal from "./BookingModal";
@@ -31,7 +31,16 @@ export default function PackagesSection() {
     }
   };
 
-  // Filter packages based on category & search term
+  const tabs = [
+    { id: "all", label: "✨ All Destinations" },
+    { id: "tamilnadu", label: "🛕 Tamil Nadu" },
+    { id: "kerala", label: "🌴 Kerala" },
+    { id: "karnataka", label: "🌄 Karnataka" },
+    { id: "honeymoon", label: "❤️ Honeymoon" },
+    { id: "college", label: "🎓 College IV" },
+    { id: "international", label: "✈️ International" }
+  ];
+
   const filteredPackages = packages.filter((pkg) => {
     const matchesCategory =
       selectedCategory === "all" ||
@@ -48,56 +57,55 @@ export default function PackagesSection() {
   });
 
   return (
-    <section id="packages" className="py-20 bg-slate-950 relative overflow-hidden">
-      {/* Decorative Glow */}
-      <div className="absolute top-1/2 left-0 w-96 h-96 bg-sky-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <section id="packages" className="py-20 bg-slate-50 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-bold uppercase tracking-wider mb-3">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Curated Travel Itineraries</span>
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+          <div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
+              Our Tour Packages
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base">
+              From stays and transport to local sightseeing, we&apos;ve got your entire trip sorted.
+            </p>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
-            Popular Tour Packages
-          </h2>
-          <p className="text-slate-400 text-sm sm:text-base">
-            From the serene tea hills of Munnar to the royal palaces of Mysore and tropical beaches of Thailand, choose your dream vacation.
-          </p>
+
+          <Link
+            href="/#contact"
+            className="self-start md:self-auto px-6 py-3 rounded-xl bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white font-bold text-xs uppercase tracking-wider shadow-md glow-btn transition-all"
+          >
+            Enquire Now
+          </Link>
         </div>
 
-        {/* Search Bar & Category Tabs */}
-        <div className="mb-10 space-y-5">
-          {/* Search Box */}
-          <div className="max-w-md mx-auto relative">
+        {/* Search Bar & Filter Tabs */}
+        <div className="mb-10 space-y-4">
+          <div className="max-w-md relative">
             <Search className="absolute left-4 top-3.5 w-4 h-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Search destination (Munnar, Ooty, Goa, Thailand...)"
+              placeholder="Search destination (Munnar, Ooty, Goa, Coorg...)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-900 border border-slate-700/80 text-white placeholder-slate-400 text-sm focus:outline-none focus:border-sky-500 shadow-inner transition-colors"
+              className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-sky-500 shadow-sm"
             />
           </div>
 
-          {/* Filter Pills */}
-          <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-            {CATEGORIES.map((cat) => {
-              const active = selectedCategory === cat.id;
+          {/* Filter Tabs */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+            {tabs.map((tab) => {
+              const active = selectedCategory === tab.id;
               return (
                 <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                  key={tab.id}
+                  onClick={() => setSelectedCategory(tab.id)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                     active
-                      ? "bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-glow border border-sky-400"
-                      : "bg-slate-900/80 text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-800"
+                      ? "bg-sky-600 text-white shadow-md"
+                      : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
                   }`}
                 >
-                  <span>{cat.icon}</span>
-                  <span>{cat.name}</span>
+                  {tab.label}
                 </button>
               );
             })}
@@ -107,23 +115,23 @@ export default function PackagesSection() {
         {/* Packages Grid */}
         {loading ? (
           <div className="py-20 flex flex-col items-center justify-center gap-3">
-            <RefreshCw className="w-8 h-8 text-sky-400 animate-spin" />
-            <p className="text-xs text-slate-400">Loading tour packages...</p>
+            <RefreshCw className="w-8 h-8 text-sky-600 animate-spin" />
+            <p className="text-xs text-slate-500">Loading tour packages...</p>
           </div>
         ) : filteredPackages.length === 0 ? (
-          <div className="py-16 text-center bg-slate-900/50 rounded-2xl border border-slate-800 p-8">
-            <p className="text-lg font-bold text-white mb-2">No packages match your search</p>
-            <p className="text-xs text-slate-400 mb-6">
-              Try changing your filter or search keywords.
+          <div className="py-16 text-center bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
+            <p className="text-lg font-bold text-slate-800 mb-1">Choose Your Destination</p>
+            <p className="text-xs text-slate-500 mb-4">
+              Select Kerala, Karnataka or Tamil Nadu above to explore our curated packages.
             </p>
             <button
               onClick={() => {
                 setSelectedCategory("all");
                 setSearchQuery("");
               }}
-              className="px-4 py-2 rounded-xl bg-sky-500 text-white text-xs font-bold"
+              className="px-4 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold"
             >
-              Reset Filters
+              Reset Filter
             </button>
           </div>
         ) : (
