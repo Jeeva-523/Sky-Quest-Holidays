@@ -444,7 +444,10 @@ body {
 .spots-list-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  flex: 1;
+  justify-content: space-between;
+  margin: 8px 0;
+  min-height: 0;
 }
 
 .spot-card-row {
@@ -452,7 +455,7 @@ body {
   border: 1px solid var(--border-subtle);
   border-left: 4px solid var(--sky-blue);
   border-radius: 10px;
-  padding: 7px 14px;
+  padding: 8px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;

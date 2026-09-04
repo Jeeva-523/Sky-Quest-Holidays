@@ -1316,102 +1316,115 @@ export default function QuotationExactPDFPage() {
                 {/* Outer Elegant Frame */}
                 <div className="absolute inset-4 border border-amber-600/30 rounded-xl pointer-events-none z-10" />
 
-                <div className="space-y-3 relative z-10">
-                  {/* Header */}
-                  <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src="/images/logo.png"
-                        alt="SkyQuest Logo"
-                        className="h-14 w-auto object-contain"
-                      />
-                      <div className="flex flex-col justify-center">
-                        <div className="flex items-baseline gap-2 leading-none">
-                          <span className="font-serif-brand font-black italic text-2xl tracking-tight text-slate-900 leading-none">
-                            <span className="text-[#0284c7]">Sky</span> Quest
-                          </span>
-                          <span className="font-serif-brand font-bold italic text-base tracking-normal text-slate-800 leading-none">
-                            Holidays
+                <div className="flex-1 flex flex-col justify-between relative z-10 h-full">
+                  {/* Top Header & Day Metadata */}
+                  <div className="space-y-2.5">
+                    {/* Header */}
+                    <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src="/images/logo.png"
+                          alt="SkyQuest Logo"
+                          className="h-14 w-auto object-contain"
+                        />
+                        <div className="flex flex-col justify-center">
+                          <div className="flex items-baseline gap-2 leading-none">
+                            <span className="font-serif-brand font-black italic text-2xl tracking-tight text-slate-900 leading-none">
+                              <span className="text-[#0284c7]">Sky</span> Quest
+                            </span>
+                            <span className="font-serif-brand font-bold italic text-base tracking-normal text-slate-800 leading-none">
+                              Holidays
+                            </span>
+                          </div>
+                          <span className="text-[7.5px] font-bold tracking-[2.2px] text-[#e67e22] uppercase mt-1 leading-none">
+                            EXPLORE BEYOND HORIZONS
                           </span>
                         </div>
-                        <span className="text-[7.5px] font-bold tracking-[2.2px] text-[#e67e22] uppercase mt-1 leading-none">
-                          EXPLORE BEYOND HORIZONS
+                      </div>
+                      <div className="border border-slate-300 rounded-full px-4 py-1 text-right bg-slate-50/80">
+                        <span className="text-[10px] font-black text-slate-800 tracking-wider uppercase block">
+                          {headerTag}
+                        </span>
+                        <span className="text-[8.5px] text-slate-600 block">
+                          Destination: {dayPage.destination}
                         </span>
                       </div>
                     </div>
-                    <div className="border border-slate-300 rounded-full px-4 py-1 text-right bg-slate-50/80">
-                      <span className="text-[10px] font-black text-slate-800 tracking-wider uppercase block">
-                        {headerTag}
+
+                    {/* 5-Column Meta Strip (Exact match with PDF) */}
+                    <div className="rounded-xl bg-[#0c1a30] text-white p-2.5 grid grid-cols-5 gap-2 text-center text-[8.5px] border border-slate-800 shadow-sm">
+                      <div className="border-r border-slate-700 pr-1">
+                        <span className="text-slate-400 font-bold block text-[7.5px] uppercase">DESTINATION</span>
+                        <span className="font-extrabold text-white text-[9.5px] block truncate">{dayPage.destination}</span>
+                      </div>
+                      <div className="border-r border-slate-700 pr-1">
+                        <span className="text-slate-400 font-bold block text-[7.5px] uppercase">DAY COVERED</span>
+                        <span className="font-extrabold text-white text-[9.5px] block">Day 0{dayPage.dayNum}</span>
+                      </div>
+                      <div className="border-r border-slate-700 pr-1">
+                        <span className="text-slate-400 font-bold block text-[7.5px] uppercase">GROUP PAX</span>
+                        <span className="font-extrabold text-white text-[9px] block truncate">{paxText}</span>
+                      </div>
+                      <div className="border-r border-slate-700 pr-1">
+                        <span className="text-slate-400 font-bold block text-[7.5px] uppercase">MEAL PLAN</span>
+                        <span className="font-extrabold text-emerald-400 text-[8.5px] block truncate">{dayPage.mealPlan}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 font-bold block text-[7.5px] uppercase">TRANSPORT</span>
+                        <span className="font-extrabold text-white text-[8.5px] block truncate">{dayPage.transport}</span>
+                      </div>
+                    </div>
+
+                    {/* Day Hero Title Strip */}
+                    <div className="rounded-xl bg-[#0c1a30] text-white p-2.5 flex items-center justify-between border border-slate-800">
+                      <div>
+                        <h2 className="text-sm font-black text-white">{dayPage.title}</h2>
+                        <p className="text-[9px] text-slate-300 mt-0.5">{dayPage.subtitle}</p>
+                      </div>
+                      <span className="px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[9px] font-black uppercase">
+                        {badgeTag}
                       </span>
-                      <span className="text-[8.5px] text-slate-600 block">
-                        Destination: {dayPage.destination}
-                      </span>
                     </div>
                   </div>
 
-                  {/* 5-Column Meta Strip (Exact match with PDF) */}
-                  <div className="rounded-xl bg-[#0c1a30] text-white p-2.5 grid grid-cols-5 gap-2 text-center text-[8.5px] border border-slate-800 shadow-sm">
-                    <div className="border-r border-slate-700 pr-1">
-                      <span className="text-slate-400 font-bold block text-[7.5px] uppercase">DESTINATION</span>
-                      <span className="font-extrabold text-white text-[9.5px] block truncate">{dayPage.destination}</span>
-                    </div>
-                    <div className="border-r border-slate-700 pr-1">
-                      <span className="text-slate-400 font-bold block text-[7.5px] uppercase">DAY COVERED</span>
-                      <span className="font-extrabold text-white text-[9.5px] block">Day 0{dayPage.dayNum}</span>
-                    </div>
-                    <div className="border-r border-slate-700 pr-1">
-                      <span className="text-slate-400 font-bold block text-[7.5px] uppercase">GROUP PAX</span>
-                      <span className="font-extrabold text-white text-[9px] block truncate">{paxText}</span>
-                    </div>
-                    <div className="border-r border-slate-700 pr-1">
-                      <span className="text-slate-400 font-bold block text-[7.5px] uppercase">MEAL PLAN</span>
-                      <span className="font-extrabold text-emerald-400 text-[8.5px] block truncate">{dayPage.mealPlan}</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 font-bold block text-[7.5px] uppercase">TRANSPORT</span>
-                      <span className="font-extrabold text-white text-[8.5px] block truncate">{dayPage.transport}</span>
-                    </div>
-                  </div>
-
-                  {/* Day Hero Title Strip */}
-                  <div className="rounded-xl bg-[#0c1a30] text-white p-2.5 flex items-center justify-between border border-slate-800">
-                    <div>
-                      <h2 className="text-sm font-black text-white">{dayPage.title}</h2>
-                      <p className="text-[9px] text-slate-300 mt-0.5">{dayPage.subtitle}</p>
-                    </div>
-                    <span className="px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[9px] font-black uppercase">
-                      {badgeTag}
-                    </span>
-                  </div>
-
-                  {/* Spots Timeline Cards (1..15 per page) */}
-                  <div className={dayPage.spots.length > 12 ? "space-y-1" : "space-y-1.5"}>
+                  {/* Spots Timeline Cards (1..15 per page) - Elegantly distributed to suit up to 15 spots per page */}
+                  <div
+                    className={`flex-1 flex flex-col ${
+                      dayPage.spots.length >= 8 ? "justify-between" : "justify-start space-y-3"
+                    } my-2.5 min-h-0`}
+                  >
                     {dayPage.spots.map((spot, sIdx) => {
                       const absoluteSpotIndex = dayPage.startSpotIndex + sIdx;
                       const colorStyle = spotColors[absoluteSpotIndex % spotColors.length];
                       return (
                         <div
                           key={sIdx}
-                          className={`rounded-xl border border-slate-200 border-l-4 ${colorStyle.border} ${colorStyle.bg} px-3.5 ${dayPage.spots.length > 12 ? "py-1.5" : "py-2"} flex items-center justify-between transition-all`}
+                          className={`rounded-xl border border-slate-200 border-l-4 ${colorStyle.border} ${colorStyle.bg} px-3.5 ${
+                            dayPage.spots.length >= 14
+                              ? "py-1.5"
+                              : dayPage.spots.length >= 10
+                              ? "py-2"
+                              : "py-2.5"
+                          } flex items-center justify-between transition-all`}
                         >
                           <div className="flex items-center gap-3">
                             <span className={`px-2.5 py-0.5 rounded font-black text-[10.5px] uppercase tracking-wider ${colorStyle.pillBg}`}>
                               SPOT {String(absoluteSpotIndex + 1).padStart(2, "0")}
                             </span>
                             <span className={`text-sm ${colorStyle.star}`}>✳</span>
-                            <span className="font-black text-slate-950 text-[15.5px] tracking-tight leading-snug">{spot}</span>
+                            <span className="font-black text-slate-950 text-[15px] tracking-tight leading-snug">{spot}</span>
                           </div>
                         </div>
                       );
                     })}
                   </div>
-                </div>
 
-                {/* Footer */}
-                <div className="border-t border-slate-200 pt-2 flex justify-between items-center text-[8.5px] text-slate-500 relative z-10">
-                  <span className="font-bold">SKYQUEST HOLIDAYS • Day 0{dayPage.dayNum} Detailed Itinerary</span>
-                  <span className="italic">{dayPage.destination}</span>
-                  <span className="px-2 py-0.5 rounded bg-slate-100 font-bold text-slate-700">Page {pageNum} of {totalPages}</span>
+                  {/* Footer */}
+                  <div className="border-t border-slate-200 pt-2 flex justify-between items-center text-[8.5px] text-slate-500">
+                    <span className="font-bold">SKYQUEST HOLIDAYS • Day 0{dayPage.dayNum} Detailed Itinerary</span>
+                    <span className="italic">{dayPage.destination}</span>
+                    <span className="px-2 py-0.5 rounded bg-slate-100 font-bold text-slate-700">Page {pageNum} of {totalPages}</span>
+                  </div>
                 </div>
               </div>
             );
