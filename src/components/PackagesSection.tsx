@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, ChevronDown } from "lucide-react";
 import { TourPackage } from "@/lib/types";
 import { INITIAL_PACKAGES } from "@/lib/data";
 import { fetchAllPackages } from "@/lib/firebaseServices";
@@ -12,11 +12,15 @@ import BookingModal from "./BookingModal";
 export default function PackagesSection() {
   const [packages, setPackages] = useState<TourPackage[]>(INITIAL_PACKAGES);
   const [loading, setLoading] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("tamilnadu");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [showAll, setShowAll] = useState(false);
   const [activePackageForBooking, setActivePackageForBooking] = useState<TourPackage | null>(null);
 
   useEffect(() => {
     loadPackagesData();
+    const handleUpdated = () => loadPackagesData();
+    window.addEventListener("packages_updated", handleUpdated);
+    return () => window.removeEventListener("packages_updated", handleUpdated);
   }, []);
 
   const loadPackagesData = async () => {
@@ -31,17 +35,21 @@ export default function PackagesSection() {
   };
 
   const tabs = [
-    { id: "tamilnadu", label: "🛕 Tamil Nadu" },
-    { id: "kerala", label: "🌴 Kerala" },
-    { id: "karnataka", label: "🌄 Karnataka" }
+    { id: "all", label: "✨ All Places (22)" },
+    { id: "kerala", label: "🌴 Kerala (10)" },
+    { id: "karnataka", label: "🌄 Karnataka (6)" },
+    { id: "tamilnadu", label: "🛕 Tamil Nadu (6)" }
   ];
 
   const filteredPackages = packages.filter((pkg) => {
+    if (selectedCategory === "all") return true;
     return (
       pkg.category?.toLowerCase() === selectedCategory.toLowerCase() ||
       pkg.state?.toLowerCase().includes(selectedCategory.toLowerCase())
     );
   });
+
+  const displayedPackages = showAll ? filteredPackages : filteredPackages.slice(0, 8);
 
   return (
     <section id="packages" className="py-20 bg-slate-50 relative">
@@ -70,8 +78,11 @@ export default function PackagesSection() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setSelectedCategory(tab.id)}
-              className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-2 whitespace-nowrap ${
+              onClick={() => {
+                setSelectedCategory(tab.id);
+                setShowAll(false);
+              }}
+              className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all shadow-sm flex items-center gap-2 whitespace-nowrap cursor-pointer ${
                 selectedCategory === tab.id
                   ? "bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-sky-500/25"
                   : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
@@ -95,15 +106,38 @@ export default function PackagesSection() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredPackages.map((pkg) => (
-              <PackageCard
-                key={pkg.id}
-                pkg={pkg}
-                onBook={(p: TourPackage) => setActivePackageForBooking(p)}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {displayedPackages.map((pkg) => (
+                <PackageCard
+                  key={pkg.id}
+                  pkg={pkg}
+                  onBook={(p: TourPackage) => setActivePackageForBooking(p)}
+                />
+              ))}
+            </div>
+
+            {/* View More Button (if more than 8 places) */}
+            {filteredPackages.length > 8 && (
+              <div className="mt-12 text-center">
+                <button
+                  onClick={() => setShowAll(!showAll)}
+                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 hover:text-sky-600 font-extrabold text-sm border-2 border-slate-200 hover:border-sky-400 shadow-md hover:shadow-lg transition-all cursor-pointer group"
+                >
+                  <span>
+                    {showAll
+                      ? "Show Less Places"
+                      : `View More Places (+${filteredPackages.length - 8} More)`}
+                  </span>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-300 ${
+                      showAll ? "rotate-180 text-sky-600" : "group-hover:translate-y-0.5 text-slate-500"
+                    }`}
+                  />
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 

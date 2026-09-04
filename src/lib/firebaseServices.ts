@@ -35,22 +35,42 @@ const LOCAL_STORAGE_BOOKINGS_KEY = "skyquest_bookings";
    1. FIRESTORE - TOUR PACKAGES
    ========================================================================= */
 
-function preservePlacesToVisit(packagesList: TourPackage[]): TourPackage[] {
-  return packagesList.map((pkg) => {
-    if (!pkg.placesToVisit || pkg.placesToVisit.length <= 1) {
-      const initial = INITIAL_PACKAGES.find((p) => p.id === pkg.id || p.name.trim().toLowerCase() === pkg.name.trim().toLowerCase());
-      if (initial && initial.placesToVisit && initial.placesToVisit.length > 1) {
-        return {
-          ...pkg,
-          placesToVisit: initial.placesToVisit,
-          inclusions: pkg.inclusions && pkg.inclusions.length > 1 ? pkg.inclusions : initial.inclusions,
-          exclusions: pkg.exclusions && pkg.exclusions.length > 1 ? pkg.exclusions : initial.exclusions,
-          price: pkg.price || initial.price
-        };
-      }
-    }
-    return pkg;
+function mergeWithInitialPackages(customList: TourPackage[]): TourPackage[] {
+  const customMap = new Map<string, TourPackage>();
+  (customList || []).forEach((pkg) => {
+    if (pkg.id) customMap.set(pkg.id, pkg);
+    if (pkg.name) customMap.set(pkg.name.trim().toLowerCase(), pkg);
   });
+
+  // Guarantee all 22 places always exist
+  const merged: TourPackage[] = INITIAL_PACKAGES.map((initial) => {
+    const custom = customMap.get(initial.id) || customMap.get(initial.name.trim().toLowerCase());
+    if (!custom) return initial;
+
+    return {
+      ...initial,
+      ...custom,
+      // If user uploaded an image via admin, keep user's uploaded image
+      image: custom.image || initial.image,
+      badge: custom.badge || initial.badge,
+      duration: custom.duration || initial.duration,
+      state: custom.state || initial.state,
+      category: custom.category || initial.category,
+      placesToVisit: (custom.placesToVisit && custom.placesToVisit.length > 1) ? custom.placesToVisit : initial.placesToVisit,
+      inclusions: (custom.inclusions && custom.inclusions.length > 0) ? custom.inclusions : initial.inclusions,
+      exclusions: (custom.exclusions && custom.exclusions.length > 0) ? custom.exclusions : initial.exclusions
+    };
+  });
+
+  // Also include any user-created custom packages
+  (customList || []).forEach((pkg) => {
+    const isInitial = INITIAL_PACKAGES.some((init) => init.id === pkg.id || init.name.trim().toLowerCase() === pkg.name.trim().toLowerCase());
+    if (!isInitial) {
+      merged.push(pkg);
+    }
+  });
+
+  return merged;
 }
 
 export async function fetchAllPackages(): Promise<TourPackage[]> {
@@ -61,7 +81,7 @@ export async function fetchAllPackages(): Promise<TourPackage[]> {
       if (res.ok) {
         const data = await res.json();
         if (data && Array.isArray(data.packages) && data.packages.length > 0) {
-          const enriched = preservePlacesToVisit(data.packages);
+          const enriched = mergeWithInitialPackages(data.packages);
           localStorage.setItem(LOCAL_STORAGE_PACKAGES_KEY, JSON.stringify(enriched));
           return enriched;
         }
@@ -80,7 +100,7 @@ export async function fetchAllPackages(): Promise<TourPackage[]> {
       const snapshot = (await Promise.race([fetchPromise, timeoutPromise])) as any;
       if (snapshot && !snapshot.empty) {
         const pkgs = snapshot.docs.map((d: any) => ({ id: d.id, ...d.data() } as TourPackage));
-        const enriched = preservePlacesToVisit(pkgs);
+        const enriched = mergeWithInitialPackages(pkgs);
         if (typeof window !== "undefined") {
           localStorage.setItem(LOCAL_STORAGE_PACKAGES_KEY, JSON.stringify(enriched));
         }
@@ -98,7 +118,7 @@ export async function fetchAllPackages(): Promise<TourPackage[]> {
       try {
         const parsed = JSON.parse(local);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return preservePlacesToVisit(parsed);
+          return mergeWithInitialPackages(parsed);
         }
       } catch (e) {}
     }
@@ -143,6 +163,7 @@ export async function saveTourPackage(pkg: Omit<TourPackage, "id"> & { id?: stri
       all.unshift(packageData as TourPackage);
     }
     localStorage.setItem(LOCAL_STORAGE_PACKAGES_KEY, JSON.stringify(all));
+    window.dispatchEvent(new CustomEvent("packages_updated", { detail: all }));
   }
 
   // 2. Sync to Server (/api/sync) so mobile phones & desktop stay identical
@@ -1035,6 +1056,7 @@ export async function saveGalleryItem(item: Omit<GalleryItem, "id"> & { id?: str
       all.unshift(itemData as GalleryItem);
     }
     localStorage.setItem(LOCAL_STORAGE_GALLERY_KEY, JSON.stringify(all));
+    window.dispatchEvent(new CustomEvent("gallery_updated", { detail: all }));
 
     try {
       await fetch("/api/sync", {
@@ -1063,6 +1085,7 @@ export async function deleteGalleryItem(itemId: string): Promise<boolean> {
     const all = await fetchGalleryItems();
     filtered = all.filter((g) => g.id !== itemId);
     localStorage.setItem(LOCAL_STORAGE_GALLERY_KEY, JSON.stringify(filtered));
+    window.dispatchEvent(new CustomEvent("gallery_updated", { detail: filtered }));
 
     try {
       await fetch("/api/sync", {
@@ -1082,6 +1105,29 @@ export async function deleteGalleryItem(itemId: string): Promise<boolean> {
   }
 
   return true;
+}
+
+// Real-time listener for Firestore gallery changes
+export function subscribeToGalleryItems(callback: (items: GalleryItem[]) => void): () => void {
+  if (isFirebaseConfigured() && db) {
+    try {
+      const q = query(collection(db, "gallery"), orderBy("createdAt", "desc"));
+      const unsubscribe = onSnapshot(q, (snap) => {
+        if (!snap.empty) {
+          const items = snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as GalleryItem));
+          if (typeof window !== "undefined") {
+            localStorage.setItem(LOCAL_STORAGE_GALLERY_KEY, JSON.stringify(items));
+            window.dispatchEvent(new CustomEvent("gallery_updated", { detail: items }));
+          }
+          callback(items);
+        }
+      });
+      return unsubscribe;
+    } catch (e) {
+      console.warn("[Firestore] subscribeToGalleryItems error:", e);
+    }
+  }
+  return () => {};
 }
 
 export async function syncAllLocalDataToServer(): Promise<{ success: boolean; message: string }> {

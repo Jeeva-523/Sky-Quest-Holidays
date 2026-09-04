@@ -28,6 +28,11 @@ export default function PackageCard({ pkg, onBook }: PackageCardProps) {
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-black/10" />
+        {pkg.badge && (
+          <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold bg-amber-500 text-white shadow-md tracking-wide">
+            {pkg.badge}
+          </span>
+        )}
       </div>
 
       {/* 2. Package Body */}

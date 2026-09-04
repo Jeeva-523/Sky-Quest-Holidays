@@ -406,65 +406,6 @@ export const INITIAL_PACKAGES: TourPackage[] = [
     inclusions: ["Sea View Hotel Stay", "Daily Breakfast", "Private Cab for Tour"],
     exclusions: ["Ferry tickets"],
     category: "tamilnadu"
-  },
-
-  // ==================== HONEYMOON SPECIAL ====================
-  {
-    id: "honeymoon-munnar-alappuzha",
-    name: "Munnar & Alleppey Honeymoon Special",
-    title: "Romantic Mist & Backwater Romance 4D/3N",
-    state: "🌴 Kerala",
-    badge: "Honeymoon Special",
-    price: "₹18,999",
-    originalPrice: "₹24,999",
-    duration: "4D | 3N",
-    image: "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=800&q=80",
-    desc: "Candlelight dinner, flower bed decoration, private luxury houseboat cruise & misty tea valley stay.",
-    location: "Munnar & Alleppey, Kerala",
-    placesToVisit: ["Munnar Tea Hills", "Mattupetty Lake", "Alleppey Backwaters", "Marari Beach"],
-    inclusions: ["Candlelight Dinner", "Honeymoon Cake & Flower Bed", "1 Night Luxury Houseboat", "2 Nights 4-Star Resort", "Private AC Sedan"],
-    exclusions: ["Personal shopping"],
-    category: "honeymoon",
-    featured: true
-  },
-
-  // ==================== COLLEGE / GROUP ====================
-  {
-    id: "goa-college-group",
-    name: "Goa Beach & College Group IV",
-    title: "Goa Vibes, Water Sports & Cruise Party",
-    state: "🏖️ Goa",
-    badge: "College IV",
-    price: "₹4,999",
-    originalPrice: "₹7,200",
-    duration: "4D | 3N",
-    image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80",
-    desc: "North & South Goa beaches, water sports combo, DJ cruise night, and Portuguese forts for students.",
-    location: "Goa",
-    placesToVisit: ["Baga Beach", "Calangute Beach", "Aguada Fort", "Mandovi River Cruise", "Dudhsagar Falls"],
-    inclusions: ["Resort with Swimming Pool", "Daily Breakfast", "Group Coach Transfers", "DJ Night Party"],
-    exclusions: ["Water sports add-ons"],
-    category: "college"
-  },
-
-  // ==================== INTERNATIONAL ====================
-  {
-    id: "thailand-express",
-    name: "Thailand Bangkok & Pattaya",
-    title: "Pattaya Coral Island & Bangkok City Tour",
-    state: "✈️ International",
-    badge: "International",
-    price: "₹18,999",
-    originalPrice: "₹26,000",
-    duration: "5D | 4N",
-    image: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=800&q=80",
-    desc: "Speedboat ride to Coral Island, Alcazar Show, Temple tour, and Chao Phraya Cruise.",
-    location: "Bangkok & Pattaya, Thailand",
-    placesToVisit: ["Coral Island with Indian Lunch", "Alcazar Cabaret Show", "Wat Traimit & Wat Pho", "Chao Phraya Dinner Cruise"],
-    inclusions: ["4-Star Hotel Stay", "Daily Breakfast", "Speedboat to Coral Island", "Airport Transfers"],
-    exclusions: ["Air tickets & Visa fees"],
-    category: "international",
-    featured: true
   }
 ];
 
