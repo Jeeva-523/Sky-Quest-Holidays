@@ -88,12 +88,18 @@ body {
 }
 
 .bg-watermark-center-logo img {
-  width: 520px;
+  width: 540px;
   max-width: 85%;
   height: auto;
-  opacity: 0.24;
+  opacity: 0.48;
   -webkit-user-select: none;
   user-select: none;
+}
+
+@media print {
+  .bg-watermark-center-logo img {
+    opacity: 0.42;
+  }
 }
 
 /* Gold Accent Outer Frame */

@@ -57,7 +57,7 @@ import { TourPackage, EnquiryLead, Booking, GalleryItem } from "@/lib/types";
 
 export default function AdminPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"overview" | "packages" | "gallery" | "leads" | "bookings" | "media" | "settings">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "packages" | "gallery" | "leads" | "bookings" | "media" | "settings" | "quotation">("overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Cloudinary Settings State
@@ -572,6 +572,7 @@ export default function AdminPage() {
       <div className="md:hidden sticky top-[53px] z-30 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 px-3 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         {[
           { id: "overview", label: "Overview", icon: LayoutDashboard },
+          { id: "quotation", label: "Quotation", icon: Sparkles },
           { id: "packages", label: `Packages (${packages.length})`, icon: Package },
           { id: "gallery", label: `Moments (${galleryItems.length})`, icon: Camera },
           { id: "media", label: "Media", icon: ImageIcon },
@@ -590,7 +591,11 @@ export default function AdminPage() {
               }}
               className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 isActive
-                  ? "bg-sky-500 text-white shadow-glow"
+                  ? tab.id === "quotation"
+                    ? "bg-amber-500 text-slate-950 font-black shadow-glow"
+                    : "bg-sky-500 text-white shadow-glow"
+                  : tab.id === "quotation"
+                  ? "bg-amber-500/10 text-amber-300 border border-amber-500/30"
                   : "bg-slate-900 text-slate-400 border border-slate-800"
               }`}
             >
@@ -599,13 +604,6 @@ export default function AdminPage() {
             </button>
           );
         })}
-        <Link
-          href="/quotation"
-          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25"
-        >
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          <span>Quotation</span>
-        </Link>
       </div>
 
       {/* Mobile Slide-Over Menu Drawer */}
@@ -632,6 +630,7 @@ export default function AdminPage() {
               <div className="space-y-1.5">
                 {[
                   { id: "overview", label: "Overview & Stats", icon: LayoutDashboard },
+                  { id: "quotation", label: "Quotation Studio", icon: Sparkles },
                   { id: "packages", label: `Tour Packages (${packages.length})`, icon: Package },
                   { id: "gallery", label: `Captured Moments (${galleryItems.length})`, icon: Camera },
                   { id: "media", label: "Site Media & Banners", icon: ImageIcon },
@@ -650,7 +649,11 @@ export default function AdminPage() {
                       }}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-left ${
                         isActive
-                          ? "bg-sky-500 text-white shadow-glow"
+                          ? tab.id === "quotation"
+                            ? "bg-amber-500 text-slate-950 font-black shadow-glow"
+                            : "bg-sky-500 text-white shadow-glow"
+                          : tab.id === "quotation"
+                          ? "text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30"
                           : "text-slate-400 hover:bg-slate-800 hover:text-white"
                       }`}
                     >
@@ -659,34 +662,10 @@ export default function AdminPage() {
                     </button>
                   );
                 })}
-
-                {/* Quotation Option in Mobile Slide Bar */}
-                <Link
-                  href="/quotation"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30"
-                >
-                  <div className="flex items-center gap-3">
-                    <Sparkles className="w-4 h-4 text-amber-400" />
-                    <span>Quotation</span>
-                  </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold uppercase tracking-wider">
-                    Studio
-                  </span>
-                </Link>
               </div>
             </div>
 
             <div className="pt-6 border-t border-slate-800 space-y-2">
-              <Link
-                href="/quotation"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-amber-500/15 text-amber-300 border border-amber-500/30 text-xs font-bold hover:bg-amber-500/25 transition-all"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>Quotation (Studio)</span>
-              </Link>
-
               <Link
                 href="/"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -818,31 +797,30 @@ export default function AdminPage() {
             </button>
 
             {/* Quotation in Sidebar Navigation */}
-            <Link
-              href="/quotation"
-              className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 shadow-sm group"
+            {/* Quotation in Sidebar Navigation */}
+            <button
+              onClick={() => setActiveTab("quotation")}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all ${
+                activeTab === "quotation"
+                  ? "bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/20"
+                  : "text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 shadow-sm group"
+              }`}
             >
               <div className="flex items-center gap-3">
                 <Sparkles className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
                 <span>Quotation</span>
               </div>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold uppercase tracking-wider">
+              <span className={`text-[10px] px-2 py-0.5 rounded font-semibold uppercase tracking-wider ${
+                activeTab === "quotation" ? "bg-black/20 text-slate-950" : "bg-amber-500/20 text-amber-300"
+              }`}>
                 Studio
               </span>
-            </Link>
+            </button>
           </nav>
         </div>
 
         {/* Footer Actions */}
         <div className="pt-6 border-t border-slate-800 space-y-2 mt-6">
-          <Link
-            href="/quotation"
-            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-bold transition-all"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Quotation (Studio)</span>
-          </Link>
-
           <Link
             href="/"
             className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-all"
@@ -868,6 +846,7 @@ export default function AdminPage() {
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-white capitalize">
               {activeTab === "overview" && "Dashboard Overview"}
+              {activeTab === "quotation" && "Official Quotation Studio"}
               {activeTab === "packages" && "Tour Packages & Image Studio"}
               {activeTab === "gallery" && "Captured Moments & Gallery Studio"}
               {activeTab === "media" && "Site Media & Images Studio"}
@@ -1775,6 +1754,19 @@ export default function AdminPage() {
                 </li>
               </ol>
             </div>
+          </div>
+        )}
+
+        {/* ========================================================= */}
+        {/* TAB 7: QUOTATION STUDIO (EMBEDDED INSIDE ADMIN DASHBOARD) */}
+        {/* ========================================================= */}
+        {activeTab === "quotation" && (
+          <div className="w-full h-[calc(100vh-140px)] min-h-[850px] rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-950 animate-fade-in">
+            <iframe
+              src="/quotation"
+              className="w-full h-full border-0 rounded-2xl"
+              title="SkyQuest Quotation Studio"
+            />
           </div>
         )}
       </main>

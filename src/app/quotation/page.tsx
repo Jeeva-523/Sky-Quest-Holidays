@@ -1105,7 +1105,7 @@ export default function QuotationExactPDFPage() {
               <img
                 src="/images/quotation-center-logo.png"
                 alt="SkyQuest Holidays"
-                className="w-[520px] max-w-[85%] h-auto object-contain opacity-[0.24] print:opacity-[0.22] select-none pointer-events-none"
+                className="w-[540px] max-w-[85%] h-auto object-contain opacity-[0.48] print:opacity-[0.42] select-none pointer-events-none"
               />
             </div>
 
@@ -1309,7 +1309,7 @@ export default function QuotationExactPDFPage() {
                   <img
                     src="/images/quotation-center-logo.png"
                     alt="SkyQuest Holidays"
-                    className="w-[520px] max-w-[85%] h-auto object-contain opacity-[0.24] print:opacity-[0.22] select-none pointer-events-none"
+                    className="w-[540px] max-w-[85%] h-auto object-contain opacity-[0.48] print:opacity-[0.42] select-none pointer-events-none"
                   />
                 </div>
 
@@ -1448,7 +1448,7 @@ export default function QuotationExactPDFPage() {
               <img
                 src="/images/quotation-center-logo.png"
                 alt="SkyQuest Holidays"
-                className="w-[520px] max-w-[85%] h-auto object-contain opacity-[0.24] print:opacity-[0.22] select-none pointer-events-none"
+                className="w-[540px] max-w-[85%] h-auto object-contain opacity-[0.48] print:opacity-[0.42] select-none pointer-events-none"
               />
             </div>
 
@@ -1520,15 +1520,15 @@ export default function QuotationExactPDFPage() {
                     <span>✔</span> PACKAGE INCLUSIONS
                   </h4>
                   <ul className="space-y-1 text-slate-700">
-                    <li><strong className="text-slate-900">✔ Transportation:</strong> 52-Seater Luxury Non-A/C Bus with full DJ lightings, sound & push-back seating.</li>
-                    <li><strong className="text-slate-900">✔ Tolls & Permits:</strong> All Interstate Taxes, Toll Gates, and Vehicle Parking fees included.</li>
-                    <li><strong className="text-slate-900">✔ Accommodations:</strong> Deluxe Room Stay @ Kochi Hotel & Vagamon Resort.</li>
-                    <li><strong className="text-slate-900">✔ Special Experience:</strong> Off-road 4x4 Jeep Safari (7 sightseeing points).</li>
-                    <li><strong className="text-slate-900">✔ Harbor Cruise:</strong> Marine Drive Sunset Boat Cruise with Live DJ Music.</li>
-                    <li><strong className="text-slate-900">✔ Campfire:</strong> Cozy night campfire with music system in Vagamon.</li>
-                    <li><strong className="text-slate-900">✔ Meal Plan:</strong> Daily Food Plan (Breakfast, Lunch & Dinner Included).</li>
-                    <li><strong className="text-slate-900">✔ Entry Tickets:</strong> Sightseeing entry passes specified in itinerary.</li>
-                    <li><strong className="text-slate-900">✔ Faculty Compliments:</strong> 2 Staff members completely complimentary.</li>
+                    <li><strong className="text-slate-900">✔ Transportation:</strong> 52-Seater Luxury Non-A/C Bus with DJ Lighting, Premium Sound System & Push-Back Seating.</li>
+                    <li><strong className="text-slate-900">✔ Tolls & Permits:</strong> All Interstate Taxes, Toll Charges, Parking Fees & Applicable Vehicle Permits Included.</li>
+                    <li><strong className="text-slate-900">✔ Accommodation:</strong> Comfortable Deluxe Room Stay at Quality Hotels & Resorts.</li>
+                    <li><strong className="text-slate-900">✔ Special Experience:</strong> Exciting Off-Road 4x4 Jeep Safari covering multiple sightseeing points.</li>
+                    <li><strong className="text-slate-900">✔ Cruise Experience:</strong> Scenic Sunset Boat Cruise with Live DJ Music & Entertainment.</li>
+                    <li><strong className="text-slate-900">✔ Campfire:</strong> Cozy Night Campfire with Music System & Group Entertainment.</li>
+                    <li><strong className="text-slate-900">✔ Meal Plan:</strong> Complete Daily Meal Plan including Breakfast, Lunch & Dinner.</li>
+                    <li><strong className="text-slate-900">✔ Entry Tickets:</strong> Sightseeing Entry Tickets & Applicable Activity Charges as per the Final Itinerary.</li>
+                    <li><strong className="text-slate-900">✔ Faculty Compliments:</strong> 2 Staff Members Completely Complimentary.</li>
                   </ul>
                 </div>
 
@@ -1607,7 +1607,7 @@ export default function QuotationExactPDFPage() {
               <img
                 src="/images/quotation-center-logo.png"
                 alt="SkyQuest Holidays"
-                className="w-[520px] max-w-[85%] h-auto object-contain opacity-[0.24] print:opacity-[0.22] select-none pointer-events-none"
+                className="w-[540px] max-w-[85%] h-auto object-contain opacity-[0.48] print:opacity-[0.42] select-none pointer-events-none"
               />
             </div>
 
