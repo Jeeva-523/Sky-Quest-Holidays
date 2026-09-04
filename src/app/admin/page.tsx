@@ -54,6 +54,7 @@ import {
   DEFAULT_ABOUT_IMG
 } from "@/lib/firebaseServices";
 import { TourPackage, EnquiryLead, Booking, GalleryItem } from "@/lib/types";
+import QuotationStudio from "@/components/QuotationStudio";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -1759,16 +1760,10 @@ export default function AdminPage() {
         )}
 
         {/* ========================================================= */}
-        {/* TAB 7: QUOTATION STUDIO (EMBEDDED INSIDE ADMIN DASHBOARD) */}
+        {/* TAB 7: QUOTATION STUDIO (NATIVE INTEGRATION INSIDE ADMIN) */}
         {/* ========================================================= */}
         {activeTab === "quotation" && (
-          <div className="w-full h-[calc(100vh-24px)] min-h-[850px] rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-950 animate-fade-in">
-            <iframe
-              src="/quotation?embedded=true"
-              className="w-full h-full border-0 rounded-2xl"
-              title="SkyQuest Quotation Studio"
-            />
-          </div>
+          <QuotationStudio embedded={true} />
         )}
       </main>
 
