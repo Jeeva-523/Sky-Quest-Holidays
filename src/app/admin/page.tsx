@@ -67,7 +67,7 @@ export default function AdminPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Cloudinary Settings State
-  const [cloudinaryCloudName, setCloudinaryCloudName] = useState("dciyanu4f");
+  const [cloudinaryCloudName, setCloudinaryCloudName] = useState("dcmv2xqn8");
   const [cloudinaryUploadPreset, setCloudinaryUploadPreset] = useState("skyquest_uploads");
   const [cloudinaryApiKey, setCloudinaryApiKey] = useState("");
   const [cloudinaryFolder, setCloudinaryFolder] = useState("skyquest");
@@ -193,7 +193,7 @@ export default function AdminPage() {
         setAboutImg(media.aboutImage || DEFAULT_ABOUT_IMG);
       }
       if (cSettings) {
-        setCloudinaryCloudName(cSettings.cloudName || "dciyanu4f");
+        setCloudinaryCloudName(cSettings.cloudName || "dcmv2xqn8");
         setCloudinaryUploadPreset(cSettings.uploadPreset || "skyquest_uploads");
         setCloudinaryApiKey(cSettings.apiKey || "");
         setCloudinaryFolder(cSettings.folder || "skyquest");

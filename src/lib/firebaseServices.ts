@@ -385,13 +385,29 @@ const LOCAL_STORAGE_CLOUDINARY_KEY = "skyquest_cloudinary_settings";
 
 export async function fetchCloudinarySettings(): Promise<CloudinarySettings> {
   const defaultSettings: CloudinarySettings = {
-    cloudName: "dciyanu4f",
+    cloudName: "dcmv2xqn8",
     uploadPreset: "skyquest_uploads",
-    apiKey: "",
+    apiKey: "111339426889723",
     folder: "skyquest",
     enabled: true
   };
 
+  // 1. Try Server Sync API (permanent data/cloudinary.json)
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch("/api/sync", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.cloudinary && data.cloudinary.cloudName) {
+          const merged = { ...defaultSettings, ...data.cloudinary };
+          localStorage.setItem(LOCAL_STORAGE_CLOUDINARY_KEY, JSON.stringify(merged));
+          return merged;
+        }
+      }
+    } catch (e) {}
+  }
+
+  // 2. Try Firestore
   if (isFirebaseConfigured() && db) {
     try {
       const docRef = doc(db, "settings", "cloudinary");
@@ -408,6 +424,7 @@ export async function fetchCloudinarySettings(): Promise<CloudinarySettings> {
     }
   }
 
+  // 3. Fallback to localStorage
   if (typeof window !== "undefined") {
     const local = localStorage.getItem(LOCAL_STORAGE_CLOUDINARY_KEY);
     if (local) {
@@ -421,10 +438,25 @@ export async function fetchCloudinarySettings(): Promise<CloudinarySettings> {
 }
 
 export async function saveCloudinarySettings(settings: CloudinarySettings): Promise<boolean> {
+  // 1. Save to localStorage
   if (typeof window !== "undefined") {
     localStorage.setItem(LOCAL_STORAGE_CLOUDINARY_KEY, JSON.stringify(settings));
   }
 
+  // 2. Save permanently to Server file (data/cloudinary.json) via /api/sync
+  if (typeof window !== "undefined") {
+    try {
+      await fetch("/api/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cloudinary: settings })
+      });
+    } catch (e) {
+      console.warn("[Sync API] saveCloudinarySettings error:", e);
+    }
+  }
+
+  // 3. Save to Firebase Firestore if available
   if (isFirebaseConfigured() && db) {
     try {
       const docRef = doc(db, "settings", "cloudinary");

@@ -9,6 +9,7 @@ const UPLOADS_DIR = path.join(process.cwd(), "public", "uploads");
 const PACKAGES_FILE = path.join(DATA_DIR, "packages.json");
 const GALLERY_FILE = path.join(DATA_DIR, "gallery.json");
 const MEDIA_FILE = path.join(DATA_DIR, "media.json");
+const CLOUDINARY_FILE = path.join(DATA_DIR, "cloudinary.json");
 
 function ensureDirs() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -66,11 +67,20 @@ export async function GET() {
       } catch (e) {}
     }
 
+    let cloudinary = null;
+    if (fs.existsSync(CLOUDINARY_FILE)) {
+      try {
+        const raw = fs.readFileSync(CLOUDINARY_FILE, "utf-8");
+        cloudinary = JSON.parse(raw);
+      } catch (e) {}
+    }
+
     return NextResponse.json({
       success: true,
       packages,
       gallery,
       media,
+      cloudinary,
       syncedAt: new Date().toISOString()
     });
   } catch (err: any) {
@@ -85,6 +95,7 @@ export async function POST(req: NextRequest) {
     let updatedPackages = null;
     let updatedGallery = null;
     let updatedMedia = null;
+    let updatedCloudinary = null;
 
     // 1. Process Packages
     if (Array.isArray(body.packages)) {
@@ -129,11 +140,18 @@ export async function POST(req: NextRequest) {
       updatedMedia = sanitizedMedia;
     }
 
+    // 4. Process Cloudinary Settings
+    if (body.cloudinary && typeof body.cloudinary === "object") {
+      fs.writeFileSync(CLOUDINARY_FILE, JSON.stringify(body.cloudinary, null, 2), "utf-8");
+      updatedCloudinary = body.cloudinary;
+    }
+
     return NextResponse.json({
       success: true,
       packages: updatedPackages,
       gallery: updatedGallery,
       media: updatedMedia,
+      cloudinary: updatedCloudinary,
       syncedAt: new Date().toISOString()
     });
   } catch (err: any) {

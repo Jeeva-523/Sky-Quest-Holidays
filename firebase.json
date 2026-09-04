@@ -1,5 +1,21 @@
 {
   "hosting": {
-    "source": "."
+    "public": "out",
+    "cleanUrls": true,
+    "rewrites": [
+      {
+        "source": "/skyadmin",
+        "destination": "/skyAdmin.html"
+      },
+      {
+        "source": "/admin/login",
+        "destination": "/skyAdmin.html"
+      }
+    ],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
   }
 }
