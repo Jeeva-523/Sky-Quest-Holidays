@@ -258,7 +258,7 @@ export default function AdminPage() {
     }
   };
 
-  // Hero Background Upload to Firebase Storage
+  // Hero Background Upload to Cloudinary & Auto-save to Firebase
   const handleHeroImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -267,15 +267,30 @@ export default function AdminPage() {
     try {
       const downloadUrl = await uploadTourImage(file, "hero-banners");
       setHeroBg(downloadUrl);
-      showToast("Photo Upload", "Hero wallpaper photo uploaded successfully!", "success");
-    } catch (error) {
-      showToast("Photo Upload Failed", "Error uploading image to Firebase Storage", "error");
+      // Auto-save to Firebase Firestore & local state immediately!
+      await saveSiteMediaSettings({
+        bgImage: downloadUrl,
+        badgeText: heroBadge,
+        subtitle: heroSubtitle,
+        whyChooseImage: whyChooseImg,
+        aboutImage: aboutImg
+      });
+      const isCloudinary = downloadUrl.includes("cloudinary.com");
+      showToast(
+        "Hero Wallpaper Saved",
+        isCloudinary 
+          ? "Photo uploaded to Cloudinary CDN & saved to Firebase live!" 
+          : "Photo saved to Firebase! (Create unsigned preset in Cloudinary for CDN)",
+        "success"
+      );
+    } catch (error: any) {
+      showToast("Photo Upload Failed", error?.message || "Error uploading image", "error");
     } finally {
       setUploadingHeroImage(false);
     }
   };
 
-  // Why Choose Us Image Upload to Firebase Storage
+  // Why Choose Us Image Upload to Cloudinary & Auto-save to Firebase
   const handleWhyChooseImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -284,15 +299,30 @@ export default function AdminPage() {
     try {
       const downloadUrl = await uploadTourImage(file, "why-choose");
       setWhyChooseImg(downloadUrl);
-      showToast("Photo Upload", "Why Choose Us photo uploaded successfully!", "success");
-    } catch (error) {
-      showToast("Photo Upload Failed", "Error uploading image to Firebase Storage", "error");
+      // Auto-save to Firebase Firestore & local state immediately!
+      await saveSiteMediaSettings({
+        bgImage: heroBg,
+        badgeText: heroBadge,
+        subtitle: heroSubtitle,
+        whyChooseImage: downloadUrl,
+        aboutImage: aboutImg
+      });
+      const isCloudinary = downloadUrl.includes("cloudinary.com");
+      showToast(
+        "Why Choose Photo Saved",
+        isCloudinary 
+          ? "Photo uploaded to Cloudinary CDN & saved to Firebase live!" 
+          : "Photo saved to Firebase! (Create unsigned preset in Cloudinary for CDN)",
+        "success"
+      );
+    } catch (error: any) {
+      showToast("Photo Upload Failed", error?.message || "Error uploading image", "error");
     } finally {
       setUploadingWhyChooseImage(false);
     }
   };
 
-  // About Section Photo Upload
+  // About Section Photo Upload to Cloudinary & Auto-save to Firebase
   const handleAboutImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -301,15 +331,30 @@ export default function AdminPage() {
     try {
       const downloadUrl = await uploadTourImage(file, "about-feature");
       setAboutImg(downloadUrl);
-      showToast("Photo Upload", "About section photo uploaded successfully!", "success");
-    } catch (error) {
-      showToast("Photo Upload Failed", "Error uploading image to Firebase Storage", "error");
+      // Auto-save to Firebase Firestore & local state immediately!
+      await saveSiteMediaSettings({
+        bgImage: heroBg,
+        badgeText: heroBadge,
+        subtitle: heroSubtitle,
+        whyChooseImage: whyChooseImg,
+        aboutImage: downloadUrl
+      });
+      const isCloudinary = downloadUrl.includes("cloudinary.com");
+      showToast(
+        "About Photo Saved",
+        isCloudinary 
+          ? "Photo uploaded to Cloudinary CDN & saved to Firebase live!" 
+          : "Photo saved to Firebase! (Create unsigned preset in Cloudinary for CDN)",
+        "success"
+      );
+    } catch (error: any) {
+      showToast("Photo Upload Failed", error?.message || "Error uploading image", "error");
     } finally {
       setUploadingAboutImage(false);
     }
   };
 
-  // Save Media Settings
+  // Save Media Settings explicitly to Firebase
   const handleSaveMediaSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     setMediaSaving(true);
@@ -323,16 +368,16 @@ export default function AdminPage() {
       });
       setMediaSaveSuccess(true);
       setTimeout(() => setMediaSaveSuccess(false), 3000);
-      showToast("Photo Upload", "Photo uploaded and saved to live website successfully!", "success");
+      showToast("Saved to Firebase", "All media photos & text saved to Firebase live!", "success");
     } catch (err) {
       console.error("Error saving media settings:", err);
-      showToast("Photo Upload Failed", "Failed to save photos to live website", "error");
+      showToast("Save Failed", "Failed to save photos to Firebase", "error");
     } finally {
       setMediaSaving(false);
     }
   };
 
-  // Image Upload to Firebase Storage for Package
+  // Image Upload to Cloudinary / Firebase for Package
   const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -341,9 +386,16 @@ export default function AdminPage() {
     try {
       const downloadUrl = await uploadTourImage(file, "tour-packages");
       setPackageImage(downloadUrl);
-      showToast("Photo Upload", "Tour package photo uploaded successfully!", "success");
-    } catch (error) {
-      showToast("Photo Upload Failed", "Error uploading image to Firebase Storage", "error");
+      const isCloudinary = downloadUrl.includes("cloudinary.com");
+      showToast(
+        "Photo Ready",
+        isCloudinary 
+          ? "Uploaded to Cloudinary CDN! Click Save Package to save to Firebase." 
+          : "Photo ready! Click Save Package to save to Firebase.",
+        "success"
+      );
+    } catch (error: any) {
+      showToast("Photo Upload Failed", error?.message || "Error uploading image", "error");
     } finally {
       setUploadingImage(false);
     }
@@ -459,9 +511,16 @@ export default function AdminPage() {
     try {
       const downloadUrl = await uploadTourImage(file, "gallery");
       setGalleryImage(downloadUrl);
-      showToast("Photo Upload", "Gallery photo uploaded successfully!", "success");
-    } catch (error) {
-      showToast("Photo Upload Failed", "Error uploading image to Firebase Storage", "error");
+      const isCloudinary = downloadUrl.includes("cloudinary.com");
+      showToast(
+        "Photo Ready",
+        isCloudinary 
+          ? "Uploaded to Cloudinary CDN! Click Save Photo to save to Firebase." 
+          : "Photo ready! Click Save Photo to save to Firebase.",
+        "success"
+      );
+    } catch (error: any) {
+      showToast("Photo Upload Failed", error?.message || "Error uploading image", "error");
     } finally {
       setUploadingGalleryImage(false);
     }

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { COMPANY_INFO } from "@/lib/data";
-import { fetchHeroSettings, DEFAULT_HERO_BG, HeroSettings } from "@/lib/firebaseServices";
+import { fetchHeroSettings, DEFAULT_HERO_BG, HeroSettings, subscribeToSiteMedia } from "@/lib/firebaseServices";
 
 export default function Hero() {
   const [heroSettings, setHeroSettings] = useState<HeroSettings>({
@@ -21,8 +21,25 @@ export default function Hero() {
       });
     };
     loadHero();
-    window.addEventListener("site_media_updated", loadHero);
-    return () => window.removeEventListener("site_media_updated", loadHero);
+
+    // Real-time Firestore listener for live updates across all devices
+    const unsubscribe = subscribeToSiteMedia((settings) => {
+      if (settings && settings.bgImage) {
+        setHeroSettings(settings);
+      }
+    });
+
+    const handleLocalUpdate = (e: any) => {
+      if (e.detail && e.detail.bgImage) {
+        setHeroSettings((prev) => ({ ...prev, ...e.detail }));
+      }
+    };
+
+    window.addEventListener("site_media_updated", handleLocalUpdate);
+    return () => {
+      unsubscribe();
+      window.removeEventListener("site_media_updated", handleLocalUpdate);
+    };
   }, []);
 
   return (

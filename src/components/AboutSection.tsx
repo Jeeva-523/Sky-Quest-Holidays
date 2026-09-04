@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { fetchSiteMediaSettings, DEFAULT_ABOUT_IMG } from "@/lib/firebaseServices";
+import { fetchSiteMediaSettings, DEFAULT_ABOUT_IMG, subscribeToSiteMedia } from "@/lib/firebaseServices";
 
 export default function AboutSection() {
   const [aboutImage, setAboutImage] = useState(DEFAULT_ABOUT_IMG);
@@ -15,8 +15,25 @@ export default function AboutSection() {
       });
     };
     loadMedia();
-    window.addEventListener("site_media_updated", loadMedia);
-    return () => window.removeEventListener("site_media_updated", loadMedia);
+
+    // Real-time Firestore listener for live updates across all devices
+    const unsubscribe = subscribeToSiteMedia((settings) => {
+      if (settings && settings.aboutImage) {
+        setAboutImage(settings.aboutImage);
+      }
+    });
+
+    const handleLocalUpdate = (e: any) => {
+      if (e.detail && e.detail.aboutImage) {
+        setAboutImage(e.detail.aboutImage);
+      }
+    };
+
+    window.addEventListener("site_media_updated", handleLocalUpdate);
+    return () => {
+      unsubscribe();
+      window.removeEventListener("site_media_updated", handleLocalUpdate);
+    };
   }, []);
 
   return (

@@ -9,7 +9,8 @@ import {
   deleteDoc,
   query,
   orderBy,
-  serverTimestamp
+  serverTimestamp,
+  onSnapshot
 } from "firebase/firestore";
 import {
   ref,
@@ -500,7 +501,7 @@ export async function uploadToCloudinary(file: File | Blob, folder?: string): Pr
 
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("upload_preset", settings.uploadPreset);
+  formData.append("upload_preset", settings.uploadPreset.trim());
   const targetFolder = folder || settings.folder || "skyquest";
   if (targetFolder) {
     formData.append("folder", targetFolder);
@@ -508,7 +509,7 @@ export async function uploadToCloudinary(file: File | Blob, folder?: string): Pr
 
   const endpoint = `https://api.cloudinary.com/v1_1/${settings.cloudName.trim()}/image/upload`;
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 6000);
+  const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout for photos
 
   try {
     const res = await fetch(endpoint, {
@@ -573,7 +574,30 @@ export async function compressImageToDataUrl(file: File | Blob, maxWidth: number
 }
 
 export async function uploadTourImage(file: File, folder: string = "tours"): Promise<string> {
-  // 1. Upload to Server File Storage (/api/upload) -> Saves permanent file in public/uploads/
+  // 1. PRIORITY #1: Direct Upload to Cloudinary
+  try {
+    const cSettings = await fetchCloudinarySettings();
+    if (cSettings.enabled !== false && cSettings.cloudName && cSettings.uploadPreset) {
+      const cloudinaryUrl = await uploadToCloudinary(file, folder);
+      if (cloudinaryUrl && cloudinaryUrl.startsWith("http")) {
+        return cloudinaryUrl;
+      }
+    }
+  } catch (cError: any) {
+    console.warn("[Cloudinary] Upload attempt failed, falling back:", cError?.message || cError);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("cloudinary_upload_error", {
+          detail: cError?.message || "Cloudinary upload failed"
+        })
+      );
+    }
+  }
+
+  // 2. Client-side compression as fallback
+  const compressedDataUrl = await compressImageToDataUrl(file, 1400, 0.82);
+
+  // 3. Fallback to Server File Storage (/api/upload) if local Next.js server is available
   if (typeof window !== "undefined") {
     try {
       const formData = new FormData();
@@ -585,41 +609,10 @@ export async function uploadTourImage(file: File, folder: string = "tours"): Pro
       });
       if (res.ok) {
         const data = await res.json();
-        if (data.url) {
-          return data.url;
-        }
-      }
-    } catch (apiErr) {
-      console.warn("[API /upload] FormData upload fallback:", apiErr);
-    }
-  }
-
-  // 2. Client-side compression
-  const compressedDataUrl = await compressImageToDataUrl(file, 1400, 0.82);
-
-  // 3. Try base64 upload to /api/upload
-  if (typeof window !== "undefined" && compressedDataUrl) {
-    try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dataUrl: compressedDataUrl, folder })
-      });
-      if (res.ok) {
-        const data = await res.json();
         if (data.url) return data.url;
       }
-    } catch (e) {}
+    } catch (apiErr) {}
   }
-
-  // 4. If Cloudinary is configured with valid preset
-  try {
-    const cSettings = await fetchCloudinarySettings();
-    if (cSettings.enabled !== false && cSettings.cloudName && cSettings.uploadPreset && cSettings.uploadPreset !== "skyquest_uploads") {
-      const blob = await (await fetch(compressedDataUrl)).blob();
-      return await uploadToCloudinary(blob, folder);
-    }
-  } catch (cError) {}
 
   return compressedDataUrl;
 }
@@ -712,7 +705,25 @@ export async function fetchSiteMediaSettings(): Promise<SiteMediaSettings> {
     aboutImage: DEFAULT_ABOUT_IMG
   };
 
-  // 1. Try Server Sync API
+  // 1. Try Firebase Firestore FIRST (cloud truth across all devices)
+  if (isFirebaseConfigured() && db) {
+    try {
+      const docRef = doc(db, "settings", "media");
+      const snap = await getDoc(docRef);
+      if (snap.exists()) {
+        const firestoreData = snap.data() as SiteMediaSettings;
+        const merged = { ...defaultSettings, ...firestoreData };
+        if (typeof window !== "undefined") {
+          localStorage.setItem(LOCAL_STORAGE_SITE_MEDIA_KEY, JSON.stringify(merged));
+        }
+        return merged;
+      }
+    } catch (e) {
+      console.warn("[Firestore] fetchSiteMediaSettings fallback:", e);
+    }
+  }
+
+  // 2. Try Server Sync API
   if (typeof window !== "undefined") {
     try {
       const res = await fetch("/api/sync", { cache: "no-store" });
@@ -725,23 +736,6 @@ export async function fetchSiteMediaSettings(): Promise<SiteMediaSettings> {
         }
       }
     } catch (e) {}
-  }
-
-  // 2. Try Firestore
-  if (isFirebaseConfigured() && db) {
-    try {
-      const docRef = doc(db, "settings", "media");
-      const snap = await getDoc(docRef);
-      if (snap.exists()) {
-        const merged = { ...defaultSettings, ...snap.data() } as SiteMediaSettings;
-        if (typeof window !== "undefined") {
-          localStorage.setItem(LOCAL_STORAGE_SITE_MEDIA_KEY, JSON.stringify(merged));
-        }
-        return merged;
-      }
-    } catch (e) {
-      console.warn("[Firestore] fetchSiteMediaSettings error:", e);
-    }
   }
 
   // 3. Fallback to localStorage
@@ -760,12 +754,29 @@ export async function fetchSiteMediaSettings(): Promise<SiteMediaSettings> {
 export async function saveSiteMediaSettings(settings: Partial<SiteMediaSettings>): Promise<boolean> {
   let firestoreSaved = false;
 
-  // 1. Save to localStorage & notify browser components in real-time
+  // 1. Merge with existing settings
   let mergedMedia: SiteMediaSettings = {};
+  try {
+    const current = await fetchSiteMediaSettings();
+    mergedMedia = { ...current, ...settings };
+  } catch (e) {
+    mergedMedia = { ...settings };
+  }
+
+  // 2. Save to Firebase Firestore FIRST (permanent cloud storage)
+  if (isFirebaseConfigured() && db) {
+    try {
+      const docRef = doc(db, "settings", "media");
+      await setDoc(docRef, { ...mergedMedia, updatedAt: serverTimestamp() }, { merge: true });
+      firestoreSaved = true;
+    } catch (e) {
+      console.error("[Firestore] saveSiteMediaSettings error:", e);
+    }
+  }
+
+  // 3. Save to localStorage & notify browser components in real-time
   if (typeof window !== "undefined") {
     try {
-      const current = await fetchSiteMediaSettings();
-      mergedMedia = { ...current, ...settings };
       localStorage.setItem(LOCAL_STORAGE_SITE_MEDIA_KEY, JSON.stringify(mergedMedia));
       window.dispatchEvent(new CustomEvent("site_media_updated", { detail: mergedMedia }));
     } catch (e) {
@@ -773,7 +784,7 @@ export async function saveSiteMediaSettings(settings: Partial<SiteMediaSettings>
     }
   }
 
-  // 2. Save to Server Sync API so phone and desktop stay synchronized
+  // 4. Save to Server Sync API so phone and desktop stay synchronized
   if (typeof window !== "undefined") {
     try {
       await fetch("/api/sync", {
@@ -786,18 +797,38 @@ export async function saveSiteMediaSettings(settings: Partial<SiteMediaSettings>
     }
   }
 
-  // 3. Save to Firebase Firestore
+  return firestoreSaved || typeof window !== "undefined";
+}
+
+// Real-time listener for Firestore site media changes
+export function subscribeToSiteMedia(callback: (settings: SiteMediaSettings) => void): () => void {
   if (isFirebaseConfigured() && db) {
     try {
       const docRef = doc(db, "settings", "media");
-      await setDoc(docRef, { ...settings, updatedAt: serverTimestamp() }, { merge: true });
-      firestoreSaved = true;
+      const unsubscribe = onSnapshot(docRef, (snap) => {
+        if (snap.exists()) {
+          const firestoreData = snap.data() as SiteMediaSettings;
+          const merged: SiteMediaSettings = {
+            bgImage: DEFAULT_HERO_BG,
+            badgeText: "100% CUSTOMIZED & SAFE TOUR PACKAGES",
+            subtitle: "From the misty tea hills of Munnar to the pristine beaches of Bali & thrilling College IV trips, create memories that last forever.",
+            whyChooseImage: DEFAULT_WHY_CHOOSE_IMG,
+            aboutImage: DEFAULT_ABOUT_IMG,
+            ...firestoreData
+          };
+          if (typeof window !== "undefined") {
+            localStorage.setItem(LOCAL_STORAGE_SITE_MEDIA_KEY, JSON.stringify(merged));
+            window.dispatchEvent(new CustomEvent("site_media_updated", { detail: merged }));
+          }
+          callback(merged);
+        }
+      });
+      return unsubscribe;
     } catch (e) {
-      console.error("[Firestore] saveSiteMediaSettings error:", e);
+      console.warn("[Firestore] subscribeToSiteMedia error:", e);
     }
   }
-
-  return firestoreSaved || typeof window !== "undefined";
+  return () => {};
 }
 
 // Aliases for backwards compatibility
