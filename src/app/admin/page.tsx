@@ -138,6 +138,8 @@ export default function AdminPage() {
   const [packageState, setPackageState] = useState("🌴 Kerala");
   const [packageDuration, setPackageDuration] = useState("2D | 1N");
   const [packageLocation, setPackageLocation] = useState("Munnar, Kerala");
+  const [packagePlaces, setPackagePlaces] = useState("");
+  const [packagePrice, setPackagePrice] = useState("");
   const [packageDesc, setPackageDesc] = useState("");
   const [packageImage, setPackageImage] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -355,29 +357,45 @@ export default function AdminPage() {
     if (packageCategory === "tamilnadu") stateTag = "🛕 Tamil Nadu";
     if (packageCategory === "karnataka") stateTag = "🌄 Karnataka";
 
-    const payload: Omit<TourPackage, "id"> & { id?: string } = {
+    const existingPkg = packages.find((p) => p.id === editingPackageId);
+
+    // Parse places to visit safely
+    let parsedPlaces: string[] = [];
+    if (packagePlaces.trim()) {
+      parsedPlaces = packagePlaces
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+    } else if (existingPkg?.placesToVisit && existingPkg.placesToVisit.length > 0) {
+      parsedPlaces = existingPkg.placesToVisit;
+    } else {
+      parsedPlaces = [packageLocation || packageName];
+    }
+
+    const payload: TourPackage = {
+      ...(existingPkg || {}),
+      id: editingPackageId || `pkg-${Date.now()}`,
       name: packageName,
       title: `${packageName} Tour`,
       state: stateTag,
       category: packageCategory,
-      price: "",
+      price: packagePrice || existingPkg?.price || "₹4,999",
+      originalPrice: existingPkg?.originalPrice || "",
+      badge: existingPkg?.badge || "Popular",
       duration: packageDuration,
       location: packageLocation,
-      desc: packageDesc || `${packageName} customized tour package.`,
-      image: packageImage || "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=800&q=80",
-      placesToVisit: [packageLocation],
-      inclusions: ["3-Star Resort Stay", "Sightseeing Cab"],
-      exclusions: ["Personal Expenses"],
+      desc: packageDesc || existingPkg?.desc || `${packageName} customized tour package.`,
+      image: packageImage || existingPkg?.image || "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=800&q=80",
+      placesToVisit: parsedPlaces,
+      inclusions: existingPkg?.inclusions && existingPkg.inclusions.length > 0 ? existingPkg.inclusions : ["3-Star Resort Stay", "Daily Breakfast", "Sightseeing Cab"],
+      exclusions: existingPkg?.exclusions && existingPkg.exclusions.length > 0 ? existingPkg.exclusions : ["Personal Expenses"],
     };
-
-    if (editingPackageId) {
-      payload.id = editingPackageId;
-    }
 
     await saveTourPackage(payload);
     setIsPackageModalOpen(false);
     resetPackageForm();
     await loadAllAdminData();
+    showToast("Package Saved", `Tour package "${packageName}" saved with all sightseeing places intact!`, "success");
   };
 
   const handleEditPackageClick = (pkg: TourPackage) => {
@@ -389,6 +407,8 @@ export default function AdminPage() {
     setPackageLocation(pkg.location || "");
     setPackageDesc(pkg.desc || "");
     setPackageImage(pkg.image);
+    setPackagePrice(pkg.price || "");
+    setPackagePlaces(Array.isArray(pkg.placesToVisit) && pkg.placesToVisit.length > 0 ? pkg.placesToVisit.join(", ") : (pkg.location || ""));
     setIsPackageModalOpen(true);
   };
 
@@ -406,6 +426,8 @@ export default function AdminPage() {
     setPackageState("🌴 Kerala");
     setPackageDuration("2D | 1N");
     setPackageLocation("Munnar, Kerala");
+    setPackagePlaces("");
+    setPackagePrice("");
     setPackageDesc("");
     setPackageImage("");
   };
@@ -989,8 +1011,23 @@ export default function AdminPage() {
                     </h3>
                     <div className="flex items-center justify-between text-xs pt-3 border-t border-slate-800">
                       <span className="font-semibold text-slate-300">📅 {pkg.duration}</span>
-                      <span className="text-slate-400">{pkg.location}</span>
+                      <span className="text-slate-400 font-medium">{pkg.location}</span>
                     </div>
+
+                    {pkg.placesToVisit && pkg.placesToVisit.length > 0 && (
+                      <div className="mt-3 pt-2.5 border-t border-slate-800/60">
+                        <span className="text-[10px] uppercase font-bold text-sky-400 block mb-1">
+                          📍 Places to Visit ({pkg.placesToVisit.length}):
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {pkg.placesToVisit.map((place, idx) => (
+                            <span key={idx} className="text-[10px] font-medium bg-slate-800/90 text-slate-300 border border-slate-700/60 px-2 py-0.5 rounded-md">
+                              {place}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -1838,6 +1875,47 @@ export default function AdminPage() {
                     placeholder="Munnar, Kerala"
                     value={packageLocation}
                     onChange={(e) => setPackageLocation(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white"
+                  />
+                </div>
+              </div>
+
+              {/* Sightseeing Places to Visit */}
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1">
+                  📍 Sightseeing Places to Visit (Comma-separated) *
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="e.g. Eravikulam National Park, Mattupetty Dam, Echo Point, Top Station, Tea Museum"
+                  value={packagePlaces}
+                  onChange={(e) => setPackagePlaces(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs leading-relaxed"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Separate each place with a comma ( , ). All places will be cleanly shown in the package details.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Price (e.g. ₹4,999)</label>
+                  <input
+                    type="text"
+                    placeholder="₹4,999"
+                    value={packagePrice}
+                    onChange={(e) => setPackagePrice(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Short Description</label>
+                  <input
+                    type="text"
+                    placeholder="Breathtaking tea gardens, misty hilltops..."
+                    value={packageDesc}
+                    onChange={(e) => setPackageDesc(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white"
                   />
                 </div>

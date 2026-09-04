@@ -34,6 +34,24 @@ const LOCAL_STORAGE_BOOKINGS_KEY = "skyquest_bookings";
    1. FIRESTORE - TOUR PACKAGES
    ========================================================================= */
 
+function preservePlacesToVisit(packagesList: TourPackage[]): TourPackage[] {
+  return packagesList.map((pkg) => {
+    if (!pkg.placesToVisit || pkg.placesToVisit.length <= 1) {
+      const initial = INITIAL_PACKAGES.find((p) => p.id === pkg.id || p.name.trim().toLowerCase() === pkg.name.trim().toLowerCase());
+      if (initial && initial.placesToVisit && initial.placesToVisit.length > 1) {
+        return {
+          ...pkg,
+          placesToVisit: initial.placesToVisit,
+          inclusions: pkg.inclusions && pkg.inclusions.length > 1 ? pkg.inclusions : initial.inclusions,
+          exclusions: pkg.exclusions && pkg.exclusions.length > 1 ? pkg.exclusions : initial.exclusions,
+          price: pkg.price || initial.price
+        };
+      }
+    }
+    return pkg;
+  });
+}
+
 export async function fetchAllPackages(): Promise<TourPackage[]> {
   // 1. Try Server Sync API (cross-device sync for mobile, desktop, etc.)
   if (typeof window !== "undefined") {
@@ -42,8 +60,9 @@ export async function fetchAllPackages(): Promise<TourPackage[]> {
       if (res.ok) {
         const data = await res.json();
         if (data && Array.isArray(data.packages) && data.packages.length > 0) {
-          localStorage.setItem(LOCAL_STORAGE_PACKAGES_KEY, JSON.stringify(data.packages));
-          return data.packages;
+          const enriched = preservePlacesToVisit(data.packages);
+          localStorage.setItem(LOCAL_STORAGE_PACKAGES_KEY, JSON.stringify(enriched));
+          return enriched;
         }
       }
     } catch (e) {}
@@ -60,10 +79,11 @@ export async function fetchAllPackages(): Promise<TourPackage[]> {
       const snapshot = (await Promise.race([fetchPromise, timeoutPromise])) as any;
       if (snapshot && !snapshot.empty) {
         const pkgs = snapshot.docs.map((d: any) => ({ id: d.id, ...d.data() } as TourPackage));
+        const enriched = preservePlacesToVisit(pkgs);
         if (typeof window !== "undefined") {
-          localStorage.setItem(LOCAL_STORAGE_PACKAGES_KEY, JSON.stringify(pkgs));
+          localStorage.setItem(LOCAL_STORAGE_PACKAGES_KEY, JSON.stringify(enriched));
         }
-        return pkgs;
+        return enriched;
       }
     } catch (error) {
       console.warn("[Firestore] fetchAllPackages fallback:", error);
@@ -76,7 +96,9 @@ export async function fetchAllPackages(): Promise<TourPackage[]> {
     if (local) {
       try {
         const parsed = JSON.parse(local);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return preservePlacesToVisit(parsed);
+        }
       } catch (e) {}
     }
   }
