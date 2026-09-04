@@ -148,25 +148,25 @@ body {
 }
 
 .brand-sq {
-  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-family: 'Times New Roman', Times, 'Playfair Display', Georgia, serif;
   font-style: italic;
   font-size: 34px;
-  font-weight: 900;
-  letter-spacing: 0.5px;
-  color: var(--text-main);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #0b1a2e;
   line-height: 1;
 }
 
 .brand-sq .text-sky {
-  color: var(--sky-blue);
+  color: #0284c7;
 }
 
 .brand-holidays {
-  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-family: 'Times New Roman', Times, 'Playfair Display', Georgia, serif;
   font-style: italic;
   font-size: 19px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0px;
   color: #1e293b;
   line-height: 1;
 }

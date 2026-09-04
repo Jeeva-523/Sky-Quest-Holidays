@@ -27,8 +27,9 @@
     font-family: 'Bruno Ace SC', sans-serif;
   }
   .font-serif-brand {
-    font-family: 'Playfair Display', Georgia, 'Times New Roman', serif !important;
+    font-family: 'Times New Roman', Times, 'Playfair Display', Georgia, serif !important;
     font-style: italic !important;
+    font-weight: 800 !important;
   }
 }
 

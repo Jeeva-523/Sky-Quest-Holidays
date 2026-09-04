@@ -514,12 +514,12 @@ export default function QuotationExactPDFPage() {
               className="h-9 w-auto object-contain transition-transform group-hover:scale-105"
             />
             <div className="flex flex-col justify-center">
-              <div className="flex items-baseline gap-1 leading-none">
-                <span className="text-base font-serif-brand font-black tracking-normal text-white leading-none">
-                  <span className="text-sky-400">𝑺𝒌𝒚</span> 𝑸𝒖𝒆𝒔𝒕
+              <div className="flex items-baseline gap-1.5 leading-none">
+                <span className="text-xl font-serif-brand font-black italic tracking-tight text-white leading-none">
+                  <span className="text-sky-400">Sky</span> Quest
                 </span>
-                <span className="text-xs font-serif-brand font-bold tracking-normal text-slate-200 leading-none">
-                  𝑯𝒐𝒍𝒊𝒅𝒂𝒚𝒔
+                <span className="text-xs font-serif-brand font-bold italic tracking-normal text-slate-200 leading-none">
+                  Holidays
                 </span>
               </div>
               <span className="text-[7.5px] font-bold tracking-widest text-slate-400 uppercase mt-0.5">
@@ -1122,15 +1122,15 @@ export default function QuotationExactPDFPage() {
                     className="h-14 w-auto object-contain"
                   />
                   <div className="flex flex-col justify-center">
-                    <div className="flex items-baseline gap-1.5 leading-none">
-                      <span className="font-serif-brand font-black text-2xl tracking-normal text-slate-900 leading-none">
-                        <span className="text-sky-600">𝑺𝒌𝒚</span> 𝑸𝒖𝒆𝒔𝒕
+                    <div className="flex items-baseline gap-2 leading-none">
+                      <span className="font-serif-brand font-black italic text-3xl tracking-tight text-slate-900 leading-none">
+                        <span className="text-[#0284c7]">Sky</span> Quest
                       </span>
-                      <span className="font-serif-brand font-bold text-base tracking-normal text-slate-800 leading-none">
-                        𝑯𝒐𝒍𝒊𝒅𝒂𝒚𝒔
+                      <span className="font-serif-brand font-bold italic text-lg tracking-normal text-slate-800 leading-none">
+                        Holidays
                       </span>
                     </div>
-                    <span className="text-[7.5px] font-bold tracking-[2px] text-slate-500 uppercase mt-1 leading-none">
+                    <span className="text-[8px] font-bold tracking-[2.2px] text-[#e67e22] uppercase mt-1 leading-none">
                       EXPLORE BEYOND HORIZONS
                     </span>
                   </div>
@@ -1326,15 +1326,15 @@ export default function QuotationExactPDFPage() {
                         className="h-14 w-auto object-contain"
                       />
                       <div className="flex flex-col justify-center">
-                        <div className="flex items-baseline gap-1.5 leading-none">
-                          <span className="font-serif-brand font-black text-2xl tracking-normal text-slate-900 leading-none">
-                            <span className="text-sky-600">𝑺𝒌𝒚</span> 𝑸𝒖𝒆𝒔𝒕
+                        <div className="flex items-baseline gap-2 leading-none">
+                          <span className="font-serif-brand font-black italic text-2xl tracking-tight text-slate-900 leading-none">
+                            <span className="text-[#0284c7]">Sky</span> Quest
                           </span>
-                          <span className="font-serif-brand font-bold text-base tracking-normal text-slate-800 leading-none">
-                            𝑯𝒐𝒍𝒊𝒅𝒂𝒚𝒔
+                          <span className="font-serif-brand font-bold italic text-base tracking-normal text-slate-800 leading-none">
+                            Holidays
                           </span>
                         </div>
-                        <span className="text-[7.5px] font-bold tracking-[2px] text-slate-500 uppercase mt-1 leading-none">
+                        <span className="text-[7.5px] font-bold tracking-[2.2px] text-[#e67e22] uppercase mt-1 leading-none">
                           EXPLORE BEYOND HORIZONS
                         </span>
                       </div>
@@ -1450,15 +1450,15 @@ export default function QuotationExactPDFPage() {
                     className="h-14 w-auto object-contain"
                   />
                   <div className="flex flex-col justify-center">
-                    <div className="flex items-baseline gap-1.5 leading-none">
-                      <span className="font-serif-brand font-black text-2xl tracking-normal text-slate-900 leading-none">
-                        <span className="text-sky-600">𝑺𝒌𝒚</span> 𝑸𝒖𝒆𝒔𝒕
+                    <div className="flex items-baseline gap-2 leading-none">
+                      <span className="font-serif-brand font-black italic text-2xl tracking-tight text-slate-900 leading-none">
+                        <span className="text-[#0284c7]">Sky</span> Quest
                       </span>
-                      <span className="font-serif-brand font-bold text-base tracking-normal text-slate-800 leading-none">
-                        𝑯𝒐𝒍𝒊𝒅𝒂𝒚𝒔
+                      <span className="font-serif-brand font-bold italic text-base tracking-normal text-slate-800 leading-none">
+                        Holidays
                       </span>
                     </div>
-                    <span className="text-[7.5px] font-bold tracking-[2px] text-slate-500 uppercase mt-1 leading-none">
+                    <span className="text-[7.5px] font-bold tracking-[2.2px] text-[#e67e22] uppercase mt-1 leading-none">
                       EXPLORE BEYOND HORIZONS
                     </span>
                   </div>
@@ -1609,15 +1609,15 @@ export default function QuotationExactPDFPage() {
                     className="h-14 w-auto object-contain"
                   />
                   <div className="flex flex-col justify-center">
-                    <div className="flex items-baseline gap-1.5 leading-none">
-                      <span className="font-serif-brand font-black text-2xl tracking-normal text-slate-900 leading-none">
-                        <span className="text-sky-600">𝑺𝒌𝒚</span> 𝑸𝒖𝒆𝒔𝒕
+                    <div className="flex items-baseline gap-2 leading-none">
+                      <span className="font-serif-brand font-black italic text-2xl tracking-tight text-slate-900 leading-none">
+                        <span className="text-[#0284c7]">Sky</span> Quest
                       </span>
-                      <span className="font-serif-brand font-bold text-base tracking-normal text-slate-800 leading-none">
-                        𝑯𝒐𝒍𝒊𝒅𝒂𝒚𝒔
+                      <span className="font-serif-brand font-bold italic text-base tracking-normal text-slate-800 leading-none">
+                        Holidays
                       </span>
                     </div>
-                    <span className="text-[7.5px] font-bold tracking-[2px] text-slate-500 uppercase mt-1 leading-none">
+                    <span className="text-[7.5px] font-bold tracking-[2.2px] text-[#e67e22] uppercase mt-1 leading-none">
                       EXPLORE BEYOND HORIZONS
                     </span>
                   </div>
