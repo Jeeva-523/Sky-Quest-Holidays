@@ -62,9 +62,9 @@ export interface FeedbackReview {
 
 export interface GalleryItem {
   id: string;
-  title: string;
-  location: string;
-  category: string;
+  title?: string;
+  location?: string;
+  category?: string;
   image: string;
   featured?: boolean;
 }

@@ -86,12 +86,11 @@ export default function AdminPage() {
   // Captured Moments & Stories Gallery State
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
-  const [editingGalleryId, setEditingGalleryId] = useState<string | null>(null);
-  const [galleryTitle, setGalleryTitle] = useState("");
-  const [galleryLocation, setGalleryLocation] = useState("");
-  const [galleryCategory, setGalleryCategory] = useState("Moments");
-  const [galleryImage, setGalleryImage] = useState("");
-  const [uploadingGalleryImage, setUploadingGalleryImage] = useState(false);
+  const [selectedBulkFiles, setSelectedBulkFiles] = useState<File[]>([]);
+  const [bulkPreviews, setBulkPreviews] = useState<string[]>([]);
+  const [bulkDirectUrl, setBulkDirectUrl] = useState("");
+  const [uploadingBulk, setUploadingBulk] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
 
   // Admin Packages Search & Filter
   const [adminPkgSearch, setAdminPkgSearch] = useState("");
@@ -486,69 +485,100 @@ export default function AdminPage() {
 
   // Captured Moments & Gallery Handlers
   const handleOpenAddGallery = () => {
-    setEditingGalleryId(null);
-    setGalleryTitle("");
-    setGalleryLocation("");
-    setGalleryCategory("Moments");
-    setGalleryImage("");
+    setSelectedBulkFiles([]);
+    setBulkPreviews([]);
+    setBulkDirectUrl("");
+    setUploadProgress(null);
     setIsGalleryModalOpen(true);
   };
 
-  const handleEditGalleryClick = (item: GalleryItem) => {
-    setEditingGalleryId(item.id);
-    setGalleryTitle(item.title || "");
-    setGalleryLocation(item.location || "");
-    setGalleryCategory(item.category || "Moments");
-    setGalleryImage(item.image);
-    setIsGalleryModalOpen(true);
+  const handleBulkFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    setSelectedBulkFiles((prev) => [...prev, ...files]);
+    const newPreviews = files.map((f) => URL.createObjectURL(f));
+    setBulkPreviews((prev) => [...prev, ...newPreviews]);
   };
 
-  const handleGalleryImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploadingGalleryImage(true);
-    try {
-      const downloadUrl = await uploadTourImage(file, "gallery");
-      setGalleryImage(downloadUrl);
-      const isCloudinary = downloadUrl.includes("cloudinary.com");
-      showToast(
-        "Photo Ready",
-        isCloudinary 
-          ? "Uploaded to Cloudinary CDN! Click Save Photo to save to Firebase." 
-          : "Photo ready! Click Save Photo to save to Firebase.",
-        "success"
-      );
-    } catch (error: any) {
-      showToast("Photo Upload Failed", error?.message || "Error uploading image", "error");
-    } finally {
-      setUploadingGalleryImage(false);
-    }
+  const handleRemoveSelectedFile = (index: number) => {
+    setSelectedBulkFiles((prev) => prev.filter((_, i) => i !== index));
+    setBulkPreviews((prev) => {
+      if (prev[index]?.startsWith("blob:")) {
+        URL.revokeObjectURL(prev[index]);
+      }
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
-  const handleSaveGalleryItem = async (e: React.FormEvent) => {
+  const handleStartBulkUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!galleryImage) {
-      alert("Please upload or provide an image URL for the photo.");
+
+    const directUrls = bulkDirectUrl
+      .split(/[\n,]/)
+      .map((u) => u.trim())
+      .filter((u) => u.startsWith("http") || u.startsWith("data:image/"));
+
+    const totalToUpload = selectedBulkFiles.length + directUrls.length;
+
+    if (totalToUpload === 0) {
+      alert("Please select at least 1 photo to upload.");
       return;
     }
 
-    const payload: Omit<GalleryItem, "id"> & { id?: string } = {
-      title: galleryTitle || "Travel Moment",
-      location: galleryLocation || "India",
-      category: galleryCategory || "Moments",
-      image: galleryImage,
-      featured: true
-    };
+    setUploadingBulk(true);
+    let successCount = 0;
 
-    if (editingGalleryId) {
-      payload.id = editingGalleryId;
+    try {
+      // 1. Upload all selected files in sequence
+      for (let i = 0; i < selectedBulkFiles.length; i++) {
+        setUploadProgress({ current: i + 1, total: totalToUpload });
+        const file = selectedBulkFiles[i];
+        try {
+          const downloadUrl = await uploadTourImage(file, "gallery");
+          if (downloadUrl) {
+            await saveGalleryItem({
+              image: downloadUrl,
+              featured: true
+            });
+            successCount++;
+          }
+        } catch (itemErr) {
+          console.warn(`[Bulk Upload] Error uploading file ${i + 1}:`, itemErr);
+        }
+      }
+
+      // 2. Process any direct URLs
+      for (let j = 0; j < directUrls.length; j++) {
+        setUploadProgress({ current: selectedBulkFiles.length + j + 1, total: totalToUpload });
+        const url = directUrls[j];
+        try {
+          await saveGalleryItem({
+            image: url,
+            featured: true
+          });
+          successCount++;
+        } catch (urlErr) {
+          console.warn(`[Bulk Upload] Error saving direct URL ${j + 1}:`, urlErr);
+        }
+      }
+
+      setIsGalleryModalOpen(false);
+      setSelectedBulkFiles([]);
+      setBulkPreviews([]);
+      setBulkDirectUrl("");
+      showToast(
+        "Bulk Upload Complete",
+        `Successfully uploaded ${successCount} photo${successCount > 1 ? "s" : ""} to Captured Moments!`,
+        "success"
+      );
+      await loadAllAdminData();
+    } catch (err: any) {
+      showToast("Bulk Upload Failed", err?.message || "Error uploading photos", "error");
+    } finally {
+      setUploadingBulk(false);
+      setUploadProgress(null);
     }
-
-    await saveGalleryItem(payload);
-    setIsGalleryModalOpen(false);
-    showToast("Photo Upload", "Captured Moments photo saved to live website!", "success");
-    await loadAllAdminData();
   };
 
   const handleDeleteGalleryClick = async (id: string) => {
@@ -971,10 +1001,10 @@ export default function AdminPage() {
               {activeTab === "gallery" && (
                 <button
                   onClick={handleOpenAddGallery}
-                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-xs shadow-glow flex items-center gap-2 transition-all cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs shadow-glow flex items-center gap-2 transition-all cursor-pointer"
                 >
-                  <Plus className="w-4 h-4" />
-                  <span>Add New Gallery Photo</span>
+                  <Upload className="w-4 h-4" />
+                  <span>📸 Bulk Upload Photos</span>
                 </button>
               )}
             </div>
@@ -1133,71 +1163,49 @@ export default function AdminPage() {
                 </div>
                 <p className="text-slate-300 font-bold text-sm">No photos in Captured Moments yet.</p>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  Click the "+ Add New Gallery Photo" button above to upload photos to Firebase Storage.
+                  Click the &ldquo;📸 Bulk Upload Photos&rdquo; button above to select and upload multiple photos at once.
                 </p>
                 <button
                   onClick={handleOpenAddGallery}
                   className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold text-xs"
                 >
-                  + Upload First Photo
+                  📸 Bulk Upload Photos
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {galleryItems.map((item) => (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {galleryItems.map((item, idx) => (
                   <div
                     key={item.id}
-                    className="group rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden shadow-lg flex flex-col justify-between hover:border-slate-700 transition-all"
+                    className="group relative rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden shadow-lg hover:border-amber-500/50 transition-all flex flex-col"
                   >
-                    <div className="relative h-52 bg-slate-950 overflow-hidden">
+                    <div className="relative aspect-square bg-slate-950 overflow-hidden">
                       <img
                         src={item.image}
-                        alt={item.title || "Gallery Moment"}
+                        alt="Captured Moment"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2.5" />
 
-                      {/* Action buttons on top */}
-                      <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                      {/* Top Action buttons on hover */}
+                      <div className="absolute top-2 right-2 flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
                         <button
-                          onClick={() => handleEditGalleryClick(item)}
-                          className="p-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-900 text-sky-400 shadow-md backdrop-blur-xs transition-colors"
-                          title="Edit Photo Info"
-                        >
-                          <Edit className="w-3.5 h-3.5" />
-                        </button>
-                        <button
+                          type="button"
                           onClick={() => handleDeleteGalleryClick(item.id)}
-                          className="p-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-900 text-rose-400 shadow-md backdrop-blur-xs transition-colors"
+                          className="p-1.5 rounded-lg bg-black/75 hover:bg-rose-600 text-slate-200 hover:text-white shadow-md backdrop-blur-xs transition-all cursor-pointer"
                           title="Delete Photo"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
 
-                      {/* Location Badge bottom left */}
-                      {item.location && (
-                        <span className="absolute bottom-2.5 left-3 text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-900/90 text-amber-300 border border-slate-700/60 backdrop-blur-xs">
-                          📍 {item.location}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="p-4 flex items-center justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <h4 className="text-xs font-bold text-white truncate">
-                          {item.title || "Travel Moment"}
-                        </h4>
-                        <span className="text-[10px] text-slate-400 font-medium">
-                          {item.category || "Captured Moment"}
+                      {/* Bottom index badge */}
+                      <div className="absolute bottom-2 left-2 pointer-events-none">
+                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-black/60 text-slate-300 border border-white/10 backdrop-blur-xs">
+                          #{idx + 1}
                         </span>
                       </div>
-                      <button
-                        onClick={() => handleEditGalleryClick(item)}
-                        className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold flex-shrink-0 transition-colors"
-                      >
-                        Edit
-                      </button>
                     </div>
                   </div>
                 ))}
@@ -2040,116 +2048,174 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* GALLERY PHOTO MODAL */}
+      {/* BULK GALLERY PHOTO MODAL */}
       {isGalleryModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-lg rounded-3xl bg-slate-900 border border-slate-700 p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+          <div className="w-full max-w-xl rounded-3xl bg-slate-900 border border-slate-700 p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400">
-                  <Camera className="w-4 h-4" />
+                <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400">
+                  <Camera className="w-5 h-5" />
                 </div>
-                <h2 className="text-base font-bold text-white">
-                  {editingGalleryId ? "Edit Captured Moment Photo" : "Upload New Gallery Photo"}
-                </h2>
+                <div>
+                  <h2 className="text-base font-bold text-white">
+                    Bulk Upload Photos to Captured Moments
+                  </h2>
+                  <p className="text-xs text-slate-400">
+                    Select multiple photos from your device at once to upload to Cloudinary & Firebase.
+                  </p>
+                </div>
               </div>
               <button
-                onClick={() => setIsGalleryModalOpen(false)}
-                className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white"
+                type="button"
+                onClick={() => !uploadingBulk && setIsGalleryModalOpen(false)}
+                disabled={uploadingBulk}
+                className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white disabled:opacity-50 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveGalleryItem} className="space-y-4 text-xs">
-              {/* Image upload box */}
-              <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-3">
-                <label className="block text-slate-200 font-bold">
-                  📸 Photo (Firebase Storage Upload or URL) *
-                </label>
-                <div className="flex items-center gap-3">
+            <form onSubmit={handleStartBulkUpload} className="space-y-5 text-xs">
+              {/* Bulk upload drop area */}
+              <div className="p-6 rounded-2xl bg-slate-800/80 border-2 border-dashed border-slate-700 hover:border-amber-500/60 transition-colors text-center space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto">
+                  <Upload className="w-6 h-6" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-white cursor-pointer hover:text-amber-400 transition-colors">
+                    Click to select multiple photos
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleBulkFilesSelected}
+                      disabled={uploadingBulk}
+                      className="hidden"
+                    />
+                  </label>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Supports JPEG, PNG, WEBP. You can select 5, 10, or 20+ photos at once!
+                  </p>
+                </div>
+
+                <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs cursor-pointer shadow-md transition-all">
+                  <Plus className="w-4 h-4" />
+                  <span>Browse Photos</span>
                   <input
                     type="file"
+                    multiple
                     accept="image/*"
-                    onChange={handleGalleryImageFileChange}
-                    className="text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400 cursor-pointer"
+                    onChange={handleBulkFilesSelected}
+                    disabled={uploadingBulk}
+                    className="hidden"
                   />
-                  {uploadingGalleryImage && (
-                    <span className="text-xs text-amber-400 flex items-center gap-1 font-semibold">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading to Storage...
-                    </span>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-slate-400 mb-1">Or direct Image URL:</label>
-                  <input
-                    type="text"
-                    placeholder="https://images.unsplash.com/... or data:image/..."
-                    value={galleryImage}
-                    onChange={(e) => setGalleryImage(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-amber-500"
-                  />
-                </div>
-
-                {galleryImage && (
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Photo Preview:</span>
-                    <div className="h-44 w-full rounded-xl overflow-hidden border border-slate-700 bg-slate-950">
-                      <img src={galleryImage} alt="Preview" className="w-full h-full object-cover" />
-                    </div>
-                  </div>
-                )}
+                </label>
               </div>
 
+              {/* Selected Photos Thumbnails Preview */}
+              {bulkPreviews.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-300 text-xs">
+                      Selected Photos ({bulkPreviews.length})
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedBulkFiles([]);
+                        setBulkPreviews([]);
+                      }}
+                      disabled={uploadingBulk}
+                      className="text-rose-400 hover:text-rose-300 text-[11px] font-semibold cursor-pointer"
+                    >
+                      Clear all
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-2.5 max-h-48 overflow-y-auto p-2 bg-slate-950/60 rounded-2xl border border-slate-800">
+                    {bulkPreviews.map((previewUrl, idx) => (
+                      <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-slate-900 border border-slate-700">
+                        <img src={previewUrl} alt={`Selected ${idx}`} className="w-full h-full object-cover" />
+                        {!uploadingBulk && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSelectedFile(idx)}
+                            className="absolute top-1 right-1 p-1 rounded-md bg-black/70 hover:bg-rose-600 text-white transition-colors cursor-pointer"
+                            title="Remove"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Direct URL input option */}
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Photo Title / Story (Optional)</label>
+                <label className="block text-slate-400 mb-1 font-semibold">
+                  Or paste Direct Image URL(s):
+                </label>
                 <input
                   type="text"
-                  placeholder="e.g. Munnar Tea Hills College Group"
-                  value={galleryTitle}
-                  onChange={(e) => setGalleryTitle(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white"
+                  placeholder="https://images.unsplash.com/... (Separate multiple with commas)"
+                  value={bulkDirectUrl}
+                  onChange={(e) => setBulkDirectUrl(e.target.value)}
+                  disabled={uploadingBulk}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-amber-500"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Location Tag</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Munnar, Kerala"
-                    value={galleryLocation}
-                    onChange={(e) => setGalleryLocation(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white"
-                  />
+              {/* Upload Progress Indicator */}
+              {uploadingBulk && uploadProgress && (
+                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 space-y-2 animate-pulse">
+                  <div className="flex items-center justify-between text-xs font-bold">
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
+                      Uploading photo {uploadProgress.current} of {uploadProgress.total}...
+                    </span>
+                    <span>
+                      {Math.round((uploadProgress.current / uploadProgress.total) * 100)}%
+                    </span>
+                  </div>
+                  <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-300"
+                      style={{ width: `${(uploadProgress.current / uploadProgress.total) * 100}%` }}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Category / Tag</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Nature, Kerala, IV Tour"
-                    value={galleryCategory}
-                    onChange={(e) => setGalleryCategory(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white"
-                  />
-                </div>
-              </div>
+              )}
 
               <div className="pt-3 flex items-center justify-end gap-3 border-t border-slate-800">
                 <button
                   type="button"
+                  disabled={uploadingBulk}
                   onClick={() => setIsGalleryModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold"
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold disabled:opacity-50 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  disabled={uploadingGalleryImage || !galleryImage}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold shadow-md disabled:opacity-50 cursor-pointer"
+                  disabled={uploadingBulk || (bulkPreviews.length === 0 && !bulkDirectUrl.trim())}
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold shadow-glow flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all"
                 >
-                  {editingGalleryId ? "Update Gallery Photo" : "Save Photo to Gallery"}
+                  {uploadingBulk ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Uploading {uploadProgress?.current || 1} of {uploadProgress?.total || bulkPreviews.length}...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4" />
+                      <span>
+                        Upload {bulkPreviews.length > 0 ? `${bulkPreviews.length} Photo${bulkPreviews.length > 1 ? "s" : ""}` : "Photos"} Now
+                      </span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>
