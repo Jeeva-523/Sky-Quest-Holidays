@@ -145,8 +145,13 @@ export default function QuotationExactPDFPage() {
   const [historySearch, setHistorySearch] = useState("");
   const [saveSuccessMsg, setSaveSuccessMsg] = useState("");
   const [previewMode, setPreviewMode] = useState(false);
+  const [isEmbedded, setIsEmbedded] = useState(false);
 
   useEffect(() => {
+    setIsEmbedded(
+      typeof window !== "undefined" &&
+      (window.location.search.includes("embedded=true") || window.self !== window.top)
+    );
     loadSavedData();
     loadHistory();
 
@@ -440,7 +445,11 @@ export default function QuotationExactPDFPage() {
   };
 
   const handlePrint = () => {
-    window.print();
+    const currentData = getCurrentFormData();
+    try {
+      localStorage.setItem(SAVED_DATA_KEY, JSON.stringify(currentData));
+    } catch (e) { }
+    window.open("/quotation-print/index.html?print=true", "_blank");
   };
 
   // Split spots exceeding 15 items per page to prevent page overflow
@@ -591,14 +600,16 @@ export default function QuotationExactPDFPage() {
             <span className="hidden sm:inline">New</span>
           </button>
 
-          <Link
-            href="/admin"
-            className="h-8 px-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700/60 text-xs font-medium flex items-center gap-1 transition-colors shadow-sm"
-            title="Back to Admin Dashboard"
-          >
-            <Settings className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Admin</span>
-          </Link>
+          {!isEmbedded && (
+            <Link
+              href="/admin"
+              className="h-8 px-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700/60 text-xs font-medium flex items-center gap-1 transition-colors shadow-sm"
+              title="Back to Admin Dashboard"
+            >
+              <Settings className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Admin</span>
+            </Link>
+          )}
 
           <div className="hidden sm:block h-5 w-px bg-slate-800 mx-0.5" />
 
@@ -1086,7 +1097,8 @@ export default function QuotationExactPDFPage() {
       )}
 
       {/* 3. EXACT PIXEL-PERFECT PDF DOCUMENT OUTPUT (Matches Quotation_SkyQuest.pdf) */}
-      <div className={`${previewMode ? "block" : "hidden print:block"} py-8 px-4 flex justify-center bg-slate-900 print:bg-white print:p-0 print:m-0 print:w-full`}>
+      {previewMode && (
+        <div className="py-8 px-4 flex justify-center bg-slate-900 print:bg-white print:p-0 print:m-0 print:w-full">
         <div className="max-w-[210mm] w-full space-y-10 print:space-y-0 text-slate-900 print:max-w-none print:w-[210mm]">
 
           {/* ================= PAGE 1: COVER & CLIENT DETAILS ================= */}
@@ -1708,6 +1720,7 @@ export default function QuotationExactPDFPage() {
 
         </div>
       </div>
+      )}
     </div>
   );
 }

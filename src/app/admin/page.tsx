@@ -840,48 +840,49 @@ export default function AdminPage() {
       </aside>
 
       {/* Main Admin Area */}
-      <main className="flex-1 p-4 sm:p-6 md:p-10 overflow-y-auto">
+      <main className={`flex-1 overflow-y-auto ${activeTab === "quotation" ? "p-0 sm:p-3" : "p-4 sm:p-6 md:p-10"}`}>
         {/* Top Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 border-b border-slate-800 pb-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white capitalize">
-              {activeTab === "overview" && "Dashboard Overview"}
-              {activeTab === "quotation" && "Official Quotation Studio"}
-              {activeTab === "packages" && "Tour Packages & Image Studio"}
-              {activeTab === "gallery" && "Captured Moments & Gallery Studio"}
-              {activeTab === "media" && "Site Media & Images Studio"}
-              {activeTab === "leads" && "Customer Leads & Enquiries"}
-              {activeTab === "bookings" && "Booking Reservations"}
-              {activeTab === "settings" && "Cloudinary Settings"}
-            </h1>
-            <p className="text-xs text-slate-400 mt-1">
-              Connected to Firebase Firestore & Storage • Real-time Sync
-            </p>
+        {activeTab !== "quotation" && (
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 border-b border-slate-800 pb-6">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-black text-white capitalize">
+                {activeTab === "overview" && "Dashboard Overview"}
+                {activeTab === "packages" && "Tour Packages & Image Studio"}
+                {activeTab === "gallery" && "Captured Moments & Gallery Studio"}
+                {activeTab === "media" && "Site Media & Images Studio"}
+                {activeTab === "leads" && "Customer Leads & Enquiries"}
+                {activeTab === "bookings" && "Booking Reservations"}
+                {activeTab === "settings" && "Cloudinary Settings"}
+              </h1>
+              <p className="text-xs text-slate-400 mt-1">
+                Connected to Firebase Firestore & Storage • Real-time Sync
+              </p>
+            </div>
+
+            {activeTab === "packages" && (
+              <button
+                onClick={() => {
+                  resetPackageForm();
+                  setIsPackageModalOpen(true);
+                }}
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs shadow-glow flex items-center gap-2 transition-all"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add New Tour Package</span>
+              </button>
+            )}
+
+            {activeTab === "gallery" && (
+              <button
+                onClick={handleOpenAddGallery}
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-xs shadow-glow flex items-center gap-2 transition-all cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add New Gallery Photo</span>
+              </button>
+            )}
           </div>
-
-          {activeTab === "packages" && (
-            <button
-              onClick={() => {
-                resetPackageForm();
-                setIsPackageModalOpen(true);
-              }}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs shadow-glow flex items-center gap-2 transition-all"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add New Tour Package</span>
-            </button>
-          )}
-
-          {activeTab === "gallery" && (
-            <button
-              onClick={handleOpenAddGallery}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-xs shadow-glow flex items-center gap-2 transition-all cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add New Gallery Photo</span>
-            </button>
-          )}
-        </div>
+        )}
 
         {/* TAB 2: PACKAGES MANAGER & IMAGE STUDIO */}
         {activeTab === "packages" && (
@@ -1761,9 +1762,9 @@ export default function AdminPage() {
         {/* TAB 7: QUOTATION STUDIO (EMBEDDED INSIDE ADMIN DASHBOARD) */}
         {/* ========================================================= */}
         {activeTab === "quotation" && (
-          <div className="w-full h-[calc(100vh-140px)] min-h-[850px] rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-950 animate-fade-in">
+          <div className="w-full h-[calc(100vh-24px)] min-h-[850px] rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-950 animate-fade-in">
             <iframe
-              src="/quotation"
+              src="/quotation?embedded=true"
               className="w-full h-full border-0 rounded-2xl"
               title="SkyQuest Quotation Studio"
             />
