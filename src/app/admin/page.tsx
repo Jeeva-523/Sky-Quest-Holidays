@@ -27,7 +27,9 @@ import {
   Settings,
   Sliders,
   Copy,
-  Check
+  Check,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import {
   isAdminLoggedIn,
@@ -60,6 +62,7 @@ export default function AdminPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"overview" | "packages" | "gallery" | "leads" | "bookings" | "media" | "settings" | "quotation">("overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Cloudinary Settings State
   const [cloudinaryCloudName, setCloudinaryCloudName] = useState("dciyanu4f");
@@ -552,19 +555,29 @@ export default function AdminPage() {
         </Link>
 
         <div className="flex items-center gap-2">
-          <Link
-            href="/quotation"
+          <button
+            onClick={() => setActiveTab("quotation")}
             className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs flex items-center gap-1 font-bold"
             title="Quotation Studio"
           >
             <Sparkles className="w-3.5 h-3.5" />
-          </Link>
+          </button>
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 rounded-xl bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 transition-colors"
+            className="px-2.5 py-1.5 rounded-xl bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 transition-colors flex items-center gap-1 text-xs font-bold cursor-pointer"
             aria-label="Toggle Mobile Menu"
           >
-            {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            {isMobileMenuOpen ? (
+              <>
+                <X className="w-4 h-4 text-rose-400" />
+                <span>Close</span>
+              </>
+            ) : (
+              <>
+                <Menu className="w-4 h-4 text-sky-400" />
+                <span>Menu</span>
+              </>
+            )}
           </button>
         </div>
       </header>
@@ -622,9 +635,11 @@ export default function AdminPage() {
                 </div>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white"
+                  className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  title="Close Slide bar"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4 text-rose-400" />
+                  <span>Close</span>
                 </button>
               </div>
 
@@ -667,6 +682,15 @@ export default function AdminPage() {
             </div>
 
             <div className="pt-6 border-t border-slate-800 space-y-2">
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition-all cursor-pointer shadow-sm mb-1"
+              >
+                <X className="w-4 h-4 text-rose-400" />
+                <span>✕ Close Slide bar</span>
+              </button>
+
               <Link
                 href="/"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -688,135 +712,89 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Desktop Sidebar (Hidden on Mobile) */}
-      <aside className="hidden md:flex md:w-64 bg-slate-900 border-r border-slate-800 p-6 flex-col justify-between flex-shrink-0 min-h-screen sticky top-0 h-screen overflow-y-auto">
+      {/* Desktop/Tablet Sidebar (Collapsible & Closeable) */}
+      <aside className={`hidden md:flex transition-all duration-300 ${
+        isSidebarCollapsed ? "md:w-20 p-3" : "md:w-64 p-6"
+      } bg-slate-900 border-r border-slate-800 flex-col justify-between flex-shrink-0 min-h-screen sticky top-0 h-screen overflow-y-auto`}>
         <div>
-          {/* Brand */}
-          <Link href="/" className="flex items-center gap-3 mb-8 group">
-            <img
-              src="/images/logo.png"
-              alt="Sky Quest Logo"
-              width={42}
-              height={42}
-              style={{ width: "auto", height: "40px", objectFit: "contain" }}
-              className="transition-transform group-hover:scale-105"
-            />
-            <div>
-              <div className="text-lg font-black tracking-tight text-white">
-                <span className="text-sky-400">SKY</span>QUEST
-              </div>
-              <p className="text-[10px] tracking-widest text-amber-400 uppercase font-bold">
-                Admin Control
-              </p>
-            </div>
-          </Link>
+          {/* Brand & Collapse Button */}
+          <div className={`flex items-center ${isSidebarCollapsed ? "justify-center flex-col gap-3" : "justify-between gap-2"} mb-8`}>
+            <Link href="/" className="flex items-center gap-3 group overflow-hidden">
+              <img
+                src="/images/logo.png"
+                alt="Sky Quest Logo"
+                width={42}
+                height={42}
+                style={{ width: "auto", height: "40px", objectFit: "contain" }}
+                className="transition-transform group-hover:scale-105 flex-shrink-0"
+              />
+              {!isSidebarCollapsed && (
+                <div>
+                  <div className="text-lg font-black tracking-tight text-white">
+                    <span className="text-sky-400">SKY</span>QUEST
+                  </div>
+                  <p className="text-[10px] tracking-widest text-amber-400 uppercase font-bold">
+                    Admin Control
+                  </p>
+                </div>
+              )}
+            </Link>
+
+            <button
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700 transition-colors flex-shrink-0 cursor-pointer"
+              title={isSidebarCollapsed ? "Expand Slide bar" : "Close / Collapse Slide bar"}
+            >
+              {isSidebarCollapsed ? <ChevronRight className="w-4 h-4 text-sky-400" /> : <ChevronLeft className="w-4 h-4" />}
+            </button>
+          </div>
 
           {/* Nav Items */}
           <nav className="space-y-1.5">
-            <button
-              onClick={() => setActiveTab("overview")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${
-                activeTab === "overview"
-                  ? "bg-sky-500 text-white shadow-glow"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800"
-              }`}
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              <span>Overview & Stats</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("packages")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${
-                activeTab === "packages"
-                  ? "bg-sky-500 text-white shadow-glow"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800"
-              }`}
-            >
-              <Package className="w-4 h-4" />
-              <span>Tour Packages & Images ({packages.length})</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("gallery")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${
-                activeTab === "gallery"
-                  ? "bg-sky-500 text-white shadow-glow"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800"
-              }`}
-            >
-              <Camera className="w-4 h-4" />
-              <span>Captured Moments ({galleryItems.length})</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("media")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${
-                activeTab === "media"
-                  ? "bg-sky-500 text-white shadow-glow"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800"
-              }`}
-            >
-              <ImageIcon className="w-4 h-4" />
-              <span>Site Media & Banners</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("leads")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${
-                activeTab === "leads"
-                  ? "bg-sky-500 text-white shadow-glow"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800"
-              }`}
-            >
-              <Users className="w-4 h-4" />
-              <span>Customer Leads ({enquiries.length})</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("bookings")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${
-                activeTab === "bookings"
-                  ? "bg-sky-500 text-white shadow-glow"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800"
-              }`}
-            >
-              <CalendarCheck className="w-4 h-4" />
-              <span>Trip Bookings ({bookings.length})</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("settings")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${
-                activeTab === "settings"
-                  ? "bg-sky-500 text-white shadow-glow"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800"
-              }`}
-            >
-              <Settings className="w-4 h-4" />
-              <span>Settings (Cloudinary)</span>
-            </button>
-
-            {/* Quotation in Sidebar Navigation */}
-            {/* Quotation in Sidebar Navigation */}
-            <button
-              onClick={() => setActiveTab("quotation")}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all ${
-                activeTab === "quotation"
-                  ? "bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/20"
-                  : "text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 shadow-sm group"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <Sparkles className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
-                <span>Quotation</span>
-              </div>
-              <span className={`text-[10px] px-2 py-0.5 rounded font-semibold uppercase tracking-wider ${
-                activeTab === "quotation" ? "bg-black/20 text-slate-950" : "bg-amber-500/20 text-amber-300"
-              }`}>
-                Studio
-              </span>
-            </button>
+            {[
+              { id: "overview", label: "Overview & Stats", icon: LayoutDashboard },
+              { id: "quotation", label: "Quotation Studio", icon: Sparkles, badge: "Studio" },
+              { id: "packages", label: `Tour Packages (${packages.length})`, icon: Package },
+              { id: "gallery", label: `Captured Moments (${galleryItems.length})`, icon: Camera },
+              { id: "media", label: "Site Media & Banners", icon: ImageIcon },
+              { id: "leads", label: `Customer Leads (${enquiries.length})`, icon: Users },
+              { id: "bookings", label: `Trip Bookings (${bookings.length})`, icon: CalendarCheck },
+              { id: "settings", label: "Cloudinary Settings", icon: Settings }
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              const isQuotation = tab.id === "quotation";
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  title={tab.label}
+                  className={`w-full flex items-center ${isSidebarCollapsed ? "justify-center px-2" : "justify-start px-4 gap-3"} py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    isActive
+                      ? isQuotation
+                        ? "bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/20"
+                        : "bg-sky-500 text-white shadow-glow"
+                      : isQuotation
+                      ? "text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30"
+                      : "text-slate-400 hover:text-white hover:bg-slate-800"
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 flex-shrink-0 ${isQuotation ? (isActive ? "text-slate-950" : "text-amber-400") : ""}`} />
+                  {!isSidebarCollapsed && (
+                    <div className="flex items-center justify-between w-full">
+                      <span>{tab.label}</span>
+                      {tab.badge && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded font-semibold uppercase tracking-wider ${
+                          isActive ? "bg-black/20 text-slate-950" : "bg-amber-500/20 text-amber-300"
+                        }`}>
+                          {tab.badge}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
           </nav>
         </div>
 
@@ -824,18 +802,20 @@ export default function AdminPage() {
         <div className="pt-6 border-t border-slate-800 space-y-2 mt-6">
           <Link
             href="/"
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-all"
+            title="View Main Website"
+            className={`w-full flex items-center ${isSidebarCollapsed ? "justify-center px-2" : "justify-center gap-2 px-3"} py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-all`}
           >
-            <ExternalLink className="w-3.5 h-3.5" />
-            <span>View Main Website</span>
+            <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
+            {!isSidebarCollapsed && <span>View Main Website</span>}
           </Link>
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/40 text-xs font-medium transition-all"
+            title="Sign Out"
+            className={`w-full flex items-center ${isSidebarCollapsed ? "justify-center px-2" : "justify-center gap-2 px-3"} py-2 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/40 text-xs font-medium transition-all cursor-pointer`}
           >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Sign Out</span>
+            <LogOut className="w-3.5 h-3.5 flex-shrink-0" />
+            {!isSidebarCollapsed && <span>Sign Out</span>}
           </button>
         </div>
       </aside>

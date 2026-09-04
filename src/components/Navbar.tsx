@@ -217,6 +217,15 @@ export default function Navbar() {
               >
                 Enquire Now
               </Link>
+
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full text-center py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer border border-slate-700/80 mt-1"
+              >
+                <X className="w-4 h-4 text-rose-400" />
+                <span>Close Menu</span>
+              </button>
             </div>
           </div>
         )}
