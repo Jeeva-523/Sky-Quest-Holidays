@@ -896,19 +896,50 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
               </div>
 
               <div>
-                <label className="block text-slate-300 font-bold uppercase mb-1.5">
-                  🍽️ Meal Plan Category
+                <label className="block text-slate-300 font-bold uppercase mb-1.5 flex items-center justify-between">
+                  <span>🍽️ Meal Plan Category</span>
+                  <span className="text-[10px] text-sky-400 font-normal">(type custom or click quick tag)</span>
                 </label>
-                <select
+                <input
+                  type="text"
+                  list="meal-plan-suggestions"
                   value={foodOption}
                   onChange={(e) => setFoodOption(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-medium focus:border-sky-500 focus:outline-none"
-                >
-                  <option value="ALL TIME FOOD INCLUDED">ALL TIME FOOD INCLUDED (Breakfast, Lunch & Dinner)</option>
-                  <option value="WITH FOOD">WITH FOOD</option>
-                  <option value="WITHOUT FOOD">WITHOUT FOOD</option>
-                  <option value="BREAKFAST & DINNER ONLY">BREAKFAST & DINNER ONLY</option>
-                </select>
+                  placeholder="e.g. ALL TIME FOOD INCLUDED, WITH FOOD, VEG ONLY..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-semibold text-xs focus:border-sky-500 focus:outline-none transition-colors"
+                />
+                <datalist id="meal-plan-suggestions">
+                  <option value="ALL TIME FOOD INCLUDED" />
+                  <option value="WITH FOOD" />
+                  <option value="WITHOUT FOOD" />
+                  <option value="BREAKFAST & DINNER ONLY" />
+                  <option value="ALL TIME FOOD INCLUDED (Breakfast, Lunch & Dinner)" />
+                  <option value="VEG & NON-VEG FOOD INCLUDED" />
+                  <option value="ONLY VEG FOOD INCLUDED" />
+                </datalist>
+
+                {/* Quick 1-Click Suggestion Tags */}
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {[
+                    "ALL TIME FOOD INCLUDED",
+                    "WITH FOOD",
+                    "WITHOUT FOOD",
+                    "BREAKFAST & DINNER ONLY"
+                  ].map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setFoodOption(opt)}
+                      className={`px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer ${
+                        foodOption === opt
+                          ? "bg-amber-500 text-slate-950 shadow-sm"
+                          : "bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60"
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
