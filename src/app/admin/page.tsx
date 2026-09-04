@@ -29,7 +29,8 @@ import {
   Copy,
   Check,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  RefreshCw
 } from "lucide-react";
 import {
   isAdminLoggedIn,
@@ -51,6 +52,7 @@ import {
   fetchGalleryItems,
   saveGalleryItem,
   deleteGalleryItem,
+  syncAllLocalDataToServer,
   DEFAULT_HERO_BG,
   DEFAULT_WHY_CHOOSE_IMG,
   DEFAULT_ABOUT_IMG
@@ -139,14 +141,34 @@ export default function AdminPage() {
   const [packageDesc, setPackageDesc] = useState("");
   const [packageImage, setPackageImage] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [syncingDevices, setSyncingDevices] = useState(false);
 
   useEffect(() => {
     if (!isAdminLoggedIn()) {
       router.push("/skyAdmin");
       return;
     }
+    // Auto-sync any existing local packages & uploaded images to server
+    syncAllLocalDataToServer().catch(() => {});
     loadAllAdminData();
   }, [router]);
+
+  const handleManualDeviceSync = async () => {
+    setSyncingDevices(true);
+    try {
+      const result = await syncAllLocalDataToServer();
+      if (result.success) {
+        showToast("Device Sync Success", "All tour packages & photos synced! Mobile & Laptop now show identical data.", "success");
+        await loadAllAdminData();
+      } else {
+        showToast("Sync Notice", result.message, "error");
+      }
+    } catch (e: any) {
+      showToast("Sync Error", e.message || "Failed to sync", "error");
+    } finally {
+      setSyncingDevices(false);
+    }
+  };
 
   const loadAllAdminData = async () => {
     setLoading(true);
@@ -840,28 +862,41 @@ export default function AdminPage() {
               </p>
             </div>
 
-            {activeTab === "packages" && (
+            <div className="flex items-center gap-2.5 flex-wrap">
               <button
-                onClick={() => {
-                  resetPackageForm();
-                  setIsPackageModalOpen(true);
-                }}
-                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs shadow-glow flex items-center gap-2 transition-all"
+                type="button"
+                onClick={handleManualDeviceSync}
+                disabled={syncingDevices}
+                className="px-3 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm disabled:opacity-50"
+                title="Synchronize all images and packages across Mobile & Laptop"
               >
-                <Plus className="w-4 h-4" />
-                <span>Add New Tour Package</span>
+                <RefreshCw className={`w-3.5 h-3.5 ${syncingDevices ? "animate-spin text-sky-400" : ""}`} />
+                <span>{syncingDevices ? "Syncing..." : "🔄 Sync to Mobile & All Devices"}</span>
               </button>
-            )}
 
-            {activeTab === "gallery" && (
-              <button
-                onClick={handleOpenAddGallery}
-                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-xs shadow-glow flex items-center gap-2 transition-all cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add New Gallery Photo</span>
-              </button>
-            )}
+              {activeTab === "packages" && (
+                <button
+                  onClick={() => {
+                    resetPackageForm();
+                    setIsPackageModalOpen(true);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs shadow-glow flex items-center gap-2 transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add New Tour Package</span>
+                </button>
+              )}
+
+              {activeTab === "gallery" && (
+                <button
+                  onClick={handleOpenAddGallery}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-xs shadow-glow flex items-center gap-2 transition-all cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add New Gallery Photo</span>
+                </button>
+              )}
+            </div>
           </div>
         )}
 

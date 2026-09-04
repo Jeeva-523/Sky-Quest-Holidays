@@ -35,23 +35,26 @@ const LOCAL_STORAGE_BOOKINGS_KEY = "skyquest_bookings";
    ========================================================================= */
 
 export async function fetchAllPackages(): Promise<TourPackage[]> {
-  // 1. Quick memory / local storage cache for instant UI rendering
+  // 1. Try Server Sync API (cross-device sync for mobile, desktop, etc.)
   if (typeof window !== "undefined") {
-    const local = localStorage.getItem(LOCAL_STORAGE_PACKAGES_KEY);
-    if (local) {
-      try {
-        const parsed = JSON.parse(local);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch (e) {}
-    }
+    try {
+      const res = await fetch("/api/sync", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && Array.isArray(data.packages) && data.packages.length > 0) {
+          localStorage.setItem(LOCAL_STORAGE_PACKAGES_KEY, JSON.stringify(data.packages));
+          return data.packages;
+        }
+      }
+    } catch (e) {}
   }
 
-  // 2. Fetch from Firestore with 2s timeout safeguard
+  // 2. Fetch from Firestore if configured
   if (isFirebaseConfigured() && db) {
     try {
       const q = query(collection(db, "packages"), orderBy("createdAt", "desc"));
       const timeoutPromise = new Promise<null>((_, reject) =>
-        setTimeout(() => reject(new Error("Firestore timeout")), 2000)
+        setTimeout(() => reject(new Error("Firestore timeout")), 4000)
       );
       const fetchPromise = getDocs(q);
       const snapshot = (await Promise.race([fetchPromise, timeoutPromise])) as any;
@@ -63,7 +66,18 @@ export async function fetchAllPackages(): Promise<TourPackage[]> {
         return pkgs;
       }
     } catch (error) {
-      console.warn("[Firestore] fetchAllPackages fallback to local:", error);
+      console.warn("[Firestore] fetchAllPackages fallback:", error);
+    }
+  }
+
+  // 3. Fallback to localStorage cache
+  if (typeof window !== "undefined") {
+    const local = localStorage.getItem(LOCAL_STORAGE_PACKAGES_KEY);
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
     }
   }
 
@@ -95,6 +109,33 @@ export async function saveTourPackage(pkg: Omit<TourPackage, "id"> & { id?: stri
     createdAt: new Date().toISOString()
   };
 
+  // 1. Update local cache
+  let all: TourPackage[] = [];
+  if (typeof window !== "undefined") {
+    all = await fetchAllPackages();
+    const existingIndex = all.findIndex((p) => p.id === packageId);
+    if (existingIndex >= 0) {
+      all[existingIndex] = { ...all[existingIndex], ...packageData };
+    } else {
+      all.unshift(packageData as TourPackage);
+    }
+    localStorage.setItem(LOCAL_STORAGE_PACKAGES_KEY, JSON.stringify(all));
+  }
+
+  // 2. Sync to Server (/api/sync) so mobile phones & desktop stay identical
+  if (typeof window !== "undefined") {
+    try {
+      await fetch("/api/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ packages: all })
+      });
+    } catch (e) {
+      console.warn("[Sync API] saveTourPackage error:", e);
+    }
+  }
+
+  // 3. Try Firebase Firestore
   if (isFirebaseConfigured() && db) {
     try {
       const docRef = doc(db, "packages", packageId);
@@ -105,22 +146,25 @@ export async function saveTourPackage(pkg: Omit<TourPackage, "id"> & { id?: stri
     }
   }
 
-  // Local fallback
-  if (typeof window !== "undefined") {
-    const all = await fetchAllPackages();
-    const existingIndex = all.findIndex((p) => p.id === packageId);
-    if (existingIndex >= 0) {
-      all[existingIndex] = { ...all[existingIndex], ...packageData };
-    } else {
-      all.unshift(packageData as TourPackage);
-    }
-    localStorage.setItem(LOCAL_STORAGE_PACKAGES_KEY, JSON.stringify(all));
-  }
-
   return packageId;
 }
 
 export async function removeTourPackage(packageId: string): Promise<boolean> {
+  let filtered: TourPackage[] = [];
+  if (typeof window !== "undefined") {
+    const all = await fetchAllPackages();
+    filtered = all.filter((p) => p.id !== packageId);
+    localStorage.setItem(LOCAL_STORAGE_PACKAGES_KEY, JSON.stringify(filtered));
+
+    try {
+      await fetch("/api/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ packages: filtered })
+      });
+    } catch (e) {}
+  }
+
   if (isFirebaseConfigured() && db) {
     try {
       await deleteDoc(doc(db, "packages", packageId));
@@ -130,11 +174,6 @@ export async function removeTourPackage(packageId: string): Promise<boolean> {
     }
   }
 
-  if (typeof window !== "undefined") {
-    const all = await fetchAllPackages();
-    const filtered = all.filter((p) => p.id !== packageId);
-    localStorage.setItem(LOCAL_STORAGE_PACKAGES_KEY, JSON.stringify(filtered));
-  }
   return true;
 }
 
@@ -480,22 +519,54 @@ export async function compressImageToDataUrl(file: File | Blob, maxWidth: number
 }
 
 export async function uploadTourImage(file: File, folder: string = "tours"): Promise<string> {
-  // 1. Instant client-side compression (reduces 10MB -> ~100KB in 50 milliseconds)
+  // 1. Upload to Server File Storage (/api/upload) -> Saves permanent file in public/uploads/
+  if (typeof window !== "undefined") {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", folder);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.url) {
+          return data.url;
+        }
+      }
+    } catch (apiErr) {
+      console.warn("[API /upload] FormData upload fallback:", apiErr);
+    }
+  }
+
+  // 2. Client-side compression
   const compressedDataUrl = await compressImageToDataUrl(file, 1400, 0.82);
 
-  // 2. If Cloudinary is configured, upload the ultra-lightweight compressed image in under 1 second
+  // 3. Try base64 upload to /api/upload
+  if (typeof window !== "undefined" && compressedDataUrl) {
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dataUrl: compressedDataUrl, folder })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.url) return data.url;
+      }
+    } catch (e) {}
+  }
+
+  // 4. If Cloudinary is configured with valid preset
   try {
     const cSettings = await fetchCloudinarySettings();
-    if (cSettings.enabled !== false && cSettings.cloudName && cSettings.uploadPreset) {
-      // Convert data URL to Blob for fast binary multipart transfer
+    if (cSettings.enabled !== false && cSettings.cloudName && cSettings.uploadPreset && cSettings.uploadPreset !== "skyquest_uploads") {
       const blob = await (await fetch(compressedDataUrl)).blob();
       return await uploadToCloudinary(blob, folder);
     }
-  } catch (cError) {
-    console.warn("[Cloudinary] Upload failed or preset missing, instantly using optimized image:", cError);
-  }
+  } catch (cError) {}
 
-  // 3. Instant zero-wait fallback (Ready in 0.1s flat, eliminating 45-second Firebase Storage hangs!)
   return compressedDataUrl;
 }
 
@@ -587,18 +658,39 @@ export async function fetchSiteMediaSettings(): Promise<SiteMediaSettings> {
     aboutImage: DEFAULT_ABOUT_IMG
   };
 
+  // 1. Try Server Sync API
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch("/api/sync", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.media && Object.keys(data.media).length > 0) {
+          const merged = { ...defaultSettings, ...data.media };
+          localStorage.setItem(LOCAL_STORAGE_SITE_MEDIA_KEY, JSON.stringify(merged));
+          return merged;
+        }
+      }
+    } catch (e) {}
+  }
+
+  // 2. Try Firestore
   if (isFirebaseConfigured() && db) {
     try {
       const docRef = doc(db, "settings", "media");
       const snap = await getDoc(docRef);
       if (snap.exists()) {
-        return { ...defaultSettings, ...snap.data() } as SiteMediaSettings;
+        const merged = { ...defaultSettings, ...snap.data() } as SiteMediaSettings;
+        if (typeof window !== "undefined") {
+          localStorage.setItem(LOCAL_STORAGE_SITE_MEDIA_KEY, JSON.stringify(merged));
+        }
+        return merged;
       }
     } catch (e) {
       console.warn("[Firestore] fetchSiteMediaSettings error:", e);
     }
   }
 
+  // 3. Fallback to localStorage
   if (typeof window !== "undefined") {
     const local = localStorage.getItem(LOCAL_STORAGE_SITE_MEDIA_KEY);
     if (local) {
@@ -614,7 +706,33 @@ export async function fetchSiteMediaSettings(): Promise<SiteMediaSettings> {
 export async function saveSiteMediaSettings(settings: Partial<SiteMediaSettings>): Promise<boolean> {
   let firestoreSaved = false;
 
-  // 1. Save to Firebase Firestore
+  // 1. Save to localStorage & notify browser components in real-time
+  let mergedMedia: SiteMediaSettings = {};
+  if (typeof window !== "undefined") {
+    try {
+      const current = await fetchSiteMediaSettings();
+      mergedMedia = { ...current, ...settings };
+      localStorage.setItem(LOCAL_STORAGE_SITE_MEDIA_KEY, JSON.stringify(mergedMedia));
+      window.dispatchEvent(new CustomEvent("site_media_updated", { detail: mergedMedia }));
+    } catch (e) {
+      console.warn("[LocalStorage] saveSiteMediaSettings error:", e);
+    }
+  }
+
+  // 2. Save to Server Sync API so phone and desktop stay synchronized
+  if (typeof window !== "undefined") {
+    try {
+      await fetch("/api/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ media: mergedMedia })
+      });
+    } catch (e) {
+      console.warn("[Sync API] saveSiteMediaSettings error:", e);
+    }
+  }
+
+  // 3. Save to Firebase Firestore
   if (isFirebaseConfigured() && db) {
     try {
       const docRef = doc(db, "settings", "media");
@@ -622,18 +740,6 @@ export async function saveSiteMediaSettings(settings: Partial<SiteMediaSettings>
       firestoreSaved = true;
     } catch (e) {
       console.error("[Firestore] saveSiteMediaSettings error:", e);
-    }
-  }
-
-  // 2. Save to localStorage & notify browser components in real-time
-  if (typeof window !== "undefined") {
-    try {
-      const current = await fetchSiteMediaSettings();
-      const updated = { ...current, ...settings };
-      localStorage.setItem(LOCAL_STORAGE_SITE_MEDIA_KEY, JSON.stringify(updated));
-      window.dispatchEvent(new CustomEvent("site_media_updated", { detail: updated }));
-    } catch (e) {
-      console.warn("[LocalStorage] saveSiteMediaSettings error:", e);
     }
   }
 
@@ -736,21 +842,26 @@ export async function deleteSharedQuotation(id: string): Promise<boolean> {
 const LOCAL_STORAGE_GALLERY_KEY = "skyquest_gallery_photos";
 
 export async function fetchGalleryItems(): Promise<GalleryItem[]> {
+  // 1. Try Server Sync API
   if (typeof window !== "undefined") {
-    const local = localStorage.getItem(LOCAL_STORAGE_GALLERY_KEY);
-    if (local) {
-      try {
-        const parsed = JSON.parse(local);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch (e) {}
-    }
+    try {
+      const res = await fetch("/api/sync", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && Array.isArray(data.gallery) && data.gallery.length > 0) {
+          localStorage.setItem(LOCAL_STORAGE_GALLERY_KEY, JSON.stringify(data.gallery));
+          return data.gallery;
+        }
+      }
+    } catch (e) {}
   }
 
+  // 2. Try Firestore
   if (isFirebaseConfigured() && db) {
     try {
       const q = query(collection(db, "gallery"), orderBy("createdAt", "desc"));
       const timeoutPromise = new Promise<null>((_, reject) =>
-        setTimeout(() => reject(new Error("Firestore timeout")), 2000)
+        setTimeout(() => reject(new Error("Firestore timeout")), 4000)
       );
       const snapshot = (await Promise.race([getDocs(q), timeoutPromise])) as any;
       if (snapshot && !snapshot.empty) {
@@ -765,6 +876,17 @@ export async function fetchGalleryItems(): Promise<GalleryItem[]> {
     }
   }
 
+  // 3. Fallback to localStorage
+  if (typeof window !== "undefined") {
+    const local = localStorage.getItem(LOCAL_STORAGE_GALLERY_KEY);
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+  }
+
   return INITIAL_GALLERY;
 }
 
@@ -776,6 +898,26 @@ export async function saveGalleryItem(item: Omit<GalleryItem, "id"> & { id?: str
     createdAt: new Date().toISOString()
   };
 
+  let all: GalleryItem[] = [];
+  if (typeof window !== "undefined") {
+    all = await fetchGalleryItems();
+    const existingIndex = all.findIndex((g) => g.id === itemId);
+    if (existingIndex >= 0) {
+      all[existingIndex] = { ...all[existingIndex], ...itemData };
+    } else {
+      all.unshift(itemData as GalleryItem);
+    }
+    localStorage.setItem(LOCAL_STORAGE_GALLERY_KEY, JSON.stringify(all));
+
+    try {
+      await fetch("/api/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gallery: all })
+      });
+    } catch (e) {}
+  }
+
   if (isFirebaseConfigured() && db) {
     try {
       const docRef = doc(db, "gallery", itemId);
@@ -785,21 +927,25 @@ export async function saveGalleryItem(item: Omit<GalleryItem, "id"> & { id?: str
     }
   }
 
-  if (typeof window !== "undefined") {
-    const all = await fetchGalleryItems();
-    const existingIndex = all.findIndex((g) => g.id === itemId);
-    if (existingIndex >= 0) {
-      all[existingIndex] = { ...all[existingIndex], ...itemData };
-    } else {
-      all.unshift(itemData as GalleryItem);
-    }
-    localStorage.setItem(LOCAL_STORAGE_GALLERY_KEY, JSON.stringify(all));
-  }
-
   return itemId;
 }
 
 export async function deleteGalleryItem(itemId: string): Promise<boolean> {
+  let filtered: GalleryItem[] = [];
+  if (typeof window !== "undefined") {
+    const all = await fetchGalleryItems();
+    filtered = all.filter((g) => g.id !== itemId);
+    localStorage.setItem(LOCAL_STORAGE_GALLERY_KEY, JSON.stringify(filtered));
+
+    try {
+      await fetch("/api/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gallery: filtered })
+      });
+    } catch (e) {}
+  }
+
   if (isFirebaseConfigured() && db) {
     try {
       await deleteDoc(doc(db, "gallery", itemId));
@@ -808,12 +954,45 @@ export async function deleteGalleryItem(itemId: string): Promise<boolean> {
     }
   }
 
-  if (typeof window !== "undefined") {
-    const all = await fetchGalleryItems();
-    const filtered = all.filter((g) => g.id !== itemId);
-    localStorage.setItem(LOCAL_STORAGE_GALLERY_KEY, JSON.stringify(filtered));
-  }
   return true;
+}
+
+export async function syncAllLocalDataToServer(): Promise<{ success: boolean; message: string }> {
+  if (typeof window === "undefined") return { success: false, message: "Client only" };
+
+  try {
+    const localPackages = localStorage.getItem(LOCAL_STORAGE_PACKAGES_KEY);
+    const localGallery = localStorage.getItem(LOCAL_STORAGE_GALLERY_KEY);
+    const localMedia = localStorage.getItem(LOCAL_STORAGE_SITE_MEDIA_KEY);
+
+    const payload: any = {};
+    if (localPackages) {
+      try { payload.packages = JSON.parse(localPackages); } catch (e) {}
+    }
+    if (localGallery) {
+      try { payload.gallery = JSON.parse(localGallery); } catch (e) {}
+    }
+    if (localMedia) {
+      try { payload.media = JSON.parse(localMedia); } catch (e) {}
+    }
+
+    const res = await fetch("/api/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.packages) localStorage.setItem(LOCAL_STORAGE_PACKAGES_KEY, JSON.stringify(data.packages));
+      if (data.gallery) localStorage.setItem(LOCAL_STORAGE_GALLERY_KEY, JSON.stringify(data.gallery));
+      if (data.media) localStorage.setItem(LOCAL_STORAGE_SITE_MEDIA_KEY, JSON.stringify(data.media));
+      return { success: true, message: "All devices are in sync! (மொபைல் மற்றும் லேப்டாப் இரண்டும் வெற்றிகரமாக இணைக்கப்பட்டது)" };
+    }
+    return { success: false, message: "Sync server returned error" };
+  } catch (err: any) {
+    return { success: false, message: err.message || "Sync failed" };
+  }
 }
 
 
