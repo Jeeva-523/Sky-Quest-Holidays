@@ -444,14 +444,12 @@ body {
 .spots-list-wrapper {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  justify-content: space-between;
-  margin: 8px 0;
-  min-height: 0;
+  gap: 12px;
+  margin: 12px 0;
 }
 
 .spot-card-row {
-  background: rgba(248, 250, 252, 0.85);
+  background: rgba(248, 250, 252, 0.9);
   border: 1px solid var(--border-subtle);
   border-left: 4px solid var(--sky-blue);
   border-radius: 10px;
@@ -459,6 +457,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .spot-left-group {

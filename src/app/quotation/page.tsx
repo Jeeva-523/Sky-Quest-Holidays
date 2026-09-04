@@ -1387,11 +1387,15 @@ export default function QuotationExactPDFPage() {
                     </div>
                   </div>
 
-                  {/* Spots Timeline Cards (1..15 per page) - Elegantly distributed to suit up to 15 spots per page */}
+                  {/* Spots Timeline Cards (1..15 per page) - Clear visible space between every spot */}
                   <div
-                    className={`flex-1 flex flex-col ${
-                      dayPage.spots.length >= 8 ? "justify-between" : "justify-start space-y-3"
-                    } my-2.5 min-h-0`}
+                    className={`flex flex-col ${
+                      dayPage.spots.length >= 14
+                        ? "gap-2"
+                        : dayPage.spots.length >= 11
+                        ? "gap-2.5"
+                        : "gap-3"
+                    } my-3`}
                   >
                     {dayPage.spots.map((spot, sIdx) => {
                       const absoluteSpotIndex = dayPage.startSpotIndex + sIdx;
@@ -1401,11 +1405,9 @@ export default function QuotationExactPDFPage() {
                           key={sIdx}
                           className={`rounded-xl border border-slate-200 border-l-4 ${colorStyle.border} ${colorStyle.bg} px-3.5 ${
                             dayPage.spots.length >= 14
-                              ? "py-1.5"
-                              : dayPage.spots.length >= 10
                               ? "py-2"
                               : "py-2.5"
-                          } flex items-center justify-between transition-all`}
+                          } flex items-center justify-between transition-all shadow-sm`}
                         >
                           <div className="flex items-center gap-3">
                             <span className={`px-2.5 py-0.5 rounded font-black text-[10.5px] uppercase tracking-wider ${colorStyle.pillBg}`}>
