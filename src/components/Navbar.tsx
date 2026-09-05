@@ -42,7 +42,7 @@ export default function Navbar() {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-sky-400/50 to-transparent pointer-events-none" />
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <div className="w-full px-4 sm:px-8 lg:px-10 flex items-center justify-between">
         {/* Brand Logo & Lockup */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative flex-shrink-0">
