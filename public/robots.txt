@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /skyAdmin
+Disallow: /api
+
+Sitemap: https://sky-quest-holidays.web.app/sitemap.xml
