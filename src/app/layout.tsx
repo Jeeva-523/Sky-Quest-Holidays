@@ -33,9 +33,18 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://sky-quest-holidays.web.app"),
   title: "SKY QUEST Holidays | Best Tour Packages",
   description: "Book affordable tour packages across Tamil Nadu, Kerala, Karnataka and all over India with SKY QUEST Holidays.",
   keywords: ["Sky Quest Holidays", "Kerala tour packages", "Munnar tour", "Ooty package", "Kodaikanal tour", "Coorg tour", "Goa college IV", "Thailand tour package"],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
   openGraph: {
     title: "SKY QUEST Holidays",
     description: "Affordable Tour Packages & Holiday Trips",
@@ -61,6 +70,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${outfit.variable} ${jakarta.variable} ${chakra.variable} scroll-smooth`}>
       <head>
+        <meta name="google-site-verification" content="rcByJrq3QdCjzyW-htDw-onjd5Q5Lqp0Qk1W299hvP0" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Bruno+Ace+SC&family=Playfair+Display:ital,wght@1,600;1,700;1,800;1,900&display=swap" rel="stylesheet" />
