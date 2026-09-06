@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Printer,
+  Download,
   Plus,
   Trash2,
   CheckCircle2,
@@ -334,8 +335,8 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
   };
 
   const handleLoadFromHistory = (item: QuotationHistoryItem) => {
-    if (!item.fullData) return;
-    const d = item.fullData;
+    const d = item.fullData || item;
+    if (!d) return;
     if (d.locationText) setLocationText(d.locationText);
     if (d.refNo) setRefNo(d.refNo);
     if (d.destination) setDestination(d.destination);
@@ -357,6 +358,8 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
       setDaysData(d.daysData);
     }
     setActiveTab("client");
+    setSaveSuccessMsg(`Loaded quotation ${d.refNo || item.refNo || ""}`);
+    setTimeout(() => setSaveSuccessMsg(""), 3000);
   };
 
   const handleDeleteHistory = async (id: string) => {
@@ -436,20 +439,55 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
     setTimeout(() => setSaveSuccessMsg(""), 3000);
   };
 
+  const saveCurrentDataLocally = (data: any) => {
+    const jsonStr = JSON.stringify(data);
+    try {
+      localStorage.setItem(SAVED_DATA_KEY, jsonStr);
+      sessionStorage.setItem(SAVED_DATA_KEY, jsonStr);
+    } catch (e) { }
+    return jsonStr;
+  };
+
+  const handleDownloadPdf = () => {
+    const currentData = getCurrentFormData();
+    const jsonStr = saveCurrentDataLocally(currentData);
+    const targetUrl = "/quotation-print/index.html?download=true";
+    const win = window.open(targetUrl, "_blank");
+    if (win) {
+      try {
+        win.name = "sqh_data:" + jsonStr;
+      } catch (e) { }
+    } else {
+      window.location.href = targetUrl;
+    }
+  };
+
   const handleOpenPdfPreviewInNewTab = () => {
     const currentData = getCurrentFormData();
-    try {
-      localStorage.setItem(SAVED_DATA_KEY, JSON.stringify(currentData));
-    } catch (e) { }
-    window.open("/quotation-print/index.html", "_blank");
+    const jsonStr = saveCurrentDataLocally(currentData);
+    const targetUrl = "/quotation-print/index.html";
+    const win = window.open(targetUrl, "_blank");
+    if (win) {
+      try {
+        win.name = "sqh_data:" + jsonStr;
+      } catch (e) { }
+    } else {
+      window.location.href = targetUrl;
+    }
   };
 
   const handlePrint = () => {
     const currentData = getCurrentFormData();
-    try {
-      localStorage.setItem(SAVED_DATA_KEY, JSON.stringify(currentData));
-    } catch (e) { }
-    window.open("/quotation-print/index.html?print=true", "_blank");
+    const jsonStr = saveCurrentDataLocally(currentData);
+    const targetUrl = "/quotation-print/index.html?print=true";
+    const win = window.open(targetUrl, "_blank");
+    if (win) {
+      try {
+        win.name = "sqh_data:" + jsonStr;
+      } catch (e) { }
+    } else {
+      window.location.href = targetUrl;
+    }
   };
 
   const SPOTS_PER_PAGE = 15;
@@ -513,13 +551,21 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
           </button>
 
           <button
-            onClick={handleOpenPdfPreviewInNewTab}
+            onClick={handleDownloadPdf}
             className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold text-xs shadow-lg shadow-sky-950/50 transition-all flex items-center gap-2 active:scale-95 cursor-pointer"
-            title="Open Exact PDF Document in New Tab"
+            title="Download Quotation PDF file directly to Phone / PC"
           >
-            <Eye className="w-4 h-4 text-sky-100" />
-            <span>Preview PDF</span>
-            <ExternalLink className="w-3.5 h-3.5 text-sky-200" />
+            <Download className="w-4 h-4 text-sky-100" />
+            <span>Download PDF</span>
+          </button>
+
+          <button
+            onClick={handleOpenPdfPreviewInNewTab}
+            className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700/80 font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+            title="Open Exact PDF Document Preview in New Tab"
+          >
+            <Eye className="w-4 h-4 text-sky-400" />
+            <span>Preview</span>
           </button>
 
           <button
@@ -1107,12 +1153,20 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
           </button>
 
           <button
-            onClick={handleOpenPdfPreviewInNewTab}
+            onClick={handleDownloadPdf}
             className="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold text-xs shadow-md shadow-sky-950/40 transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer"
+            title="Download Quotation PDF file directly"
           >
-            <Eye className="w-4 h-4" />
-            <span>Preview PDF</span>
-            <ExternalLink className="w-3 h-3" />
+            <Download className="w-4 h-4" />
+            <span>Download PDF</span>
+          </button>
+
+          <button
+            onClick={handleOpenPdfPreviewInNewTab}
+            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 font-bold text-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer"
+          >
+            <Eye className="w-4 h-4 text-sky-400" />
+            <span>Preview</span>
           </button>
 
           <button

@@ -11,9 +11,37 @@
     href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Montserrat:wght@700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,700;1,800;1,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="/quotation-print/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
 <body>
+  <!-- Sticky Action Floating Bar for Phone & Desktop (Hidden on Print) -->
+  <div class="mobile-pdf-action-bar no-print">
+    <div class="action-bar-inner">
+      <div class="brand-info">
+        <div class="brand-title-group">
+          <span class="live-pulse-dot"></span>
+          <span class="bar-title">SkyQuest Tour Quotation</span>
+        </div>
+        <span class="bar-sub" id="bar-ref-sub">Official PDF Document</span>
+      </div>
+      <div class="action-buttons">
+        <button id="btn-download-pdf" onclick="downloadPDF()" class="btn-action btn-download" title="Save PDF to Phone / Computer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Download PDF</span>
+        </button>
+        <button id="btn-share-pdf" onclick="sharePDF()" class="btn-action btn-share" title="Share PDF via WhatsApp / Apps">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          <span>Share</span>
+        </button>
+        <button onclick="window.print()" class="btn-action btn-print" title="Print document">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <span>Print</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="document-wrapper" id="document-wrapper">
 
     <!-- PAGE 1: COVER & CLIENT DETAILS -->
@@ -424,18 +452,28 @@
         }
       }
 
-      if (data.rate) document.getElementById('doc-rate-amount').innerText = data.rate;
-      if (data.ratePaxBasis) document.getElementById('doc-rate-pax-sub').innerText = data.ratePaxBasis;
-      if (data.phone) document.getElementById('doc-conn-phone').innerText = data.phone;
-      if (data.email) document.getElementById('doc-conn-email').innerText = data.email;
-      if (data.web) document.getElementById('doc-conn-web').innerText = data.web;
-      if (data.insta) document.getElementById('doc-conn-insta').innerText = data.insta;
+      const safeSetText = (id, text) => {
+        if (!text) return;
+        const el = document.getElementById(id);
+        if (el) el.innerText = String(text).trim();
+      };
+
+      safeSetText('doc-rate-amount', data.rate);
+      safeSetText('doc-rate-pax-sub', data.ratePaxBasis);
+      safeSetText('doc-inv-meal-pill', data.foodOption);
+      safeSetText('doc-conn-phone', data.phone);
+      safeSetText('doc-conn-email', data.email);
+      safeSetText('doc-conn-web', data.web);
+      safeSetText('doc-conn-insta', data.insta);
+      if (data.locationText) {
+        safeSetText('doc-sig-accepted-label', 'ACCEPTED BY (' + data.locationText.toUpperCase() + ')');
+      }
 
       // Render Itinerary Pages with 15 spots per page pagination
       const itContainer = document.getElementById('dynamic-itinerary-pages');
       if (itContainer && data.daysData && Array.isArray(data.daysData)) {
         itContainer.innerHTML = '';
-        const SPOTS_PER_PAGE = 15;
+        const SPOTS_PER_PAGE = 10;
 
         const renderedDayPages = [];
         data.daysData.forEach((day, dIdx) => {
@@ -480,7 +518,8 @@
         const totalPages = renderedDayPages.length + 3;
 
         document.querySelectorAll('.total-pages-count').forEach(el => el.innerText = totalPages);
-        document.getElementById('doc-inv-page-num').innerText = totalPages - 1;
+        const invPageEl = document.getElementById('doc-inv-page-num');
+        if (invPageEl) invPageEl.innerText = totalPages - 1;
 
         renderedDayPages.forEach((dayPage, pIdx) => {
           const pageNum = pIdx + 2;
@@ -570,16 +609,206 @@
       }
     }
 
+    async function downloadPDF() {
+      const btn = document.getElementById('btn-download-pdf');
+      const origHtml = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="animate-spin"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg> <span>Generating PDF...</span>';
+      }
+
+      const wrapper = document.getElementById('document-wrapper');
+      const refNoEl = document.getElementById('doc-ref-no');
+      let refText = refNoEl ? refNoEl.innerText.replace('Ref: ', '').trim() : 'SQH_Quotation';
+      const cleanFileName = refText.replace(/[^a-zA-Z0-9_-]/g, '_') + '.pdf';
+
+      const prevMargin = wrapper.style.margin;
+      const prevPosition = wrapper.style.position;
+      const prevLeft = wrapper.style.left;
+      const prevGap = wrapper.style.gap;
+
+      wrapper.style.margin = '0';
+      wrapper.style.position = 'relative';
+      wrapper.style.left = '0';
+      wrapper.style.gap = '0';
+      window.scrollTo(0, 0);
+
+      const opt = {
+        margin: [0, 0, 0, 0],
+        filename: cleanFileName,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          scrollX: 0,
+          scrollY: 0,
+          x: 0,
+          y: 0,
+          width: 794,
+          windowWidth: 794
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: 'css', before: '.page-a4:not(:first-child)' }
+      };
+
+      try {
+        if (window.html2pdf) {
+          await html2pdf().set(opt).from(wrapper).save();
+        } else {
+          window.print();
+        }
+      } catch (err) {
+        console.error('PDF generation failed:', err);
+        window.print();
+      } finally {
+        wrapper.style.margin = prevMargin;
+        wrapper.style.position = prevPosition;
+        wrapper.style.left = prevLeft;
+        wrapper.style.gap = prevGap;
+
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
+        }
+      }
+    }
+
+    async function sharePDF() {
+      const btn = document.getElementById('btn-share-pdf');
+      const origHtml = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>Sharing...</span>';
+      }
+
+      const refNoEl = document.getElementById('doc-ref-no');
+      let refText = refNoEl ? refNoEl.innerText.replace('Ref: ', '').trim() : 'SQH_Quotation';
+      const cleanFileName = refText.replace(/[^a-zA-Z0-9_-]/g, '_') + '.pdf';
+
+      const wrapper = document.getElementById('document-wrapper');
+      const prevMargin = wrapper.style.margin;
+      const prevPosition = wrapper.style.position;
+      const prevLeft = wrapper.style.left;
+      const prevGap = wrapper.style.gap;
+
+      wrapper.style.margin = '0';
+      wrapper.style.position = 'relative';
+      wrapper.style.left = '0';
+      wrapper.style.gap = '0';
+      window.scrollTo(0, 0);
+
+      const opt = {
+        margin: [0, 0, 0, 0],
+        filename: cleanFileName,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          scrollX: 0,
+          scrollY: 0,
+          x: 0,
+          y: 0,
+          width: 794,
+          windowWidth: 794
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: 'css', before: '.page-a4:not(:first-child)' }
+      };
+
+      try {
+        if (window.html2pdf) {
+          const pdfBlob = await html2pdf().set(opt).from(wrapper).output('blob');
+          const file = new File([pdfBlob], cleanFileName, { type: 'application/pdf' });
+
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: 'SkyQuest Official Quotation',
+              text: `SkyQuest Holidays Tour Quotation (${refText})`
+            });
+          } else if (navigator.share) {
+            await navigator.share({
+              title: 'SkyQuest Official Quotation',
+              text: `SkyQuest Holidays Tour Quotation (${refText})`,
+              url: window.location.href
+            });
+          } else {
+            downloadPDF();
+          }
+        } else {
+          downloadPDF();
+        }
+      } catch (e) {
+        console.warn('Share cancelled or not supported:', e);
+      } finally {
+        wrapper.style.margin = prevMargin;
+        wrapper.style.position = prevPosition;
+        wrapper.style.left = prevLeft;
+        wrapper.style.gap = prevGap;
+
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
+        }
+      }
+    }
+
+    function getStoredQuotationData() {
+      try {
+        if (window.name && window.name.startsWith('sqh_data:')) {
+          const raw = window.name.substring(9);
+          if (raw) return JSON.parse(raw);
+        }
+      } catch (e) {}
+
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const dataParam = params.get('data');
+        if (dataParam) {
+          return JSON.parse(decodeURIComponent(dataParam));
+        }
+      } catch (e) {}
+
+      try {
+        const sess = sessionStorage.getItem('skyquest_quotation_saved_data');
+        if (sess) return JSON.parse(sess);
+      } catch (e) {}
+
+      try {
+        const local = localStorage.getItem('skyquest_quotation_saved_data');
+        if (local) return JSON.parse(local);
+      } catch (e) {}
+
+      return null;
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       try {
-        const saved = localStorage.getItem('skyquest_quotation_saved_data');
-        if (saved) {
-          updateQuotationData(JSON.parse(saved));
+        const savedData = getStoredQuotationData();
+        if (savedData) {
+          updateQuotationData(savedData);
         }
-      } catch (e) { }
+      } catch (e) {
+        console.error('Error applying quotation data:', e);
+      }
 
-      if (window.location.search.includes('print=true')) {
-        setTimeout(() => window.print(), 600);
+      const refNoEl = document.getElementById('doc-ref-no');
+      const barRefSub = document.getElementById('bar-ref-sub');
+      if (refNoEl && barRefSub && refNoEl.innerText) {
+        barRefSub.innerText = refNoEl.innerText;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('download') === 'true') {
+        setTimeout(() => {
+          downloadPDF();
+        }, 700);
+      } else if (params.get('print') === 'true') {
+        setTimeout(() => {
+          window.print();
+        }, 600);
       }
     });
   </script>

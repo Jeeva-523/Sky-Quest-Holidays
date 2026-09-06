@@ -903,43 +903,64 @@ export const saveHeroSettings = saveSiteMediaSettings;
    ========================================================================= */
 
 export async function fetchSharedQuotations(): Promise<{ quotations: any[]; nextSeq: number }> {
+  let list: any[] = [];
+
   // 1. Try Firebase Firestore
   if (isFirebaseConfigured() && db) {
     try {
-      const q = query(collection(db, "quotations"), orderBy("savedAt", "desc"));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        return { quotations: list, nextSeq: 750 };
+      let snap;
+      try {
+        const q = query(collection(db, "quotations"), orderBy("savedAt", "desc"));
+        snap = await getDocs(q);
+      } catch (e) {
+        snap = await getDocs(collection(db, "quotations"));
+      }
+
+      if (snap && !snap.empty) {
+        list = snap.docs.map((d) => ({ ...d.data(), id: d.id }));
       }
     } catch (e) {
-      console.warn("[Firestore] fetchSharedQuotations fallback to API:", e);
+      console.warn("[Firestore] fetchSharedQuotations fallback error:", e);
     }
   }
 
-  // 2. Fallback to localStorage
+  // 2. Fallback / Merge with localStorage
   if (typeof window !== "undefined") {
     try {
       const local = localStorage.getItem("skyquest_quotations_history_list_v1");
       if (local) {
         const parsed = JSON.parse(local);
-        if (Array.isArray(parsed)) return { quotations: parsed, nextSeq: 750 };
+        if (Array.isArray(parsed)) {
+          const existingIds = new Set(list.map((q: any) => q.id || q.refNo));
+          parsed.forEach((localItem: any) => {
+            const key = localItem.id || localItem.refNo;
+            if (key && !existingIds.has(key)) {
+              list.push(localItem);
+            }
+          });
+        }
       }
     } catch (e) {}
   }
 
-  return { quotations: [], nextSeq: 750 };
+  return { quotations: list, nextSeq: 750 };
 }
 
 export async function saveSharedQuotation(item: any, nextSeq?: number): Promise<boolean> {
+  const cleanId = String(item.id || item.refNo || `qt_${Date.now()}`).replace(/[\/\s]/g, "_");
+  const cleanRefNo = item.refNo ? String(item.refNo).trim() : `SQH/QT/2026/SKY-${Date.now().toString().slice(-4)}`;
+
+  const payload = {
+    ...item,
+    id: cleanId,
+    refNo: cleanRefNo,
+    updatedAt: serverTimestamp()
+  };
+
   // 1. Save to Firebase Firestore
   if (isFirebaseConfigured() && db) {
     try {
-      const docId = item.id || (item.refNo ? item.refNo.replace(/[\/\s]/g, "_") : `qt_${Date.now()}`);
-      await setDoc(doc(db, "quotations", docId), {
-        ...item,
-        updatedAt: serverTimestamp()
-      }, { merge: true });
+      await setDoc(doc(db, "quotations", cleanId), payload, { merge: true });
     } catch (e) {
       console.warn("[Firestore] saveSharedQuotation error:", e);
     }
@@ -950,7 +971,7 @@ export async function saveSharedQuotation(item: any, nextSeq?: number): Promise<
     try {
       const raw = localStorage.getItem("skyquest_quotations_history_list_v1");
       const list = raw ? JSON.parse(raw) : [];
-      const updated = [item, ...list.filter((q: any) => q.id !== item.id)];
+      const updated = [payload, ...list.filter((q: any) => q.id !== cleanId && q.refNo !== cleanRefNo)];
       localStorage.setItem("skyquest_quotations_history_list_v1", JSON.stringify(updated));
       if (nextSeq) {
         localStorage.setItem("skyquest_quotations_sequence_v1", String(nextSeq));
@@ -961,11 +982,12 @@ export async function saveSharedQuotation(item: any, nextSeq?: number): Promise<
 }
 
 export async function deleteSharedQuotation(id: string): Promise<boolean> {
+  const cleanId = String(id).replace(/[\/\s]/g, "_");
+
   // 1. Delete from Firestore
   if (isFirebaseConfigured() && db) {
     try {
-      const docId = id.replace(/[\/\s]/g, "_");
-      await deleteDoc(doc(db, "quotations", docId));
+      await deleteDoc(doc(db, "quotations", cleanId));
     } catch (e) {}
   }
 
@@ -975,7 +997,7 @@ export async function deleteSharedQuotation(id: string): Promise<boolean> {
       const raw = localStorage.getItem("skyquest_quotations_history_list_v1");
       if (raw) {
         const list = JSON.parse(raw);
-        const filtered = list.filter((q: any) => q.id !== id);
+        const filtered = list.filter((q: any) => q.id !== cleanId && q.id !== id);
         localStorage.setItem("skyquest_quotations_history_list_v1", JSON.stringify(filtered));
       }
     } catch (e) {}

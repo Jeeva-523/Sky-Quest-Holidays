@@ -42,12 +42,16 @@
         💾 Save
       </button>
 
-      <a href="index.html" target="_blank" class="btn btn-sky" id="btn-preview-link" onclick="updatePreview()">
-        👁️ PDF Preview
+      <button class="btn btn-sky" id="btn-download-main" onclick="downloadQuotationPDF()">
+        📥 Download PDF
+      </button>
+
+      <a href="index.html" target="_blank" class="btn btn-slate" id="btn-preview-link" onclick="updatePreview()">
+        👁️ Preview
       </a>
 
       <button class="btn btn-gold" id="btn-print-main" onclick="printQuotation()">
-        🖨️ Print / Save PDF
+        🖨️ Print PDF
       </button>
 
       <a href="/admin" class="btn btn-slate">
@@ -685,6 +689,21 @@
       updateTotalBadge();
     }
 
+    function downloadQuotationPDF() {
+      updatePreview();
+      const iframe = document.getElementById('preview-frame');
+      try {
+        if (iframe && iframe.contentWindow && iframe.contentWindow.downloadPDF) {
+          iframe.contentWindow.downloadPDF();
+          return;
+        }
+      } catch (e) {}
+      const win = window.open('index.html?download=true', '_blank');
+      if (!win) {
+        window.location.href = 'index.html?download=true';
+      }
+    }
+
     function printQuotation() {
       updatePreview();
       const iframe = document.getElementById('preview-frame');
@@ -695,7 +714,10 @@
           return;
         }
       } catch (e) {}
-      window.open('index.html?print=true', '_blank');
+      const win = window.open('index.html?print=true', '_blank');
+      if (!win) {
+        window.location.href = 'index.html?print=true';
+      }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
