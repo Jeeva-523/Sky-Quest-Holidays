@@ -14,6 +14,22 @@
 </head>
 
 <body>
+  <!-- Top Action & Download Toolbar (Hidden during Print/PDF export) -->
+  <div class="print-control-bar no-print">
+    <div class="control-left">
+      <span class="control-brand">✈️ SkyQuest Quotation</span>
+      <span class="control-ref-badge" id="ctrl-top-ref">SQH/QT/2026/SKY-750</span>
+    </div>
+    <div class="control-actions">
+      <button type="button" class="ctrl-btn ctrl-btn-download" onclick="triggerDownloadPdf()" title="Download or Save as PDF file">
+        📥 Download PDF
+      </button>
+      <button type="button" class="ctrl-btn ctrl-btn-print" onclick="window.print()" title="Open print dialog">
+        🖨️ Print
+      </button>
+    </div>
+  </div>
+
   <div class="document-wrapper" id="document-wrapper">
 
     <!-- PAGE 1: COVER & CLIENT DETAILS -->
@@ -299,7 +315,7 @@
             <div class="sig-line">Authorized Signature & Tour Operators Seal</div>
           </div>
           <div class="sig-box">
-            <span class="sig-label" id="doc-sig-accepted-label">ACCEPTED BY (ERODE, TAMIL NADU)</span>
+            <span class="sig-label" id="doc-sig-accepted-label">ACCEPTED BY (CLIENT / INSTITUTION)</span>
             <div class="sig-line">HOD / Staff Coordinator Signature & Date</div>
           </div>
         </div>
@@ -347,6 +363,11 @@
         if (data.refNo && data.refNo.trim()) {
           elRef.style.display = 'block';
           elRef.innerText = 'Ref: ' + data.refNo.trim();
+          const topRef = document.getElementById('ctrl-top-ref');
+          if (topRef) topRef.innerText = data.refNo.trim();
+          const cleanRef = data.refNo.trim().replace(/[\/\\:]/g, '_');
+          const cleanLoc = (data.locationText || '').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+          document.title = cleanRef + (cleanLoc ? ('_' + cleanLoc) : '') + '_Quotation';
         } else {
           elRef.style.display = 'none';
         }
@@ -426,12 +447,29 @@
         }
       }
 
-      if (data.rate) document.getElementById('doc-rate-amount').innerText = data.rate;
+      const elRate = document.getElementById('doc-rate-amount');
+      if (elRate) {
+        const rateVal = (data.rate !== undefined && data.rate !== null) ? String(data.rate).trim() : '';
+        if (rateVal) {
+          elRate.innerText = rateVal;
+        } else {
+          elRate.innerHTML = '<span class="rate-manual-dash">₹ ____________ /-</span>';
+        }
+      }
       if (data.ratePaxBasis) document.getElementById('doc-rate-pax-sub').innerText = data.ratePaxBasis;
       if (data.phone) document.getElementById('doc-conn-phone').innerText = data.phone;
       if (data.email) document.getElementById('doc-conn-email').innerText = data.email;
       if (data.web) document.getElementById('doc-conn-web').innerText = data.web;
       if (data.insta) document.getElementById('doc-conn-insta').innerText = data.insta;
+
+      const sigAcceptedEl = document.getElementById('doc-sig-accepted-label');
+      if (sigAcceptedEl) {
+        if (data.locationText && data.locationText.trim()) {
+          sigAcceptedEl.innerText = 'ACCEPTED BY (' + data.locationText.trim().toUpperCase() + ')';
+        } else {
+          sigAcceptedEl.innerText = 'ACCEPTED BY (CLIENT / INSTITUTION)';
+        }
+      }
 
       // Render Itinerary Pages with 15 spots per page pagination
       const itContainer = document.getElementById('dynamic-itinerary-pages');
@@ -572,6 +610,21 @@
       }
     }
 
+    function triggerDownloadPdf() {
+      try {
+        const saved = localStorage.getItem('skyquest_quotation_saved_data');
+        if (saved) {
+          const d = JSON.parse(saved);
+          if (d.refNo) {
+            const cleanRef = d.refNo.trim().replace(/[\/\\:]/g, '_');
+            const cleanLoc = (d.locationText || '').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+            document.title = cleanRef + (cleanLoc ? ('_' + cleanLoc) : '') + '_Quotation';
+          }
+        }
+      } catch (e) {}
+      window.print();
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       try {
         const saved = localStorage.getItem('skyquest_quotation_saved_data');
@@ -580,7 +633,9 @@
         }
       } catch (e) { }
 
-      if (window.location.search.includes('print=true')) {
+      if (window.location.search.includes('download=true')) {
+        setTimeout(() => triggerDownloadPdf(), 600);
+      } else if (window.location.search.includes('print=true')) {
         setTimeout(() => window.print(), 600);
       }
     });

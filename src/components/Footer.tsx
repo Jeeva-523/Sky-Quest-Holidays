@@ -54,28 +54,48 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Col 2: Quick Links */}
+          {/* Col 2: Services & Quick Links */}
           <div className="space-y-3">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider">Quick Links</h4>
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider">Services & Tours</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/#packages" className="hover:text-sky-400 transition-colors">
-                  Popular Tour Packages
+                <Link href="/tour-operators" className="hover:text-sky-400 transition-colors">
+                  Tour Operators South India
                 </Link>
               </li>
               <li>
-                <Link href="/#about" className="hover:text-sky-400 transition-colors">
-                  About Sky Quest
+                <Link href="/tour-operators-tamil-nadu" className="hover:text-sky-400 transition-colors">
+                  Tour Operators Tamil Nadu
                 </Link>
               </li>
               <li>
-                <Link href="/gallery" className="hover:text-sky-400 transition-colors">
-                  Photo & Video Gallery
+                <Link href="/educational-tours" className="hover:text-sky-400 transition-colors">
+                  Educational Tours & Field Trips
                 </Link>
               </li>
               <li>
-                <Link href="/#contact" className="hover:text-sky-400 transition-colors">
-                  Contact Support
+                <Link href="/industrial-visit-packages" className="hover:text-sky-400 transition-colors">
+                  Industrial Visit Packages (IV)
+                </Link>
+              </li>
+              <li>
+                <Link href="/college-tour-packages" className="hover:text-sky-400 transition-colors">
+                  College Tour Packages
+                </Link>
+              </li>
+              <li>
+                <Link href="/group-tour-packages" className="hover:text-sky-400 transition-colors">
+                  Group Tour Packages
+                </Link>
+              </li>
+              <li>
+                <Link href="/customized-tour-packages" className="hover:text-sky-400 transition-colors">
+                  Customized Tour Packages
+                </Link>
+              </li>
+              <li>
+                <Link href="/tour-packages" className="hover:text-sky-400 transition-colors">
+                  All Tour Packages
                 </Link>
               </li>
             </ul>
@@ -83,14 +103,30 @@ export default function Footer() {
 
           {/* Col 3: Popular Destinations */}
           <div className="space-y-3">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider">Destinations</h4>
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider">Top Destinations</h4>
             <ul className="space-y-2">
-              <li>Munnar & Alleppey Houseboat (Kerala)</li>
-              <li>Ooty & Kodaikanal Hills (Tamil Nadu)</li>
-              <li>Coorg & Chikmagalur Coffee Valleys (Karnataka)</li>
-              <li>Goa Beach & College Group IV</li>
-              <li>Rameshwaram & Kanyakumari Pilgrimage</li>
-              <li>Thailand & Malaysia International Tours</li>
+              <li>
+                <Link href="/kerala-tour-packages" className="hover:text-sky-400 transition-colors">
+                  Kerala Tour Packages
+                </Link>
+              </li>
+              <li>
+                <Link href="/munnar-tour-packages" className="hover:text-sky-400 transition-colors">
+                  Munnar Tour Packages
+                </Link>
+              </li>
+              <li>
+                <Link href="/vagamon-tour-packages" className="hover:text-sky-400 transition-colors">
+                  Vagamon Tour Packages
+                </Link>
+              </li>
+              <li>
+                <Link href="/ooty-tour-packages" className="hover:text-sky-400 transition-colors">
+                  Ooty Tour Packages
+                </Link>
+              </li>
+              <li className="text-slate-500">Goa Beach & College Tours</li>
+              <li className="text-slate-500">Kodaikanal & Coorg Packages</li>
             </ul>
           </div>
 
@@ -113,6 +149,84 @@ export default function Footer() {
               <MapPin className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
               <span>{COMPANY_INFO.address}</span>
             </p>
+          </div>
+        </div>
+
+        {/* SEO Internal Links Strip */}
+        <div className="mt-12 pt-8 border-t border-slate-800/80 text-[11px] text-slate-500 leading-relaxed">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-center">
+            <span className="text-slate-400 font-semibold">Popular Searches:</span>
+            <Link href="/tour-operators" className="hover:text-sky-400 transition-colors">
+              Tour Operators
+            </Link>
+            <span>•</span>
+            <Link href="/tour-operators-tamil-nadu" className="hover:text-sky-400 transition-colors">
+              Tour Operators in Tamil Nadu
+            </Link>
+            <span>•</span>
+            <Link href="/educational-tours" className="hover:text-sky-400 transition-colors">
+              Educational Tours
+            </Link>
+            <span>•</span>
+            <Link href="/educational-tour-packages" className="hover:text-sky-400 transition-colors">
+              Educational Tour Packages
+            </Link>
+            <span>•</span>
+            <Link href="/industrial-visit-packages" className="hover:text-sky-400 transition-colors">
+              Industrial Visit Packages
+            </Link>
+            <span>•</span>
+            <Link href="/industrial-visit-organizers" className="hover:text-sky-400 transition-colors">
+              Industrial Visit Organizers
+            </Link>
+            <span>•</span>
+            <Link href="/iv-packages" className="hover:text-sky-400 transition-colors">
+              College IV Packages
+            </Link>
+            <span>•</span>
+            <Link href="/college-tour-packages" className="hover:text-sky-400 transition-colors">
+              College Tour Packages
+            </Link>
+            <span>•</span>
+            <Link href="/college-excursion-packages" className="hover:text-sky-400 transition-colors">
+              College Excursion Packages
+            </Link>
+            <span>•</span>
+            <Link href="/student-tour-packages" className="hover:text-sky-400 transition-colors">
+              Student Tour Packages
+            </Link>
+            <span>•</span>
+            <Link href="/group-tour-packages" className="hover:text-sky-400 transition-colors">
+              Group Tour Packages
+            </Link>
+            <span>•</span>
+            <Link href="/customized-tour-packages" className="hover:text-sky-400 transition-colors">
+              Customized Tour Packages
+            </Link>
+            <span>•</span>
+            <Link href="/namakkal-travel-agency" className="hover:text-sky-400 transition-colors">
+              Best Travel Agency in Namakkal
+            </Link>
+            <span>•</span>
+            <Link href="/kerala-tour-packages" className="hover:text-sky-400 transition-colors">
+              Kerala Tour Packages
+            </Link>
+            <span>•</span>
+            <Link href="/munnar-tour-packages" className="hover:text-sky-400 transition-colors">
+              Munnar Tour Packages
+            </Link>
+            <span>•</span>
+            <Link href="/vagamon-tour-packages" className="hover:text-sky-400 transition-colors">
+              Vagamon Tour Packages
+            </Link>
+            <span>•</span>
+            <Link href="/ooty-tour-packages" className="hover:text-sky-400 transition-colors">
+              Ooty Tour Packages
+            </Link>
+            <span>•</span>
+            <Link href="/family-tour-packages" className="hover:text-sky-400 transition-colors">
+              Family Tour Packages
+            </Link>
           </div>
         </div>
       </div>

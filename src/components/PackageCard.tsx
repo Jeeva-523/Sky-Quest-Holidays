@@ -23,7 +23,7 @@ export default function PackageCard({ pkg, onBook }: PackageCardProps) {
       <div className="relative h-52 w-full overflow-hidden bg-slate-100">
         <img
           src={pkg.image || "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=800&q=80"}
-          alt={pkg.name}
+          alt={`SKY QUEST HOLIDAYS - ${pkg.name} tour package`}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />

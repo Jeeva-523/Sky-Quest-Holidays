@@ -11,7 +11,6 @@ import {
   subscribeToGalleryItems
 } from "@/lib/firebaseServices";
 import { GalleryItem } from "@/lib/types";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function Hero() {
   const [heroSettings, setHeroSettings] = useState<HeroSettings>({
@@ -111,14 +110,6 @@ export default function Hero() {
     return () => clearInterval(interval);
   }, [images.length]);
 
-  const nextSlide = () => {
-    setActiveSlide((prev) => (prev + 1) % images.length);
-  };
-
-  const prevSlide = () => {
-    setActiveSlide((prev) => (prev - 1 + images.length) % images.length);
-  };
-
   return (
     <section className="relative pt-36 pb-20 overflow-hidden min-h-[580px] flex items-center justify-center bg-slate-950">
       {/* Background Images with slow, gentle cross-fade */}
@@ -150,16 +141,26 @@ export default function Hero() {
         </div>
 
         {/* Title */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[1.15] mb-6 max-w-5xl mx-auto drop-shadow-lg">
-          Explore the World with{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-sky-300 to-cyan-300 drop-shadow-sm">
-            Sky Quest Holidays
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.18] mb-4 max-w-5xl mx-auto drop-shadow-lg">
+          <span className="font-audiowide tracking-wider block mb-2 text-3xl sm:text-5xl lg:text-6xl">
+            <span className="text-sky-400 drop-shadow-[0_0_25px_rgba(56,189,248,0.6)]">
+              SKY{" "}
+            </span>
+            <span className="text-white drop-shadow-[0_2px_10px_rgba(255,255,255,0.4)]">
+              QUEST{" "}
+            </span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 drop-shadow-[0_0_25px_rgba(245,158,11,0.6)]">
+              HOLIDAYS
+            </span>
+          </span>
+          <span className="block text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-100 mt-3 tracking-tight">
+            Educational Tours, Industrial Visits & Customized Tour Packages
           </span>
         </h1>
 
         {/* Subtitle */}
-        <p className="max-w-3xl mx-auto text-base sm:text-xl text-slate-200 font-medium leading-relaxed mb-12 drop-shadow-md">
-          {heroSettings.subtitle || "From the misty tea hills of Munnar to the pristine beaches of Bali & thrilling College IV trips, create memories that last forever."}
+        <p className="max-w-3xl mx-auto text-sm sm:text-lg text-slate-200 font-medium leading-relaxed mb-10 drop-shadow-md">
+          {heroSettings.subtitle || "Trusted tour operator in Namakkal for customized South India tour packages, College IV trips, Kerala & Munnar tours, and memorable family holidays with 24/7 on-trip support."}
         </p>
 
         {/* Feature Counters Grid - High-contrast Frosted Glass Cards */}
@@ -181,42 +182,6 @@ export default function Hero() {
             <p className="text-xs font-semibold text-slate-300 mt-1">On-Trip Manager Support</p>
           </div>
         </div>
-
-        {/* Real Traveler Moments Slide Navigation (if multiple images) */}
-        {images.length > 1 && (
-          <div className="flex items-center justify-center gap-3 pt-2">
-            <button
-              onClick={prevSlide}
-              aria-label="Previous traveler photo"
-              className="p-1.5 rounded-full bg-black/40 hover:bg-black/60 border border-white/20 text-white/80 hover:text-white transition-all backdrop-blur-sm cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-
-            <div className="flex items-center gap-1.5">
-              {images.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveSlide(idx)}
-                  aria-label={`Go to photo ${idx + 1}`}
-                  className={`h-2 rounded-full transition-all cursor-pointer ${
-                    idx === activeSlide
-                      ? "w-7 bg-sky-400 shadow-sm shadow-sky-400/50"
-                      : "w-2 bg-white/40 hover:bg-white/70"
-                  }`}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={nextSlide}
-              aria-label="Next traveler photo"
-              className="p-1.5 rounded-full bg-black/40 hover:bg-black/60 border border-white/20 text-white/80 hover:text-white transition-all backdrop-blur-sm cursor-pointer"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        )}
       </div>
     </section>
   );

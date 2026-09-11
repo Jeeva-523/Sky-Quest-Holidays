@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Phone, Menu, X, Camera, ArrowRight } from "lucide-react";
@@ -8,17 +8,96 @@ import { COMPANY_INFO } from "@/lib/data";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [activeNav, setActiveNav] = useState<string>("home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
 
   useEffect(() => {
+    if (pathname === "/gallery") {
+      setActiveNav("gallery");
+    } else if (pathname === "/") {
+      if (typeof window !== "undefined" && window.location.hash) {
+        const h = window.location.hash.replace("#", "");
+        if (["packages", "about", "contact"].includes(h)) {
+          setActiveNav(h);
+        }
+      }
+    } else {
+      setActiveNav("");
+    }
+  }, [pathname]);
+
+  useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 30);
+      const top =
+        (typeof window !== "undefined" ? window.scrollY || window.pageYOffset : 0) ||
+        (typeof document !== "undefined"
+          ? document.documentElement.scrollTop || document.body.scrollTop
+          : 0) ||
+        0;
+
+      const isScrolled = top > 15;
+      setScrolled(isScrolled);
+
+      if (headerRef.current) {
+        if (isScrolled || pathname !== "/") {
+          headerRef.current.classList.add("header-scrolled");
+          headerRef.current.classList.remove("header-top");
+        } else {
+          headerRef.current.classList.remove("header-scrolled");
+          headerRef.current.classList.add("header-top");
+        }
+      }
+
+      // Auto-detect active section when scrolling on homepage
+      if (pathname === "/") {
+        const scrollPosition = top + 150;
+        const contactSec = document.getElementById("contact");
+        const aboutSec = document.getElementById("about");
+        const packagesSec = document.getElementById("packages");
+
+        if (contactSec && scrollPosition >= contactSec.offsetTop) {
+          setActiveNav("contact");
+        } else if (aboutSec && scrollPosition >= aboutSec.offsetTop) {
+          setActiveNav("about");
+        } else if (packagesSec && scrollPosition >= packagesSec.offsetTop) {
+          setActiveNav("packages");
+        } else {
+          setActiveNav("home");
+        }
+      }
     };
+
     handleScroll();
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    document.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("scroll", handleScroll);
+    };
+  }, [pathname]);
+
+  const handleNavClick = (sectionId: string, href: string, e: React.MouseEvent) => {
+    setActiveNav(sectionId);
+    setMobileMenuOpen(false);
+
+    if (pathname === "/") {
+      if (sectionId === "home") {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+      const elem = document.getElementById(sectionId);
+      if (elem) {
+        e.preventDefault();
+        const yOffset = -75;
+        const y = elem.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }
+    }
+  };
 
   // Do not render website navbar on studio, admin or skyAdmin pages to prevent clash
   if (
@@ -31,14 +110,15 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-500 ease-out ${
-        scrolled
-          ? "bg-slate-950/90 backdrop-blur-xl border-b border-sky-500/20 shadow-[0_12px_35px_rgba(0,0,0,0.85)] py-3 sm:py-3.5"
-          : "bg-transparent border-b border-white/10 py-5 sm:py-6"
+      ref={headerRef}
+      className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 ease-out ${
+        scrolled || pathname !== "/"
+          ? "header-scrolled bg-slate-950/95 backdrop-blur-xl border-b border-sky-500/20 shadow-[0_12px_35px_rgba(0,0,0,0.85)] py-3 sm:py-3.5"
+          : "header-top bg-transparent border-b border-white/10 py-5 sm:py-6"
       }`}
     >
       {/* Top Ambient Edge Glow Line on scroll */}
-      {scrolled && (
+      {(scrolled || pathname !== "/") && (
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-sky-400/50 to-transparent pointer-events-none" />
       )}
 
@@ -84,12 +164,11 @@ export default function Navbar() {
         <nav className="hidden lg:flex items-center gap-1.5">
           <Link
             href="/"
+            onClick={(e) => handleNavClick("home", "/", e)}
             className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
-              pathname === "/"
-                ? scrolled
-                  ? "bg-sky-500/20 text-sky-400 border border-sky-500/30 shadow-[0_0_15px_rgba(14,165,233,0.3)]"
-                  : "bg-white/15 text-white backdrop-blur-md border border-white/25 shadow-sm"
-                : "text-white/80 hover:text-white hover:bg-white/10"
+              activeNav === "home"
+                ? "bg-sky-500/20 text-sky-400 border border-sky-500/40 shadow-[0_0_15px_rgba(14,165,233,0.3)]"
+                : "text-white/80 hover:text-white hover:bg-white/10 border border-transparent"
             }`}
           >
             Home
@@ -97,19 +176,23 @@ export default function Navbar() {
 
           <Link
             href="/#packages"
-            className="px-4 py-2 rounded-xl text-sm font-bold text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200"
+            onClick={(e) => handleNavClick("packages", "/#packages", e)}
+            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
+              activeNav === "packages"
+                ? "bg-sky-500/20 text-sky-400 border border-sky-500/40 shadow-[0_0_15px_rgba(14,165,233,0.3)]"
+                : "text-white/80 hover:text-white hover:bg-white/10 border border-transparent"
+            }`}
           >
             🌴 Destinations
           </Link>
 
           <Link
             href="/gallery"
+            onClick={(e) => handleNavClick("gallery", "/gallery", e)}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
-              pathname === "/gallery"
-                ? scrolled
-                  ? "bg-sky-500/20 text-sky-400 border border-sky-500/30 shadow-[0_0_15px_rgba(14,165,233,0.3)]"
-                  : "bg-white/15 text-white backdrop-blur-md border border-white/25 shadow-sm"
-                : "text-white/80 hover:text-white hover:bg-white/10"
+              activeNav === "gallery"
+                ? "bg-sky-500/20 text-sky-400 border border-sky-500/40 shadow-[0_0_15px_rgba(14,165,233,0.3)]"
+                : "text-white/80 hover:text-white hover:bg-white/10 border border-transparent"
             }`}
           >
             <Camera className="w-4 h-4 text-sky-400" />
@@ -118,14 +201,24 @@ export default function Navbar() {
 
           <Link
             href="/#about"
-            className="px-4 py-2 rounded-xl text-sm font-bold text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200"
+            onClick={(e) => handleNavClick("about", "/#about", e)}
+            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
+              activeNav === "about"
+                ? "bg-sky-500/20 text-sky-400 border border-sky-500/40 shadow-[0_0_15px_rgba(14,165,233,0.3)]"
+                : "text-white/80 hover:text-white hover:bg-white/10 border border-transparent"
+            }`}
           >
             About
           </Link>
 
           <Link
             href="/#contact"
-            className="px-4 py-2 rounded-xl text-sm font-bold text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200"
+            onClick={(e) => handleNavClick("contact", "/#contact", e)}
+            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
+              activeNav === "contact"
+                ? "bg-sky-500/20 text-sky-400 border border-sky-500/40 shadow-[0_0_15px_rgba(14,165,233,0.3)]"
+                : "text-white/80 hover:text-white hover:bg-white/10 border border-transparent"
+            }`}
           >
             Contact
           </Link>
@@ -186,8 +279,12 @@ export default function Navbar() {
         <div className="lg:hidden border-t border-slate-800/90 bg-slate-950/98 backdrop-blur-2xl px-4 pt-3 pb-5 space-y-2 mt-3 animate-fade-in shadow-2xl">
           <Link
             href="/"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold text-white bg-slate-900/90 border border-slate-800/80"
+            onClick={(e) => handleNavClick("home", "/", e)}
+            className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+              activeNav === "home"
+                ? "text-sky-400 bg-sky-500/15 border border-sky-500/30"
+                : "text-slate-300 hover:text-white hover:bg-slate-900 border border-transparent"
+            }`}
           >
             <span>🏠 Home</span>
             <span className="text-xs text-sky-400">Main</span>
@@ -195,8 +292,12 @@ export default function Navbar() {
 
           <Link
             href="/#packages"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-900"
+            onClick={(e) => handleNavClick("packages", "/#packages", e)}
+            className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+              activeNav === "packages"
+                ? "text-sky-400 bg-sky-500/15 border border-sky-500/30"
+                : "text-slate-300 hover:text-white hover:bg-slate-900 border border-transparent"
+            }`}
           >
             <span>🌴 Tour Destinations</span>
             <span className="text-xs text-slate-500">Explore</span>
@@ -204,8 +305,12 @@ export default function Navbar() {
 
           <Link
             href="/gallery"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-900"
+            onClick={(e) => handleNavClick("gallery", "/gallery", e)}
+            className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+              activeNav === "gallery"
+                ? "text-sky-400 bg-sky-500/15 border border-sky-500/30"
+                : "text-slate-300 hover:text-white hover:bg-slate-900 border border-transparent"
+            }`}
           >
             <span>📸 Photo Gallery</span>
             <span className="text-xs text-slate-500">Moments</span>
@@ -213,8 +318,12 @@ export default function Navbar() {
 
           <Link
             href="/#about"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-900"
+            onClick={(e) => handleNavClick("about", "/#about", e)}
+            className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+              activeNav === "about"
+                ? "text-sky-400 bg-sky-500/15 border border-sky-500/30"
+                : "text-slate-300 hover:text-white hover:bg-slate-900 border border-transparent"
+            }`}
           >
             <span>ℹ️ About Sky Quest</span>
             <span className="text-xs text-slate-500">Why Us</span>
@@ -222,8 +331,12 @@ export default function Navbar() {
 
           <Link
             href="/#contact"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-900"
+            onClick={(e) => handleNavClick("contact", "/#contact", e)}
+            className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+              activeNav === "contact"
+                ? "text-sky-400 bg-sky-500/15 border border-sky-500/30"
+                : "text-slate-300 hover:text-white hover:bg-slate-900 border border-transparent"
+            }`}
           >
             <span>📩 Contact Us</span>
             <span className="text-xs text-slate-500">Reach Out</span>

@@ -45,7 +45,7 @@ export default function AboutSection() {
             <div className="relative h-[440px] w-full rounded-3xl overflow-hidden shadow-xl border border-slate-200">
               <img
                 src={aboutImage || DEFAULT_ABOUT_IMG}
-                alt="Sky Quest Holidays Destination"
+                alt="SKY QUEST HOLIDAYS - Tour Operator in Namakkal, Tamil Nadu"
                 className="w-full h-full object-cover transition-all duration-500 hover:scale-102"
               />
             </div>
@@ -58,7 +58,7 @@ export default function AboutSection() {
                 </div>
                 <div>
                   <h4 className="text-sm font-black text-white">8+ Years Experience</h4>
-                  <p className="text-[11px] text-sky-400 font-semibold">Government Certified Agency</p>
+                  <p className="text-[11px] text-sky-400 font-semibold">Govt Regd: TN/NKL/TOUR/2020/4891</p>
                 </div>
               </div>
             </div>
@@ -67,16 +67,16 @@ export default function AboutSection() {
           {/* Right Content */}
           <div>
             <div className="inline-block px-4 py-1 rounded-full bg-sky-100 text-sky-800 text-xs font-bold uppercase tracking-wider mb-4">
-              About Sky Quest Holidays
+              About Sky Quest Holidays Namakkal
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-6">
-              Passionate Travel Experts Based in Tamil Nadu
+              Premier Tour Operator Based in Namakkal, Tamil Nadu
             </h2>
             <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6">
-              Founded with the vision to make holidays smooth, exciting, and accessible to everyone, <strong className="text-slate-900">Sky Quest Holidays</strong> has grown into one of South India&apos;s most dependable tour operators.
+              Founded with the vision to make travel seamless, trustworthy, and unforgettable, <strong className="text-slate-900">SKY QUEST HOLIDAYS</strong> is headquartered in Namakkal, Tamil Nadu, and has grown into one of South India&apos;s most dependable tour operators.
             </p>
             <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-8">
-              Whether you are looking for a romantic honeymoon escape in misty Munnar, an adventurous college industrial visit in Goa, a devotional pilgrimage to Rameshwaram, or group tours across Kerala & Karnataka, our dedicated team handles transport, deluxe accommodations, and on-ground logistics with utmost care.
+              Whether you are planning a family holiday in misty Munnar, an educational college industrial visit (IV) in Goa or Kerala, a serene pilgrimage to Rameshwaram, or group tours across Karnataka & Tamil Nadu, our Namakkal travel team coordinates doorstep cab pickups, verified hotel accommodations, and 24/7 on-ground assistance with utmost care.
             </p>
 
             <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-100">

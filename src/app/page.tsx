@@ -1,5 +1,4 @@
 import Hero from "@/components/Hero";
-import TrustBadges from "@/components/TrustBadges";
 import PackagesSection from "@/components/PackagesSection";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import GallerySection from "@/components/GallerySection";
@@ -12,7 +11,6 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <TrustBadges />
       <PackagesSection />
       <WhyChooseUs />
       <GallerySection />

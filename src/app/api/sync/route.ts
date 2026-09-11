@@ -10,6 +10,7 @@ const PACKAGES_FILE = path.join(DATA_DIR, "packages.json");
 const GALLERY_FILE = path.join(DATA_DIR, "gallery.json");
 const MEDIA_FILE = path.join(DATA_DIR, "media.json");
 const CLOUDINARY_FILE = path.join(DATA_DIR, "cloudinary.json");
+const QUOTATIONS_FILE = path.join(DATA_DIR, "quotations.json");
 
 function ensureDirs() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -75,12 +76,22 @@ export async function GET() {
       } catch (e) {}
     }
 
+    let quotations: any[] = [];
+    if (fs.existsSync(QUOTATIONS_FILE)) {
+      try {
+        const raw = fs.readFileSync(QUOTATIONS_FILE, "utf-8");
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) quotations = parsed;
+      } catch (e) {}
+    }
+
     return NextResponse.json({
       success: true,
       packages,
       gallery,
       media,
       cloudinary,
+      quotations,
       syncedAt: new Date().toISOString()
     });
   } catch (err: any) {
@@ -146,12 +157,20 @@ export async function POST(req: NextRequest) {
       updatedCloudinary = body.cloudinary;
     }
 
+    // 5. Process Quotations
+    let updatedQuotations = null;
+    if (Array.isArray(body.quotations)) {
+      fs.writeFileSync(QUOTATIONS_FILE, JSON.stringify(body.quotations, null, 2), "utf-8");
+      updatedQuotations = body.quotations;
+    }
+
     return NextResponse.json({
       success: true,
       packages: updatedPackages,
       gallery: updatedGallery,
       media: updatedMedia,
       cloudinary: updatedCloudinary,
+      quotations: updatedQuotations,
       syncedAt: new Date().toISOString()
     });
   } catch (err: any) {

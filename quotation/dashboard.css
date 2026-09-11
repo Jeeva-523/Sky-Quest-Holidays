@@ -531,3 +531,33 @@ label {
   font-size: 11px;
   color: #64748b;
 }
+
+.rate-quick-btns {
+  margin-top: 6px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-chip {
+  font-size: 11px;
+  padding: 3px 8px;
+  background: #334155;
+  color: #f8fafc;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-chip:hover {
+  background: #475569;
+}
+
+.btn-indigo {
+  background: #4f46e5;
+  color: #ffffff;
+}
+
+.btn-indigo:hover {
+  background: #4338ca;
+}

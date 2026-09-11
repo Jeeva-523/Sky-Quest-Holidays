@@ -155,7 +155,11 @@
           <div class="form-row-2">
             <div class="form-group">
               <label for="inp-rate">💰 Package Investment Rate (₹)</label>
-              <input type="text" id="inp-rate" class="form-input" value="₹6,000 /-" oninput="updatePreview()">
+              <input type="text" id="inp-rate" class="form-input" value="₹6,000 /-" oninput="updatePreview()" placeholder="e.g. ₹6,000 /- (Leave empty for manual dashes)">
+              <div class="rate-quick-btns">
+                <button type="button" class="btn btn-sm btn-chip" onclick="document.getElementById('inp-rate').value=''; updatePreview();">✍️ Manual Fill (Dashes)</button>
+                <button type="button" class="btn btn-sm btn-chip" onclick="document.getElementById('inp-rate').value='₹6,000 /-'; updatePreview();">₹6,000 /-</button>
+              </div>
             </div>
             <div class="form-group">
               <label for="inp-rate-cond">📋 Based On Pax Subtext</label>
@@ -369,13 +373,16 @@
                 <span class="history-badge-tag">🔖 ${escapeHtml(item.refNo || 'REF: N/A')}</span>
                 <span>📍 ${escapeHtml(item.destination || 'N/A')}</span>
                 <span>👥 ${escapeHtml(item.paxText || 'N/A')}</span>
-                <span>💰 ${escapeHtml(item.rate || 'N/A')}</span>
+                <span>💰 ${escapeHtml((item.rate && item.rate.trim()) ? item.rate : '₹ ________ /- (Manual Fill)')}</span>
                 <span class="history-date-stamp">🕒 ${dateStr}</span>
               </div>
             </div>
             <div class="history-actions-row">
               <button class="btn btn-sky btn-sm-pad" onclick="loadQuotationFromHistoryById('${itemId}')">
                 ✏️ Edit
+              </button>
+              <button class="btn btn-sm-pad btn-indigo" onclick="duplicateQuotationFromHistoryById('${itemId}')">
+                📋 Duplicate
               </button>
               <button class="btn btn-green btn-sm-pad" onclick="previewQuotationFromHistoryById('${itemId}')">
                 👁️ Preview
@@ -404,7 +411,7 @@
         validity: document.getElementById('inp-validity')?.value || '15 Days from issuance',
         preparedBy: document.getElementById('inp-prepared-by')?.value || 'SkyQuest Tour Operations Wing',
         foodOption: document.getElementById('inp-food-option')?.value || 'ALL TIME FOOD INCLUDED',
-        rate: document.getElementById('inp-rate')?.value || '₹6,000 /-',
+        rate: document.getElementById('inp-rate') ? document.getElementById('inp-rate').value : '',
         ratePaxBasis: document.getElementById('inp-rate-cond')?.value || 'Based on 16 Pax',
         phone: document.getElementById('inp-phone')?.value || '7338710611 / 6381825934',
         email: document.getElementById('inp-email')?.value || 'skyquestholidays@gmail.com',
@@ -521,6 +528,67 @@
       updatePreview();
     }
 
+    function duplicateQuotationFromHistoryById(id) {
+      const list = getHistoryList();
+      const item = list.find(it => it.id === id || (it.refNo && it.refNo.trim() === id.trim()));
+      if (!item || !item.fullData) return;
+
+      const d = item.fullData;
+      let nextNum = 750;
+      list.forEach(it => {
+        if (it.refNo) {
+          const m = it.refNo.match(/SKY-(\d+)/i);
+          if (m && m[1]) {
+            const num = parseInt(m[1], 10);
+            if (!isNaN(num) && num >= nextNum) nextNum = num + 1;
+          }
+        }
+      });
+
+      const year = new Date().getFullYear();
+      const newRefNo = `SQH/QT/${year}/SKY-${nextNum}`;
+      const baseTitle = d.locationText || item.clientName || 'Quotation';
+      const copyTitle = baseTitle.endsWith('(Copy)') ? baseTitle : `${baseTitle} (Copy)`;
+
+      const cloned = {
+        ...d,
+        refNo: newRefNo,
+        locationText: copyTitle,
+        quoteDate: new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' })
+      };
+
+      const newItem = {
+        id: newRefNo,
+        clientName: copyTitle,
+        locationText: copyTitle,
+        refNo: newRefNo,
+        destination: cloned.destination || '',
+        paxText: cloned.paxText || '',
+        rate: cloned.rate || '',
+        savedAt: new Date().toISOString(),
+        fullData: cloned
+      };
+
+      list.unshift(newItem);
+      try {
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(list));
+      } catch (e) {}
+
+      try {
+        fetch('/api/quotations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ quotation: newItem, nextSeq: nextNum + 1 })
+        });
+      } catch (e) {}
+
+      renderHistoryCards();
+      populateDashboardForm(cloned);
+      switchTab('tab-client', document.querySelector('.tab-btn'));
+      updatePreview();
+      alert(`📋 Quotation Duplicated as ${newRefNo}!\nLoaded into editor.`);
+    }
+
     function previewQuotationFromHistoryById(id) {
       const list = getHistoryList();
       const item = list.find(it => it.id === id || (it.refNo && it.refNo.trim() === id.trim()));
@@ -538,6 +606,9 @@
         try {
           localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(list));
         } catch (e) {}
+        try {
+          fetch('/api/quotations?id=' + encodeURIComponent(id), { method: 'DELETE' });
+        } catch (e) {}
         renderHistoryCards();
       }
     }
@@ -545,6 +616,9 @@
     function clearAllHistory() {
       if (confirm('Clear all saved quotations history?')) {
         localStorage.removeItem(HISTORY_STORAGE_KEY);
+        try {
+          fetch('/api/quotations?clearAll=true', { method: 'DELETE' });
+        } catch (e) {}
         renderHistoryCards();
       }
     }

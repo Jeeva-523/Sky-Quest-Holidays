@@ -31,6 +31,23 @@
     font-style: italic !important;
     font-weight: 800 !important;
   }
+
+  .header-scrolled {
+    background-color: rgba(2, 6, 23, 0.96) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(14, 165, 233, 0.25) !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.85) !important;
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  .header-top {
+    background-color: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding-top: 1.25rem !important;
+    padding-bottom: 1.25rem !important;
+  }
 }
 
 @layer base {

@@ -902,42 +902,174 @@ export const saveHeroSettings = saveSiteMediaSettings;
    6. SHARED QUOTATIONS - MULTI-ADMIN CLOUD & SERVER SYNC
    ========================================================================= */
 
+const LOCAL_STORAGE_QUOTATIONS_KEY = "skyquest_quotations_history_list_v1";
+const LOCAL_STORAGE_QUOTATIONS_SEQ_KEY = "skyquest_quotation_seq_no";
+
+export function toSafeQuotationDocId(rawIdOrRef?: string): string {
+  if (!rawIdOrRef || typeof rawIdOrRef !== "string") {
+    return `qt_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+  }
+  // Firestore document paths cannot contain slashes '/' because they treat them as subcollections!
+  return rawIdOrRef.trim().replace(/[\/\s\\#?%*:.]/g, "_");
+}
+
+export function computeNextQuotationSeq(list: any[] = []): number {
+  let highest = 750;
+  if (!Array.isArray(list)) return highest;
+  list.forEach((item) => {
+    const ref = item.refNo || item.id || "";
+    const match = String(ref).match(/SKY-(\d+)/i);
+    if (match && match[1]) {
+      const num = parseInt(match[1], 10);
+      if (!isNaN(num) && num >= highest) {
+        highest = num + 1;
+      }
+    }
+  });
+  return highest;
+}
+
 export async function fetchSharedQuotations(): Promise<{ quotations: any[]; nextSeq: number }> {
-  // 1. Try Firebase Firestore
-  if (isFirebaseConfigured() && db) {
+  let quotations: any[] = [];
+  let nextSeq = 750;
+
+  // 1. Try Next.js Server API (/api/quotations)
+  if (typeof window !== "undefined") {
     try {
-      const q = query(collection(db, "quotations"), orderBy("savedAt", "desc"));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        return { quotations: list, nextSeq: 750 };
+      const res = await fetch("/api/quotations", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && Array.isArray(data.quotations) && data.quotations.length > 0) {
+          quotations = data.quotations;
+          if (typeof data.nextSeq === "number" && data.nextSeq >= 750) {
+            nextSeq = data.nextSeq;
+          }
+        }
       }
     } catch (e) {
-      console.warn("[Firestore] fetchSharedQuotations fallback to API:", e);
+      // Fall through to Firestore
     }
   }
 
-  // 2. Fallback to localStorage
-  if (typeof window !== "undefined") {
+  // 2. Try Firebase Firestore (Cloud persistence across all admin logins & devices)
+  if (isFirebaseConfigured() && db) {
     try {
-      const local = localStorage.getItem("skyquest_quotations_history_list_v1");
+      const snap = await getDocs(collection(db, "quotations"));
+      if (!snap.empty) {
+        const firestoreList: Array<{ id: string; refNo?: string; savedAt?: string; createdAt?: string; [key: string]: any }> =
+          snap.docs.map((d) => ({
+            ...(d.data() as Record<string, any>),
+            id: d.id
+          }));
+
+        if (firestoreList.length > 0) {
+          // Merge Firestore items with API items by refNo / id
+          const map = new Map<string, any>();
+          quotations.forEach((q: any) => {
+            const key = String(q.refNo || q.id || "").trim().toLowerCase();
+            if (key) map.set(key, q);
+          });
+          firestoreList.forEach((q) => {
+            const key = String(q.refNo || q.id || "").trim().toLowerCase();
+            if (key) map.set(key, q);
+          });
+          quotations = Array.from(map.values());
+        }
+      }
+    } catch (e) {
+      console.warn("[Firestore] fetchSharedQuotations error:", e);
+    }
+  }
+
+  // 3. Fallback to localStorage
+  if (quotations.length === 0 && typeof window !== "undefined") {
+    try {
+      const local = localStorage.getItem(LOCAL_STORAGE_QUOTATIONS_KEY);
       if (local) {
         const parsed = JSON.parse(local);
-        if (Array.isArray(parsed)) return { quotations: parsed, nextSeq: 750 };
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          quotations = parsed;
+        }
       }
     } catch (e) {}
   }
 
-  return { quotations: [], nextSeq: 750 };
+  // Sort descending by savedAt date
+  quotations.sort((a, b) => {
+    const timeA = new Date(a.savedAt || a.createdAt || 0).getTime();
+    const timeB = new Date(b.savedAt || b.createdAt || 0).getTime();
+    return timeB - timeA;
+  });
+
+  // Dynamically calculate latest next sequence number
+  const computedSeq = computeNextQuotationSeq(quotations);
+  if (computedSeq > nextSeq) nextSeq = computedSeq;
+
+  // Sync to localStorage
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_QUOTATIONS_KEY, JSON.stringify(quotations));
+      localStorage.setItem(LOCAL_STORAGE_QUOTATIONS_SEQ_KEY, String(nextSeq));
+    } catch (e) {}
+  }
+
+  return { quotations, nextSeq };
+}
+
+export function subscribeToSharedQuotations(
+  callback: (quotations: any[], nextSeq: number) => void
+): () => void {
+  if (isFirebaseConfigured() && db) {
+    try {
+      const unsub = onSnapshot(
+        collection(db, "quotations"),
+        (snap) => {
+          const list: Array<{ id: string; refNo?: string; savedAt?: string; createdAt?: string; [key: string]: any }> =
+            snap.docs.map((d) => ({
+              ...(d.data() as Record<string, any>),
+              id: d.id
+            }));
+          list.sort((a: any, b: any) => {
+            const timeA = new Date(a.savedAt || a.createdAt || 0).getTime();
+            const timeB = new Date(b.savedAt || b.createdAt || 0).getTime();
+            return timeB - timeA;
+          });
+          const nextSeq = computeNextQuotationSeq(list);
+
+          if (typeof window !== "undefined" && list.length > 0) {
+            try {
+              localStorage.setItem(LOCAL_STORAGE_QUOTATIONS_KEY, JSON.stringify(list));
+              localStorage.setItem(LOCAL_STORAGE_QUOTATIONS_SEQ_KEY, String(nextSeq));
+            } catch (e) {}
+          }
+          callback(list, nextSeq);
+        },
+        (err) => {
+          console.warn("[Firestore] subscribeToSharedQuotations error:", err);
+        }
+      );
+      return unsub;
+    } catch (e) {
+      console.warn("[Firestore] subscribeToSharedQuotations init error:", e);
+    }
+  }
+  return () => {};
 }
 
 export async function saveSharedQuotation(item: any, nextSeq?: number): Promise<boolean> {
-  // 1. Save to Firebase Firestore
+  const safeDocId = toSafeQuotationDocId(item.refNo || item.id);
+  const normalizedItem = {
+    ...item,
+    id: safeDocId,
+    refNo: item.refNo || item.id,
+    savedAt: item.savedAt || new Date().toISOString()
+  };
+
+  // 1. Save to Firebase Firestore (Global Cloud Truth for all admins on any device)
   if (isFirebaseConfigured() && db) {
     try {
-      const docId = item.id || (item.refNo ? item.refNo.replace(/[\/\s]/g, "_") : `qt_${Date.now()}`);
-      await setDoc(doc(db, "quotations", docId), {
-        ...item,
+      await setDoc(doc(db, "quotations", safeDocId), {
+        ...normalizedItem,
         updatedAt: serverTimestamp()
       }, { merge: true });
     } catch (e) {
@@ -945,15 +1077,32 @@ export async function saveSharedQuotation(item: any, nextSeq?: number): Promise<
     }
   }
 
-  // 2. Save to localStorage
+  // 2. Save to Next.js API /api/quotations
   if (typeof window !== "undefined") {
     try {
-      const raw = localStorage.getItem("skyquest_quotations_history_list_v1");
+      await fetch("/api/quotations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ quotation: normalizedItem, nextSeq })
+      });
+    } catch (e) {}
+  }
+
+  // 3. Save to localStorage
+  if (typeof window !== "undefined") {
+    try {
+      const raw = localStorage.getItem(LOCAL_STORAGE_QUOTATIONS_KEY);
       const list = raw ? JSON.parse(raw) : [];
-      const updated = [item, ...list.filter((q: any) => q.id !== item.id)];
-      localStorage.setItem("skyquest_quotations_history_list_v1", JSON.stringify(updated));
+      const updated = [
+        normalizedItem,
+        ...list.filter((q: any) => {
+          const qSafe = toSafeQuotationDocId(q.refNo || q.id);
+          return qSafe !== safeDocId && q.refNo !== normalizedItem.refNo;
+        })
+      ];
+      localStorage.setItem(LOCAL_STORAGE_QUOTATIONS_KEY, JSON.stringify(updated));
       if (nextSeq) {
-        localStorage.setItem("skyquest_quotations_sequence_v1", String(nextSeq));
+        localStorage.setItem(LOCAL_STORAGE_QUOTATIONS_SEQ_KEY, String(nextSeq));
       }
     } catch (e) {}
   }
@@ -961,23 +1110,66 @@ export async function saveSharedQuotation(item: any, nextSeq?: number): Promise<
 }
 
 export async function deleteSharedQuotation(id: string): Promise<boolean> {
+  const safeDocId = toSafeQuotationDocId(id);
+
   // 1. Delete from Firestore
   if (isFirebaseConfigured() && db) {
     try {
-      const docId = id.replace(/[\/\s]/g, "_");
-      await deleteDoc(doc(db, "quotations", docId));
+      await deleteDoc(doc(db, "quotations", safeDocId));
+    } catch (e) {
+      console.warn("[Firestore] deleteSharedQuotation error:", e);
+    }
+  }
+
+  // 2. Delete from Next.js Server API
+  if (typeof window !== "undefined") {
+    try {
+      await fetch(`/api/quotations?id=${encodeURIComponent(safeDocId)}`, {
+        method: "DELETE"
+      });
     } catch (e) {}
   }
 
-  // 2. Delete from localStorage
+  // 3. Delete from localStorage
   if (typeof window !== "undefined") {
     try {
-      const raw = localStorage.getItem("skyquest_quotations_history_list_v1");
+      const raw = localStorage.getItem(LOCAL_STORAGE_QUOTATIONS_KEY);
       if (raw) {
         const list = JSON.parse(raw);
-        const filtered = list.filter((q: any) => q.id !== id);
-        localStorage.setItem("skyquest_quotations_history_list_v1", JSON.stringify(filtered));
+        const filtered = list.filter((q: any) => {
+          const qSafe = toSafeQuotationDocId(q.refNo || q.id);
+          return qSafe !== safeDocId && q.refNo !== id && q.id !== id;
+        });
+        localStorage.setItem(LOCAL_STORAGE_QUOTATIONS_KEY, JSON.stringify(filtered));
       }
+    } catch (e) {}
+  }
+  return true;
+}
+
+export async function clearAllSharedQuotations(): Promise<boolean> {
+  // 1. Clear Firestore
+  if (isFirebaseConfigured() && db) {
+    try {
+      const snap = await getDocs(collection(db, "quotations"));
+      const promises = snap.docs.map((d) => deleteDoc(d.ref));
+      await Promise.all(promises);
+    } catch (e) {
+      console.warn("[Firestore] clearAllSharedQuotations error:", e);
+    }
+  }
+
+  // 2. Clear Server API
+  if (typeof window !== "undefined") {
+    try {
+      await fetch("/api/quotations?clearAll=true", { method: "DELETE" });
+    } catch (e) {}
+  }
+
+  // 3. Clear localStorage
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_QUOTATIONS_KEY);
     } catch (e) {}
   }
   return true;
@@ -1137,6 +1329,7 @@ export async function syncAllLocalDataToServer(): Promise<{ success: boolean; me
     const localPackages = localStorage.getItem(LOCAL_STORAGE_PACKAGES_KEY);
     const localGallery = localStorage.getItem(LOCAL_STORAGE_GALLERY_KEY);
     const localMedia = localStorage.getItem(LOCAL_STORAGE_SITE_MEDIA_KEY);
+    const localQuotations = localStorage.getItem(LOCAL_STORAGE_QUOTATIONS_KEY);
 
     const payload: any = {};
     if (localPackages) {
@@ -1147,6 +1340,9 @@ export async function syncAllLocalDataToServer(): Promise<{ success: boolean; me
     }
     if (localMedia) {
       try { payload.media = JSON.parse(localMedia); } catch (e) {}
+    }
+    if (localQuotations) {
+      try { payload.quotations = JSON.parse(localQuotations); } catch (e) {}
     }
 
     const res = await fetch("/api/sync", {
@@ -1160,6 +1356,7 @@ export async function syncAllLocalDataToServer(): Promise<{ success: boolean; me
       if (data.packages) localStorage.setItem(LOCAL_STORAGE_PACKAGES_KEY, JSON.stringify(data.packages));
       if (data.gallery) localStorage.setItem(LOCAL_STORAGE_GALLERY_KEY, JSON.stringify(data.gallery));
       if (data.media) localStorage.setItem(LOCAL_STORAGE_SITE_MEDIA_KEY, JSON.stringify(data.media));
+      if (data.quotations) localStorage.setItem(LOCAL_STORAGE_QUOTATIONS_KEY, JSON.stringify(data.quotations));
       return { success: true, message: "All devices are in sync! (மொபைல் மற்றும் லேப்டாப் இரண்டும் வெற்றிகரமாக இணைக்கப்பட்டது)" };
     }
     return { success: false, message: "Sync server returned error" };

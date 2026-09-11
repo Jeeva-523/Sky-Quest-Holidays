@@ -19,13 +19,17 @@ import {
   Clock,
   Calendar,
   MapPin,
-  Users
+  Users,
+  Copy,
+  Download
 } from "lucide-react";
 
 import {
   fetchSharedQuotations,
   saveSharedQuotation,
-  deleteSharedQuotation
+  deleteSharedQuotation,
+  subscribeToSharedQuotations,
+  clearAllSharedQuotations
 } from "@/lib/firebaseServices";
 
 export interface DayItinerary {
@@ -156,12 +160,22 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
     loadSavedData();
     loadHistory();
 
-    // Multi-admin cross-device sync: poll every 10 seconds
+    // Real-time Firestore sync listener across all admins & devices
+    const unsub = subscribeToSharedQuotations((quotations, nextSeq) => {
+      if (Array.isArray(quotations)) {
+        setHistoryList(quotations);
+      }
+    });
+
+    // Multi-admin cross-device sync: poll every 10 seconds as backup
     const interval = setInterval(() => {
       loadHistory();
     }, 10000);
 
-    return () => clearInterval(interval);
+    return () => {
+      unsub();
+      clearInterval(interval);
+    };
   }, []);
 
   const loadSavedData = () => {
@@ -347,7 +361,7 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
     if (d.validity) setValidity(d.validity);
     if (d.preparedBy) setPreparedBy(d.preparedBy);
     if (d.foodOption) setFoodOption(d.foodOption);
-    if (d.rate) setRate(d.rate);
+    if (d.rate !== undefined) setRate(d.rate);
     if (d.ratePaxBasis) setRatePaxBasis(d.ratePaxBasis);
     if (d.phone) setPhone(d.phone);
     if (d.email) setEmail(d.email);
@@ -357,6 +371,75 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
       setDaysData(d.daysData);
     }
     setActiveTab("client");
+  };
+
+  const handleDuplicateQuotation = async (item: QuotationHistoryItem) => {
+    if (!item.fullData) return;
+    const d = item.fullData;
+
+    // Calculate next sequence number for the duplicate
+    const nextNum = getNextQuotationSeq(historyList);
+    const newRefNo = formatRefNo(nextNum);
+
+    const baseTitle = d.locationText || item.clientName || "Quotation";
+    const duplicateTitle = baseTitle.endsWith("(Copy)") ? baseTitle : `${baseTitle} (Copy)`;
+
+    const duplicatedData = {
+      ...d,
+      refNo: newRefNo,
+      locationText: duplicateTitle,
+      quoteDate: new Date().toLocaleString("en-US", { month: "long", year: "numeric" }),
+    };
+
+    const newHistoryItem: QuotationHistoryItem = {
+      id: newRefNo,
+      clientName: duplicateTitle,
+      locationText: duplicateTitle,
+      refNo: newRefNo,
+      destination: duplicatedData.destination || item.destination || "",
+      paxText: duplicatedData.paxText || item.paxText || "",
+      rate: duplicatedData.rate !== undefined ? duplicatedData.rate : (item.rate || ""),
+      savedAt: new Date().toISOString(),
+      fullData: duplicatedData
+    };
+
+    const updatedList = [newHistoryItem, ...historyList];
+    setHistoryList(updatedList);
+
+    try {
+      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updatedList));
+      localStorage.setItem(SAVED_DATA_KEY, JSON.stringify(duplicatedData));
+      localStorage.setItem(SEQ_STORAGE_KEY, String(nextNum + 1));
+    } catch (e) { }
+
+    // Multi-admin cloud sync
+    await saveSharedQuotation(newHistoryItem, nextNum + 1);
+
+    // Populate editor form with duplicated data
+    setLocationText(duplicateTitle);
+    setRefNo(newRefNo);
+    if (duplicatedData.destination) setDestination(duplicatedData.destination);
+    if (duplicatedData.durationText) setDurationText(duplicatedData.durationText);
+    if (duplicatedData.paxText) setPaxText(duplicatedData.paxText);
+    if (duplicatedData.datesText) setDatesText(duplicatedData.datesText);
+    if (duplicatedData.tourType) setTourType(duplicatedData.tourType);
+    setQuoteDate(duplicatedData.quoteDate);
+    if (duplicatedData.validity) setValidity(duplicatedData.validity);
+    if (duplicatedData.preparedBy) setPreparedBy(duplicatedData.preparedBy);
+    if (duplicatedData.foodOption) setFoodOption(duplicatedData.foodOption);
+    setRate(duplicatedData.rate !== undefined ? duplicatedData.rate : "");
+    if (duplicatedData.ratePaxBasis) setRatePaxBasis(duplicatedData.ratePaxBasis);
+    if (duplicatedData.phone) setPhone(duplicatedData.phone);
+    if (duplicatedData.email) setEmail(duplicatedData.email);
+    if (duplicatedData.web) setWeb(duplicatedData.web);
+    if (duplicatedData.insta) setInsta(duplicatedData.insta);
+    if (duplicatedData.daysData && Array.isArray(duplicatedData.daysData)) {
+      setDaysData(duplicatedData.daysData);
+    }
+
+    setActiveTab("client");
+    setSaveSuccessMsg(`📋 Duplicated ${item.refNo} as ${newRefNo}! Loaded into editor.`);
+    setTimeout(() => setSaveSuccessMsg(""), 5000);
   };
 
   const handleDeleteHistory = async (id: string) => {
@@ -376,11 +459,7 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
       try {
         localStorage.removeItem(HISTORY_STORAGE_KEY);
       } catch (e) { }
-      try {
-        for (const item of historyList) {
-          await deleteSharedQuotation(item.id);
-        }
-      } catch (e) { }
+      await clearAllSharedQuotations();
     }
   };
 
@@ -452,6 +531,14 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
     window.open("/quotation-print/index.html?print=true", "_blank");
   };
 
+  const handleDownloadPdf = () => {
+    const currentData = getCurrentFormData();
+    try {
+      localStorage.setItem(SAVED_DATA_KEY, JSON.stringify(currentData));
+    } catch (e) { }
+    window.open("/quotation-print/index.html?download=true", "_blank");
+  };
+
   const SPOTS_PER_PAGE = 15;
   const renderedDayPagesCount = daysData.reduce((acc, day) => {
     const spots = day.spotsText.split("\n").filter((l) => l.trim().length > 0);
@@ -520,6 +607,15 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
             <Eye className="w-4 h-4 text-sky-100" />
             <span>Preview PDF</span>
             <ExternalLink className="w-3.5 h-3.5 text-sky-200" />
+          </button>
+
+          <button
+            onClick={handleDownloadPdf}
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/40 transition-all flex items-center gap-2 active:scale-95 cursor-pointer"
+            title="Download as PDF file"
+          >
+            <Download className="w-4 h-4 text-emerald-100" />
+            <span>Download PDF</span>
           </button>
 
           <button
@@ -870,16 +966,58 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
               <div>
-                <label className="block text-slate-300 font-bold uppercase mb-1.5">
-                  💰 Rate per Student / Pax
+                <label className="block text-slate-300 font-bold uppercase mb-1.5 flex items-center justify-between">
+                  <span>💰 Rate per Student / Pax</span>
+                  <span className={`text-[10px] font-bold ${!rate.trim() ? "text-amber-400" : "text-sky-400"}`}>
+                    {!rate.trim() ? "✍️ Manual Dash Mode" : "Fixed Rate"}
+                  </span>
                 </label>
                 <input
                   type="text"
                   value={rate}
                   onChange={(e) => setRate(e.target.value)}
-                  placeholder="e.g. ₹6,000 /-"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-bold text-sm focus:border-sky-500 focus:outline-none"
+                  placeholder="e.g. ₹6,000 /- (Leave empty for manual dashes)"
+                  className={`w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border text-white font-bold text-sm focus:outline-none transition-colors ${
+                    !rate.trim()
+                      ? "border-amber-500/70 focus:border-amber-400"
+                      : "border-slate-700 focus:border-sky-500"
+                  }`}
                 />
+
+                {/* Status indicator when empty */}
+                {!rate.trim() ? (
+                  <div className="mt-1.5 p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-medium flex items-center gap-1.5 animate-fade-in">
+                    <span>✍️</span>
+                    <span>Prints with manual fill dash: <strong className="font-mono text-amber-200">₹ ____________ /-</strong></span>
+                  </div>
+                ) : (
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    Tip: Clear this field to print manual fill dashes on the quotation.
+                  </p>
+                )}
+
+                {/* Quick 1-Click Suggestion Tags */}
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {[
+                    { label: "₹6,000 /-", val: "₹6,000 /-" },
+                    { label: "₹5,500 /-", val: "₹5,500 /-" },
+                    { label: "₹5,000 /-", val: "₹5,000 /-" },
+                    { label: "✍️ Leave Blank (Dash)", val: "" }
+                  ].map((btn) => (
+                    <button
+                      key={btn.label}
+                      type="button"
+                      onClick={() => setRate(btn.val)}
+                      className={`px-2.5 py-1 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer ${
+                        rate === btn.val
+                          ? "bg-amber-500 text-slate-950 shadow-sm"
+                          : "bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60"
+                      }`}
+                    >
+                      {btn.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div>
@@ -1026,14 +1164,28 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
                   className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs focus:outline-none focus:border-sky-500 font-medium"
                 />
               </div>
-              {historyList.length > 0 && (
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={handleClearAllHistory}
-                  className="px-3.5 py-2 rounded-xl bg-rose-950/60 text-rose-300 hover:bg-rose-900 text-xs font-semibold cursor-pointer border border-rose-800/40"
+                  type="button"
+                  onClick={async () => {
+                    await loadHistory();
+                    setSaveSuccessMsg("🔄 Shared Quotations synced from server & cloud!");
+                    setTimeout(() => setSaveSuccessMsg(""), 3500);
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-sky-950/70 text-sky-300 hover:bg-sky-900 text-xs font-semibold cursor-pointer border border-sky-800/40 flex items-center gap-1.5 transition-colors"
+                  title="Force re-sync quotation history from cloud & server"
                 >
-                  Clear All History
+                  <span>🔄 Sync / Refresh</span>
                 </button>
-              )}
+                {historyList.length > 0 && (
+                  <button
+                    onClick={handleClearAllHistory}
+                    className="px-3.5 py-2 rounded-xl bg-rose-950/60 text-rose-300 hover:bg-rose-900 text-xs font-semibold cursor-pointer border border-rose-800/40 transition-colors"
+                  >
+                    Clear All History
+                  </button>
+                )}
+              </div>
             </div>
 
             {historyList.length === 0 ? (
@@ -1063,7 +1215,9 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
                           </span>
                           <span>📍 {item.destination}</span>
                           <span>👥 {item.paxText}</span>
-                          <span className="text-amber-400 font-bold">💰 {item.rate}</span>
+                          <span className="text-amber-400 font-bold">
+                            💰 {item.rate && item.rate.trim() ? item.rate : "₹ ________ /- (Manual Fill)"}
+                          </span>
                         </div>
                       </div>
 
@@ -1071,8 +1225,17 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
                         <button
                           onClick={() => handleLoadFromHistory(item)}
                           className="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs transition-colors cursor-pointer"
+                          title="Load this quotation into editor"
                         >
                           Load Quote
+                        </button>
+                        <button
+                          onClick={() => handleDuplicateQuotation(item)}
+                          className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+                          title="Duplicate this quotation with a new Ref No"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Duplicate</span>
                         </button>
                         <button
                           onClick={() => handleDeleteHistory(item.id)}
@@ -1113,6 +1276,15 @@ export default function QuotationStudio({ embedded = false }: QuotationStudioPro
             <Eye className="w-4 h-4" />
             <span>Preview PDF</span>
             <ExternalLink className="w-3 h-3" />
+          </button>
+
+          <button
+            onClick={handleDownloadPdf}
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-xs shadow-md shadow-emerald-950/40 transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer"
+            title="Download as PDF file"
+          >
+            <Download className="w-4 h-4" />
+            <span>Download PDF</span>
           </button>
 
           <button
